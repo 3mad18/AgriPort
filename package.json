@@ -1,0 +1,31 @@
+{
+  "name": "agri-port",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "css": "node scripts/compile-css.js",
+    "predev": "node scripts/compile-css.js",
+    "prebuild": "node scripts/compile-css.js",
+    "dev": "next dev --webpack",
+    "dev:ops": "node scripts/compile-css.js && npm --prefix ops run dev",
+    "build": "next build --webpack",
+    "build:ops": "node scripts/compile-css.js && npm --prefix ops run build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
