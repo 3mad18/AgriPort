@@ -175,9 +175,22 @@ function ContactFormInner() {
                   <a
                     href={`tel:${(siteSettings.phone || "+20 100 720 2636").replace(/\s+/g, "")}`}
                     dir="ltr"
-                    className="font-bold text-slate-900 hover:text-emerald-600 transition-colors block text-start"
+                    className="font-bold text-slate-900 hover:text-emerald-600 transition-colors block text-start font-mono"
                   >
                     {siteSettings.phone || "+20 100 720 2636"}
+                  </a>
+                  <a
+                    href={`https://wa.me/${(siteSettings.phone || "201007202636").replace(/\D/g, "")}?text=${encodeURIComponent(
+                      dir === "rtl"
+                        ? "مرحباً، أود الاستفسار عن تفاصيل وأسعار تصدير الحاصلات الزراعية"
+                        : "Hello, I would like to inquire about export quotes and specifications"
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg transition-colors"
+                  >
+                    <span>💬</span>
+                    <span>{dir === "rtl" ? "محادثة واتساب فورية" : "Instant WhatsApp Chat"}</span>
                   </a>
                 </div>
               </div>

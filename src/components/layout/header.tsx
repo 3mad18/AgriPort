@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { FlagIcon } from "@/components/ui/flag-icon";
 import { useLanguage } from "@/context/language-context";
+import { useSiteSettings } from "@/lib/use-site-settings";
 import { SUPPORTED_LANGUAGES, type Language } from "@/lib/i18n";
 
 // Standalone Icons mimicking user snippet
@@ -46,6 +47,7 @@ const CloseIcon = () => (
 
 export function Header() {
   const { language, setLanguage, currentLangInfo, t, dir } = useLanguage();
+  const { settings: siteSettings } = useSiteSettings();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -100,13 +102,35 @@ export function Header() {
   };
 
   return (
-    <>
+    <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+      {/* 0. Top Export Announcement Banner */}
+      {siteSettings.showExportBanner && siteSettings.exportBannerText && (
+        <div className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white text-[11px] sm:text-xs py-2 px-4 font-bold shadow-xs">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+            <span className="truncate max-w-xl sm:max-w-3xl">
+              {siteSettings.exportBannerText}
+            </span>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-1 rounded-full bg-white/20 hover:bg-white/30 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-extrabold text-white transition-all shrink-0 ml-2"
+            >
+              <span>{language === "ar" ? "تصدير الآن" : "Export Now"}</span>
+              <span className={dir === "rtl" ? "rotate-180" : ""}>→</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* 1. Glassmorphic Navbar */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-lg border-b border-slate-200/60 shadow-xs ${
+        className={`transition-all duration-300 bg-white/85 backdrop-blur-lg border-b border-slate-200/60 shadow-xs ${
           isScrolled
-            ? "py-3 bg-white/90 shadow-sm"
-            : "py-4"
+            ? "py-2.5 bg-white/95 shadow-sm"
+            : "py-3.5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">
@@ -328,6 +352,6 @@ export function Header() {
           </div>
         </div>
       )}
-    </>
+    </header>
   );
 }

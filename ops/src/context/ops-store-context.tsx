@@ -64,7 +64,7 @@ type OpsStoreContextType = {
   markInquiryRead: (id: string) => void;
   markAllInquiriesRead: () => void;
   deleteInquiry: (id: string) => void;
-  updateSettings: (settings: Partial<SiteSettings>) => void;
+  updateSettings: (settings: Partial<SiteSettings>) => Promise<{ success: boolean; error?: string }>;
 };
 
 const DEFAULT_PRODUCTS: Product[] = [
@@ -465,7 +465,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       if (!supabaseUrl || !supabaseKey) return;
       try {
-        const res = await fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.main`, {
+        const res = await fetch(`${supabaseUrl}/rest/v1/site_settings?limit=1`, {
           headers: {
             apikey: supabaseKey,
             Authorization: `Bearer ${supabaseKey}`,
@@ -747,7 +747,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const updateSettings = useCallback(
-    async (partial: Partial<SiteSettings>) => {
+    async (partial: Partial<SiteSettings>): Promise<{ success: boolean; error?: string }> => {
       const current = getSettingsSnapshot();
       const updated = { ...current, ...partial };
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
@@ -761,15 +761,16 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
-          await fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.main`, {
-            method: "PATCH",
+          const res = await fetch(`${supabaseUrl}/rest/v1/site_settings`, {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
               apikey: supabaseKey,
               Authorization: `Bearer ${supabaseKey}`,
-              Prefer: "return=minimal",
+              Prefer: "resolution=merge-duplicates,return=representation",
             },
             body: JSON.stringify({
+              id: "main",
               company_name: updated.companyName,
               tagline: updated.tagline,
               email: updated.email,
@@ -777,12 +778,34 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               location: updated.location,
               export_banner_text: updated.exportBannerText,
               show_export_banner: updated.showExportBanner,
+              updated_at: new Date().toISOString(),
             }),
           });
-        } catch (e) {
+
+          if (!res.ok) {
+            const errText = await res.text();
+            console.error("❌ [AgriPort Ops] Failed to update site_settings in Supabase:", res.status, errText);
+            let userFriendly = `خطأ في حفظ الإعدادات في Supabase (${res.status})`;
+            if (res.status === 404 || errText.includes("schema cache")) {
+              userFriendly = "جدول site_settings غير موجود بعد في Supabase. يرجى تشغيل كود SQL في Supabase SQL Editor أولاً لتفعيله.";
+            }
+            return {
+              success: false,
+              error: userFriendly,
+            };
+          }
+
+          console.log("✅ [AgriPort Ops] site_settings successfully synced to Supabase:", updated);
+          return { success: true };
+        } catch (e: any) {
           console.error("Failed to update site_settings in Supabase:", e);
+          return {
+            success: false,
+            error: e?.message || "خطأ أثناء محاولة الاتصال بـ Supabase",
+          };
         }
       }
+      return { success: true };
     },
     [],
   );

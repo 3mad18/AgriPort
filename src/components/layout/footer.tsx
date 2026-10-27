@@ -57,10 +57,29 @@ export function Footer() {
               </button>
             </form>
 
-            {/* Location Tag */}
-            <div className="mt-6 flex items-center gap-2 text-xs text-slate-400 font-medium">
-              <span className="text-emerald-400">📍</span>
-              <span>{siteSettings.location || t.contactPage.locationValue}</span>
+            {/* Location & Direct Contact Tag */}
+            <div className="mt-6 flex flex-col gap-2.5 text-xs text-slate-400 font-medium">
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-400">📍</span>
+                <span>{siteSettings.location || t.contactPage.locationValue}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-4 text-slate-300">
+                <a
+                  href={`mailto:${siteSettings.email || "agriporteg@gmail.com"}`}
+                  className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
+                >
+                  <span>✉</span>
+                  <span>{siteSettings.email || "agriporteg@gmail.com"}</span>
+                </a>
+                <a
+                  href={`tel:${(siteSettings.phone || "+20 100 720 2636").replace(/\s+/g, "")}`}
+                  dir="ltr"
+                  className="hover:text-emerald-400 transition-colors font-mono flex items-center gap-1.5"
+                >
+                  <span>📞</span>
+                  <span>{siteSettings.phone || "+20 100 720 2636"}</span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -131,7 +150,7 @@ export function Footer() {
           </div>
 
           <p>
-            &copy; {CURRENT_YEAR} AgriPort Technologies & Exports.{" "}
+            &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
             {footer.rights}.
           </p>
         </div>

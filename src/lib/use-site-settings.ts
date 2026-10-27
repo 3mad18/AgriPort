@@ -75,7 +75,7 @@ export function useSiteSettings() {
       if (!supabaseUrl || !supabaseKey) return;
       try {
         const res = await fetch(
-          `${supabaseUrl}/rest/v1/site_settings?id=eq.main`,
+          `${supabaseUrl}/rest/v1/site_settings?limit=1`,
           {
             headers: {
               apikey: supabaseKey,
@@ -114,7 +114,7 @@ export function useSiteSettings() {
     }
 
     fetchSettings();
-    const interval = setInterval(fetchSettings, 5000);
+    const interval = setInterval(fetchSettings, 3500);
 
     const handleFocus = () => fetchSettings();
     window.addEventListener("focus", handleFocus);

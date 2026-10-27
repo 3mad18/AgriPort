@@ -24,7 +24,7 @@ const ArrowRight = ({ isRTL = false }: { isRTL?: boolean }) => (
 );
 
 export function Hero() {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const { settings: siteSettings } = useSiteSettings();
   const isRTL = dir === "rtl";
 
@@ -51,7 +51,9 @@ export function Hero() {
 
       {/* Subtitle */}
       <p className="text-lg md:text-xl text-slate-500 max-w-2xl mb-10 font-medium leading-relaxed">
-        {t.hero.leadParagraph}
+        {language === "ar" && siteSettings.tagline
+          ? siteSettings.tagline
+          : t.hero.leadParagraph}
       </p>
 
       {/* Action Buttons */}

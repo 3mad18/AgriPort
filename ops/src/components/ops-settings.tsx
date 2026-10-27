@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOpsStore } from "@/context/ops-store-context";
 
 export function OpsSettings() {
@@ -22,13 +22,52 @@ export function OpsSettings() {
     showExportBanner: settings.showExportBanner !== false,
   });
 
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Sync form when settings change in store / cloud
+  useEffect(() => {
+    if (settings) {
+      setForm({
+        companyName: settings.companyName || "AgriPort",
+        tagline: settings.tagline || "",
+        email: settings.email || "agriporteg@gmail.com",
+        phone: settings.phone || "+20 100 720 2636",
+        location:
+          settings.location ||
+          "جمهورية مصر العربية — محافظة البحيرة / كفر الدوار",
+        exportBannerText: settings.exportBannerText || "",
+        showExportBanner: settings.showExportBanner !== false,
+      });
+    }
+  }, [settings]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateSettings(form);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+    setIsSaving(true);
+    setStatusMsg(null);
+
+    const result = await updateSettings(form);
+    setIsSaving(false);
+
+    if (result.success) {
+      setStatusMsg({
+        type: "success",
+        text: "تم حفظ وتحديث إعدادات الموقع ونشرها بنجاح في السحابة وموقع الزوار فوراً!",
+      });
+    } else {
+      setStatusMsg({
+        type: "error",
+        text: result.error || "تعذر الحفظ في قاعدة البيانات السحابية.",
+      });
+    }
+
+    setTimeout(() => {
+      setStatusMsg((prev) => (prev?.type === "success" ? null : prev));
+    }, 6000);
   };
 
   return (
@@ -50,12 +89,27 @@ export function OpsSettings() {
         </div>
       </div>
 
-      {savedSuccess && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-bold text-emerald-900 flex items-center justify-between animate-fade-in">
+      {statusMsg && (
+        <div
+          className={`rounded-2xl border p-4 text-xs font-bold flex items-center justify-between animate-fade-in ${
+            statusMsg.type === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              : "border-amber-200 bg-amber-50 text-amber-900"
+          }`}
+        >
           <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span>تم حفظ وتحديث إعدادات الموقع بنجاح، وستنعكس فوراً على موقع الزوار!</span>
+            <span>{statusMsg.type === "success" ? "✅" : "⚠️"}</span>
+            <span>{statusMsg.text}</span>
           </div>
+          {statusMsg.type === "error" && (
+            <button
+              type="button"
+              onClick={() => setStatusMsg(null)}
+              className="text-amber-700 hover:text-amber-900 text-xs px-2 py-0.5 rounded-lg border border-amber-300"
+            >
+              إغلاق
+            </button>
+          )}
         </div>
       )}
 
@@ -187,13 +241,58 @@ export function OpsSettings() {
           </div>
         </div>
 
+        {/* Live Preview of Banner & Settings */}
+        <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-6 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              👁️ معاينة فورية لشريط الإعلان أعلى الموقع
+            </h4>
+            <a
+              href="http://localhost:3000"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1"
+            >
+              <span>فتح موقع الزوار (Port 3000) للتحقق</span>
+              <span>↗</span>
+            </a>
+          </div>
+
+          {form.showExportBanner ? (
+            <div className="rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 p-3 text-white text-xs font-bold flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-white animate-ping" />
+                <span>{form.exportBannerText || "نص الإعلان التصديري..."}</span>
+              </div>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-[11px]">
+                تصدير الآن ←
+              </span>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 p-3 text-center text-xs text-slate-400 font-medium">
+              شريط الإعلان معطّل حالياً ولن يظهر للزوار
+            </div>
+          )}
+        </div>
+
         {/* Save Button */}
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end gap-3">
           <button
             type="submit"
-            className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-8 py-3 text-xs font-bold text-white shadow-xs hover:shadow-emerald-500/20 active:scale-95 transition-all"
+            disabled={isSaving}
+            className="flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 px-8 py-3 text-xs font-bold text-white shadow-xs hover:shadow-emerald-500/20 active:scale-95 transition-all"
           >
-            💾 حفظ ونشر الإعدادات
+            {isSaving ? (
+              <>
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span>جاري الحفظ والمزامنة...</span>
+              </>
+            ) : (
+              <>
+                <span>💾</span>
+                <span>حفظ ونشر الإعدادات</span>
+              </>
+            )}
           </button>
         </div>
       </form>
