@@ -313,40 +313,102 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     async function syncInquiriesFromCloud() {
-      try {
-        const res = await fetch("/api/inquiries", { cache: "no-store" });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.success && Array.isArray(data.inquiries) && isMounted) {
-          const local = getInquiriesSnapshot();
-          const localIds = new Set(local.map((i) => i.id));
-          const hasNew = data.inquiries.some((item: Inquiry) => !localIds.has(item.id));
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-          // Merge cloud inquiries, preserving any non-conflicting local inquiries
-          const cloudIds = new Set(data.inquiries.map((i: any) => i.id));
-          const merged = [...data.inquiries];
-          local.forEach((loc) => {
-            if (!cloudIds.has(loc.id) && !loc.id.startsWith("demo-")) {
-              merged.push(loc);
-            }
+      console.log("🔄 [AgriPort Ops] Cloud sync triggered...", {
+        hasSupabaseUrl: Boolean(supabaseUrl),
+        hasSupabaseKey: Boolean(supabaseKey),
+      });
+
+      let cloudList: Inquiry[] | null = null;
+
+      // 1. Try direct Supabase query if credentials in browser
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const sbRes = await fetch(`${supabaseUrl}/rest/v1/inquiries?select=*&order=created_at.desc`, {
+            method: "GET",
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+            },
+            cache: "no-store",
           });
 
-          merged.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-          localStorage.setItem(INQUIRIES_KEY, JSON.stringify(merged));
-          cachedInquiries = merged;
-          cachedInquiriesRaw = JSON.stringify(merged);
-          notifyChange();
-
-          if (hasNew && typeof window !== "undefined") {
-            const newest = data.inquiries[0];
-            window.dispatchEvent(
-              new CustomEvent("agriport_new_inquiry_event", { detail: newest })
-            );
+          if (sbRes.ok) {
+            const rawData = await sbRes.json();
+            console.log(`✅ [AgriPort Ops] Direct Supabase fetch success (${rawData.length} inquiries found):`, rawData);
+            cloudList = rawData.map((item: any) => ({
+              id: item.id,
+              date: item.date,
+              name: item.name,
+              company: item.company || "",
+              country: item.country || "",
+              email: item.email,
+              phone: item.phone || "",
+              product: item.product,
+              quantity: item.quantity || "",
+              incoterms: item.incoterms || "FOB",
+              destinationPort: item.destination_port || item.destinationPort || "",
+              message: item.message || "",
+              status: item.status || "جديد",
+              read: item.read ?? false,
+              createdAt: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
+            }));
+          } else {
+            console.error("❌ [AgriPort Ops] Direct Supabase fetch failed:", sbRes.status, await sbRes.text());
           }
+        } catch (sbErr) {
+          console.error("❌ [AgriPort Ops] Direct Supabase connection error:", sbErr);
         }
-      } catch (err) {
-        // Silently skip if network offline
+      } else {
+        console.warn("⚠️ [AgriPort Ops] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set in Ops environment!");
+      }
+
+      // 2. Fallback to /api/inquiries if direct fetch was not used or failed
+      if (!cloudList) {
+        try {
+          const res = await fetch("/api/inquiries", { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.inquiries)) {
+              console.log(`📡 [AgriPort Ops] /api/inquiries returned ${data.inquiries.length} inquiries`);
+              cloudList = data.inquiries;
+            }
+          }
+        } catch (err) {
+          console.warn("⚠️ [AgriPort Ops] /api/inquiries fallback unreachable:", err);
+        }
+      }
+
+      // 3. Merge into store
+      if (cloudList && isMounted) {
+        const local = getInquiriesSnapshot();
+        const localIds = new Set(local.map((i) => i.id));
+        const hasNew = cloudList.some((item: Inquiry) => !localIds.has(item.id));
+
+        const cloudIds = new Set(cloudList.map((i: any) => i.id));
+        const merged = [...cloudList];
+        local.forEach((loc) => {
+          if (!cloudIds.has(loc.id) && !loc.id.startsWith("demo-")) {
+            merged.push(loc);
+          }
+        });
+
+        merged.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        localStorage.setItem(INQUIRIES_KEY, JSON.stringify(merged));
+        cachedInquiries = merged;
+        cachedInquiriesRaw = JSON.stringify(merged);
+        notifyChange();
+
+        if (hasNew && typeof window !== "undefined") {
+          const newest = cloudList[0];
+          console.log("🔔 [AgriPort Ops] New incoming inquiry detected:", newest);
+          window.dispatchEvent(
+            new CustomEvent("agriport_new_inquiry_event", { detail: newest })
+          );
+        }
       }
     }
 

@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
     if (supabaseUrl && supabaseKey) {
       try {
-        await fetch(`${supabaseUrl}/rest/v1/inquiries`, {
+        const sbRes = await fetch(`${supabaseUrl}/rest/v1/inquiries`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -24,22 +24,30 @@ export async function POST(request: Request) {
             id: "inq-" + Date.now(),
             date: new Date().toISOString().split("T")[0],
             name: data.name,
-            company: data.company,
-            country: data.country,
+            company: data.company || "Individual / Private Buyer",
+            country: data.country || "International",
             email: data.email,
-            phone: data.phone,
-            product: data.product,
-            quantity: data.quantity,
-            incoterms: data.incoterms,
-            destination_port: data.destinationPort,
-            message: data.message,
+            phone: data.phone || "",
+            product: data.product || "General Quotation",
+            quantity: data.quantity || "As agreed",
+            incoterms: data.incoterms || "FOB",
+            destination_port: data.destinationPort || "",
+            message: data.message || "",
             status: "جديد",
             read: false,
           }),
         });
+        if (!sbRes.ok) {
+          const errText = await sbRes.text();
+          console.error("Supabase REST error:", sbRes.status, errText);
+        } else {
+          console.log("Supabase insert from API route success!");
+        }
       } catch (err) {
-        console.warn("Could not push to Supabase:", err);
+        console.warn("Could not push to Supabase from server:", err);
       }
+    } else {
+      console.warn("Server API: Supabase URL or Key missing in process.env");
     }
 
     // 2. If Ops API URL is configured (e.g. https://ops.agriport.com/api/inquiries)

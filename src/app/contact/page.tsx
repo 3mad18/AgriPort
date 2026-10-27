@@ -119,8 +119,10 @@ function ContactFormInner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("📝 [Contact Form] Submit clicked, data:", formData);
     setIsSubmitting(true);
-    await submitQuoteInquiry(formData);
+    const res = await submitQuoteInquiry(formData);
+    console.log("📨 [Contact Form] Submit completed, response:", res);
     setIsSubmitting(false);
     setSubmitted(true);
   };

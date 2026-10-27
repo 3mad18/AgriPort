@@ -104,16 +104,77 @@ export async function submitQuoteInquiry(inquiryData: {
   destinationPort: string;
   message: string;
 }) {
-  // 1. Submit to local API endpoint /api/inquiries
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  console.log("📤 [AgriPort] Submitting inquiry...", {
+    product: inquiryData.product,
+    email: inquiryData.email,
+    hasSupabaseUrl: Boolean(supabaseUrl),
+    hasSupabaseKey: Boolean(supabaseKey),
+  });
+
+  const payload = {
+    id: "inq-" + Date.now(),
+    date: new Date().toISOString().split("T")[0],
+    name: inquiryData.name,
+    company: inquiryData.company || "Individual / Private Buyer",
+    country: inquiryData.country || "International",
+    email: inquiryData.email,
+    phone: inquiryData.phone || "",
+    product: inquiryData.product || "General Quotation",
+    quantity: inquiryData.quantity || "As agreed",
+    incoterms: inquiryData.incoterms || "FOB",
+    destination_port: inquiryData.destinationPort || "",
+    message: inquiryData.message || "",
+    status: "جديد",
+    read: false,
+  };
+
+  // 1. Direct write to Supabase if configured in client
+  let directSuccess = false;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      console.log("⚡ [AgriPort] Writing directly to Supabase REST API...");
+      const sbRes = await fetch(`${supabaseUrl}/rest/v1/inquiries`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (sbRes.ok) {
+        directSuccess = true;
+        console.log("✅ [AgriPort] Direct Supabase write SUCCESS!");
+      } else {
+        const errorText = await sbRes.text();
+        console.error("❌ [AgriPort] Direct Supabase write FAILED:", sbRes.status, errorText);
+      }
+    } catch (sbErr) {
+      console.error("❌ [AgriPort] Supabase direct connection error:", sbErr);
+    }
+  } else {
+    console.warn(
+      "⚠️ [AgriPort] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined in browser environment!"
+    );
+  }
+
+  // 2. Also submit to local API endpoint /api/inquiries (server-side push)
   try {
     const res = await fetch("/api/inquiries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(inquiryData),
     });
-    return await res.json();
+    const result = await res.json();
+    console.log("📡 [AgriPort] /api/inquiries response:", result);
+    return { success: directSuccess || Boolean(result?.success), ...result };
   } catch (err) {
-    console.error("Inquiry submission error:", err);
-    return { success: false, error: err };
+    console.error("❌ [AgriPort] /api/inquiries submission error:", err);
+    return { success: directSuccess, error: err };
   }
 }
