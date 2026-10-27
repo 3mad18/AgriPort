@@ -14,9 +14,9 @@ export type ExportProduct = {
 export const EXPORT_CATALOG: ExportProduct[] = [
   {
     id: "citrus",
-    name: "برتقال فالنسيا وموالح مصرية",
+    name: "الموالح والبرتقال المصري",
     category: "موالح",
-    variety: "برتقال صيفي فالنسيا، أبو صرة، ليمون، يوسفي",
+    variety: "برتقال فالنسيا (صيفي)، أبو صرة، ليمون، يوسفي",
     season: "نوفمبر — مايو",
     pack: "كراتين تليسكوبيك 15 كجم، أوبن توب، شبك",
     specs: "معايرات كاليبر: 40، 48، 56، 64، 72، 80، 88",
@@ -27,7 +27,7 @@ export const EXPORT_CATALOG: ExportProduct[] = [
   },
   {
     id: "onions",
-    name: "بصل مصري طازج (أحمر وذهبي)",
+    name: "البصل المصري (الأحمر والذهبي)",
     category: "خضروات",
     variety: "بصل أحمر إيطالي، بصل ذهبي مجفف طبيعياً",
     season: "فبراير — أغسطس",
@@ -40,12 +40,12 @@ export const EXPORT_CATALOG: ExportProduct[] = [
   },
   {
     id: "strawberries",
-    name: "فراولة طازجة فاخرة",
+    name: "الفراولة الطازجة الفاخرة",
     category: "فواكه",
     variety: "فورتونا، فستيفال، سنشريشن",
     season: "نوفمبر — مارس",
     pack: "بانيتات 250 جم داخل كراتين 2 كجم و 2.5 كجم",
-    specs: "شحن جوي مبرد سريع، فحص متبقيات معتمد",
+    specs: "شحن جوي مبرد سريع، خالية من متبقيات المبيدات",
     imageUrl:
       "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=800&q=80",
     icon: "🍓",
@@ -53,9 +53,9 @@ export const EXPORT_CATALOG: ExportProduct[] = [
   },
   {
     id: "pomegranates",
-    name: "رمان وندرفول أحمر",
+    name: "الرمان الوندرفول الفاخر",
     category: "فواكه",
-    variety: "رمان وندرفول عالي السكرية وبريكس مرتفع",
+    variety: "رمان وندرفول أحمر داكن عالي السكرية",
     season: "سبتمبر — ديسمبر",
     pack: "كراتين 4.5 كجم و 5 كجم (بانيتات أو كراتين مفتوحة)",
     specs: "أحجام: 6، 7، 8، 9، 10، 12، 14 حبة بالكرتونة",
@@ -66,7 +66,7 @@ export const EXPORT_CATALOG: ExportProduct[] = [
   },
   {
     id: "potatoes",
-    name: "بطاطس مجهزة للتصدير",
+    name: "البطاطس المجهزة للتصدير",
     category: "خضروات",
     variety: "سبونتا، مونديال، ليدي روزيتا، كارا",
     season: "يناير — يونيو",
@@ -79,7 +79,7 @@ export const EXPORT_CATALOG: ExportProduct[] = [
   },
   {
     id: "grapes",
-    name: "عنب طازج بدون بذور",
+    name: "العنب الطازج بدون بذور",
     category: "فواكه",
     variety: "إيرلي سويت، سوبيريور، فليم، كريمسون",
     season: "مايو — أغسطس",
@@ -88,7 +88,7 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=800&q=80",
     icon: "🍇",
-    status: "موسم قادم",
+    status: "متاح للتصدير",
   },
 ];
 

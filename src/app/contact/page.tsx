@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
 import { submitQuoteInquiry } from "@/lib/catalog";
 import { useLiveProducts } from "@/lib/use-live-products";
+import { useSiteSettings } from "@/lib/use-site-settings";
 import { useLanguage } from "@/context/language-context";
 
 function ContactFormInner() {
@@ -15,6 +16,7 @@ function ContactFormInner() {
   const p = t.productsPage;
   const searchParams = useSearchParams();
   const { products: liveCatalog } = useLiveProducts();
+  const { settings: siteSettings } = useSiteSettings();
 
   const cropParam = searchParams.get("crop") || searchParams.get("product") || "";
   const idParam = searchParams.get("id") || "";
@@ -153,10 +155,10 @@ function ContactFormInner() {
                     {c.emailLabel}
                   </div>
                   <a
-                    href="mailto:agriporteg@gmail.com"
+                    href={`mailto:${siteSettings.email || "agriporteg@gmail.com"}`}
                     className="font-bold text-slate-900 hover:text-emerald-600 transition-colors"
                   >
-                    agriporteg@gmail.com
+                    {siteSettings.email || "agriporteg@gmail.com"}
                   </a>
                 </div>
               </div>
@@ -171,11 +173,11 @@ function ContactFormInner() {
                     {c.phoneLabel}
                   </div>
                   <a
-                    href="tel:+201007202636"
+                    href={`tel:${(siteSettings.phone || "+20 100 720 2636").replace(/\s+/g, "")}`}
                     dir="ltr"
                     className="font-bold text-slate-900 hover:text-emerald-600 transition-colors block text-start"
                   >
-                    +20 100 720 2636
+                    {siteSettings.phone || "+20 100 720 2636"}
                   </a>
                 </div>
               </div>
@@ -190,7 +192,7 @@ function ContactFormInner() {
                     {c.locationLabel}
                   </div>
                   <div className="text-sm font-medium text-slate-600">
-                    {c.locationValue}
+                    {siteSettings.location || c.locationValue}
                   </div>
                 </div>
               </div>

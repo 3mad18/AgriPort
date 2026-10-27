@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/context/language-context";
+import { useSiteSettings } from "@/lib/use-site-settings";
 
 const CURRENT_YEAR = 2026;
 
 export function Footer() {
   const { t } = useLanguage();
+  const { settings: siteSettings } = useSiteSettings();
   const pathname = usePathname();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -58,7 +60,7 @@ export function Footer() {
             {/* Location Tag */}
             <div className="mt-6 flex items-center gap-2 text-xs text-slate-400 font-medium">
               <span className="text-emerald-400">📍</span>
-              <span>{t.contactPage.locationValue}</span>
+              <span>{siteSettings.location || t.contactPage.locationValue}</span>
             </div>
           </div>
 

@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
+import { useSiteSettings } from "@/lib/use-site-settings";
 
 const ArrowRight = ({ isRTL = false }: { isRTL?: boolean }) => (
   <svg
@@ -24,18 +25,21 @@ const ArrowRight = ({ isRTL = false }: { isRTL?: boolean }) => (
 
 export function Hero() {
   const { t, dir } = useLanguage();
+  const { settings: siteSettings } = useSiteSettings();
   const isRTL = dir === "rtl";
 
   return (
     <section className="pt-32 pb-16 px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
-      {/* Pill Tag */}
-      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-sm font-semibold tracking-wide mb-8 animate-fade-in">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-        </span>
-        {t.hero.pillTag}
-      </div>
+      {/* Pill Tag / Live Export Banner */}
+      {siteSettings.showExportBanner && (
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs sm:text-sm font-semibold tracking-wide mb-8 animate-fade-in max-w-2xl">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span>{siteSettings.exportBannerText || t.hero.pillTag}</span>
+        </div>
+      )}
 
       {/* Massive Heading */}
       <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] font-extrabold tracking-tighter text-slate-900 mb-8 leading-[1.25] sm:leading-[1.2] max-w-4xl">

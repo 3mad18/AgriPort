@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { EXPORT_CATALOG, ExportProduct } from "./catalog";
 
 const STORAGE_KEY = "agriport_live_products_cache";
@@ -85,6 +85,7 @@ export function useLiveProducts() {
               localStorage.setItem(STORAGE_KEY, raw);
               cachedProducts = mapped;
               cachedRaw = raw;
+              console.log("📦 [AgriPort Live Products] Updated from Supabase:", mapped.map(p => `${p.name} (${p.status})`));
               window.dispatchEvent(new Event(CHANGE_EVENT));
             }
           }
@@ -95,15 +96,17 @@ export function useLiveProducts() {
     }
 
     fetchProducts();
-    const interval = setInterval(fetchProducts, 10000); // Check every 10s
+    const interval = setInterval(fetchProducts, 3000); // Check every 3 seconds
 
     const handleFocus = () => fetchProducts();
     window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
 
     return () => {
       isMounted = false;
       clearInterval(interval);
       window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
     };
   }, []);
 

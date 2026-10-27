@@ -70,9 +70,9 @@ type OpsStoreContextType = {
 const DEFAULT_PRODUCTS: Product[] = [
   {
     id: "citrus",
-    name: "برتقال فالنسيا وموالح مصرية",
+    name: "الموالح والبرتقال المصري",
     category: "موالح",
-    variety: "برتقال صيفي فالنسيا، أبو صرة، ليمون، يوسفي",
+    variety: "برتقال فالنسيا (صيفي)، أبو صرة، ليمون، يوسفي",
     season: "نوفمبر — مايو",
     pack: "كراتين تليسكوبيك 15 كجم، أوبن توب، شبك",
     specs: "معايرات كاليبر: 40، 48، 56، 64، 72، 80، 88",
@@ -84,7 +84,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: "onions",
-    name: "بصل مصري طازج (أحمر وذهبي)",
+    name: "البصل المصري (الأحمر والذهبي)",
     category: "خضروات",
     variety: "بصل أحمر إيطالي، بصل ذهبي مجفف طبيعياً",
     season: "فبراير — أغسطس",
@@ -98,12 +98,12 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: "strawberries",
-    name: "فراولة طازجة فاخرة",
+    name: "الفراولة الطازجة الفاخرة",
     category: "فواكه",
     variety: "فورتونا، فستيفال، سنشريشن",
     season: "نوفمبر — مارس",
     pack: "بانيتات 250 جم داخل كراتين 2 كجم و 2.5 كجم",
-    specs: "شحن جوي مبرد سريع، فحص متبقيات معتمد",
+    specs: "شحن جوي مبرد سريع، خالية من متبقيات المبيدات",
     imageUrl:
       "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=800&q=80",
     icon: "🍓",
@@ -112,9 +112,9 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: "pomegranates",
-    name: "رمان وندرفول أحمر",
+    name: "الرمان الوندرفول الفاخر",
     category: "فواكه",
-    variety: "رمان وندرفول عالي السكرية وبريكس مرتفع",
+    variety: "رمان وندرفول أحمر داكن عالي السكرية",
     season: "سبتمبر — ديسمبر",
     pack: "كراتين 4.5 كجم و 5 كجم (بانيتات أو كراتين مفتوحة)",
     specs: "أحجام: 6، 7، 8، 9، 10، 12، 14 حبة بالكرتونة",
@@ -126,7 +126,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: "potatoes",
-    name: "بطاطس مجهزة للتصدير",
+    name: "البطاطس المجهزة للتصدير",
     category: "خضروات",
     variety: "سبونتا، مونديال، ليدي روزيتا، كارا",
     season: "يناير — يونيو",
@@ -140,7 +140,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: "grapes",
-    name: "عنب طازج بدون بذور",
+    name: "العنب الطازج بدون بذور",
     category: "فواكه",
     variety: "إيرلي سويت، سوبيريور، فليم، كريمسون",
     season: "مايو — أغسطس",
@@ -149,7 +149,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=800&q=80",
     icon: "🍇",
-    status: "موسم قادم",
+    status: "متاح للتصدير",
     featured: false,
   },
 ];
@@ -458,20 +458,61 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    async function syncSettingsFromCloud() {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !supabaseKey) return;
+      try {
+        const res = await fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.main`, {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+          cache: "no-store",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0 && isMounted) {
+            const row = data[0];
+            const mapped: SiteSettings = {
+              companyName: row.company_name || DEFAULT_SETTINGS.companyName,
+              tagline: row.tagline || DEFAULT_SETTINGS.tagline,
+              email: row.email || DEFAULT_SETTINGS.email,
+              phone: row.phone || DEFAULT_SETTINGS.phone,
+              location: row.location || DEFAULT_SETTINGS.location,
+              exportBannerText: row.export_banner_text || DEFAULT_SETTINGS.exportBannerText,
+              showExportBanner: row.show_export_banner ?? true,
+            };
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(mapped));
+            cachedSettings = mapped;
+            cachedSettingsRaw = JSON.stringify(mapped);
+            notifyChange();
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
+
     // Initial fetch
     syncInquiriesFromCloud();
     syncProductsFromCloud();
+    syncSettingsFromCloud();
 
     // Poll every 15s
     const timer = setInterval(() => {
       syncInquiriesFromCloud();
       syncProductsFromCloud();
+      syncSettingsFromCloud();
     }, 15000);
 
     // Sync on tab focus / visibility
     const handleFocus = () => {
       syncInquiriesFromCloud();
       syncProductsFromCloud();
+      syncSettingsFromCloud();
     };
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleFocus);
@@ -706,13 +747,42 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const updateSettings = useCallback(
-    (partial: Partial<SiteSettings>) => {
+    async (partial: Partial<SiteSettings>) => {
       const current = getSettingsSnapshot();
       const updated = { ...current, ...partial };
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
       cachedSettings = updated;
       cachedSettingsRaw = JSON.stringify(updated);
       notifyChange();
+
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.main`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              company_name: updated.companyName,
+              tagline: updated.tagline,
+              email: updated.email,
+              phone: updated.phone,
+              location: updated.location,
+              export_banner_text: updated.exportBannerText,
+              show_export_banner: updated.showExportBanner,
+            }),
+          });
+        } catch (e) {
+          console.error("Failed to update site_settings in Supabase:", e);
+        }
+      }
     },
     [],
   );

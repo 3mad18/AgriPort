@@ -7,14 +7,18 @@ import { useLiveProducts } from "@/lib/use-live-products";
 import { useLanguage } from "@/context/language-context";
 
 export default function ProductsPage() {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const p = t.productsPage;
   const { products: liveCatalog } = useLiveProducts();
 
-  // Localize products if translation list exists
+  // In Arabic, the live database catalog edited from the Ops dashboard is 100% authoritative!
+  // In other languages, we overlay translations where available, but never overwrite customized status/image/icon.
   const products = liveCatalog.map((cat) => {
+    if (language === "ar") {
+      return cat;
+    }
     const loc = p.productsList?.find((item) => item.id === cat.id);
-    return loc ? { ...cat, ...loc } : cat;
+    return loc ? { ...cat, name: loc.name || cat.name, variety: loc.variety || cat.variety, pack: loc.pack || cat.pack, specs: loc.specs || cat.specs } : cat;
   });
 
   return (
@@ -58,7 +62,22 @@ export default function ProductsPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                  {/* Season Badge */}
+                  {/* Status Badge (Top Start) */}
+                  <div className="absolute top-4 start-4">
+                    <span
+                      className={`rounded-full px-3 py-1 text-[11px] font-bold shadow-xs backdrop-blur-md ${
+                        item.status === "متاح للتصدير"
+                          ? "bg-emerald-500/90 text-white"
+                          : item.status === "موسم قادم"
+                          ? "bg-amber-500/90 text-white"
+                          : "bg-rose-500/90 text-white"
+                      }`}
+                    >
+                      {item.status || "متاح للتصدير"}
+                    </span>
+                  </div>
+
+                  {/* Season Badge (Top End) */}
                   <div className="absolute top-4 end-4">
                     <span className="rounded-full bg-white/90 backdrop-blur-md px-3.5 py-1 text-[11px] font-bold text-slate-900 shadow-xs">
                       {item.season}
