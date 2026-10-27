@@ -4,7 +4,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
-import { EXPORT_CATALOG, submitQuoteInquiry } from "@/lib/catalog";
+import { submitQuoteInquiry } from "@/lib/catalog";
+import { useLiveProducts } from "@/lib/use-live-products";
 import { useLanguage } from "@/context/language-context";
 
 function ContactFormInner() {
@@ -13,13 +14,14 @@ function ContactFormInner() {
   const f = c.fields;
   const p = t.productsPage;
   const searchParams = useSearchParams();
+  const { products: liveCatalog } = useLiveProducts();
 
   const cropParam = searchParams.get("crop") || searchParams.get("product") || "";
   const idParam = searchParams.get("id") || "";
   const emailParam = searchParams.get("email") || "";
 
-  // Locate product from EXPORT_CATALOG if matched
-  const matchedProduct = EXPORT_CATALOG.find((item) => {
+  // Locate product from liveCatalog if matched
+  const matchedProduct = liveCatalog.find((item) => {
     if (idParam && item.id.toLowerCase() === idParam.toLowerCase()) return true;
     if (cropParam) {
       const lowerCrop = cropParam.toLowerCase();

@@ -414,14 +414,65 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    async function syncProductsFromCloud() {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !supabaseKey) return;
+      try {
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/products?select=*&order=sort_order.asc,created_at.asc`,
+          {
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+            },
+            cache: "no-store",
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0 && isMounted) {
+            const mapped: Product[] = data.map((item: any) => ({
+              id: item.id,
+              name: item.name,
+              category: item.category,
+              variety: item.variety,
+              season: item.season,
+              pack: item.pack,
+              specs: item.specs,
+              imageUrl: item.image_url || item.imageUrl,
+              icon: item.icon || "🌿",
+              status: item.status || "متاح للتصدير",
+              featured: item.featured ?? false,
+            }));
+            localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mapped));
+            cachedProducts = mapped;
+            cachedProductsRaw = JSON.stringify(mapped);
+            notifyChange();
+          }
+        }
+      } catch (err) {
+        // Silently skip if network offline
+      }
+    }
+
     // Initial fetch
     syncInquiriesFromCloud();
+    syncProductsFromCloud();
 
     // Poll every 15s
-    const timer = setInterval(syncInquiriesFromCloud, 15000);
+    const timer = setInterval(() => {
+      syncInquiriesFromCloud();
+      syncProductsFromCloud();
+    }, 15000);
 
     // Sync on tab focus / visibility
-    const handleFocus = () => syncInquiriesFromCloud();
+    const handleFocus = () => {
+      syncInquiriesFromCloud();
+      syncProductsFromCloud();
+    };
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleFocus);
 
@@ -434,7 +485,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addProduct = useCallback(
-    (item: Omit<Product, "id">) => {
+    async (item: Omit<Product, "id">) => {
       const current = getProductsSnapshot();
       const newProduct: Product = {
         ...item,
@@ -445,12 +496,46 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
+
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/rest/v1/products`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              id: newProduct.id,
+              name: newProduct.name,
+              category: newProduct.category,
+              variety: newProduct.variety,
+              season: newProduct.season,
+              pack: newProduct.pack,
+              specs: newProduct.specs,
+              image_url: newProduct.imageUrl,
+              icon: newProduct.icon || "🌿",
+              status: newProduct.status,
+              featured: newProduct.featured ?? false,
+              sort_order: 0,
+            }),
+          });
+        } catch (e) {
+          console.error("Failed to push product to Supabase:", e);
+        }
+      }
     },
     [],
   );
 
   const updateProduct = useCallback(
-    (id: string, partial: Partial<Product>) => {
+    async (id: string, partial: Partial<Product>) => {
       const current = getProductsSnapshot();
       const updated = current.map((p) =>
         p.id === id ? { ...p, ...partial } : p,
@@ -459,18 +544,69 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
+
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const payload: Record<string, any> = {};
+          if (partial.name !== undefined) payload.name = partial.name;
+          if (partial.category !== undefined) payload.category = partial.category;
+          if (partial.variety !== undefined) payload.variety = partial.variety;
+          if (partial.season !== undefined) payload.season = partial.season;
+          if (partial.pack !== undefined) payload.pack = partial.pack;
+          if (partial.specs !== undefined) payload.specs = partial.specs;
+          if (partial.imageUrl !== undefined) payload.image_url = partial.imageUrl;
+          if (partial.icon !== undefined) payload.icon = partial.icon;
+          if (partial.status !== undefined) payload.status = partial.status;
+          if (partial.featured !== undefined) payload.featured = partial.featured;
+
+          await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify(payload),
+          });
+        } catch (e) {
+          console.error("Failed to patch product in Supabase:", e);
+        }
+      }
     },
     [],
   );
 
   const deleteProduct = useCallback(
-    (id: string) => {
+    async (id: string) => {
       const current = getProductsSnapshot();
       const updated = current.filter((p) => p.id !== id);
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
+
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
+            method: "DELETE",
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+            },
+          });
+        } catch (e) {
+          console.error("Failed to delete product in Supabase:", e);
+        }
+      }
     },
     [],
   );

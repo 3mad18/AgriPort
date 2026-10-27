@@ -3,15 +3,16 @@
 
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
-import { EXPORT_CATALOG } from "@/lib/catalog";
+import { useLiveProducts } from "@/lib/use-live-products";
 import { useLanguage } from "@/context/language-context";
 
 export default function ProductsPage() {
   const { t, dir } = useLanguage();
   const p = t.productsPage;
+  const { products: liveCatalog } = useLiveProducts();
 
   // Localize products if translation list exists
-  const products = EXPORT_CATALOG.map((cat) => {
+  const products = liveCatalog.map((cat) => {
     const loc = p.productsList?.find((item) => item.id === cat.id);
     return loc ? { ...cat, ...loc } : cat;
   });
