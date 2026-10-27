@@ -134,7 +134,6 @@ export async function submitQuoteInquiry(inquiryData: {
   };
 
   // 1. Direct write to Supabase if configured in client
-  let directSuccess = false;
   if (supabaseUrl && supabaseKey) {
     try {
       console.log("⚡ [AgriPort] Writing directly to Supabase REST API...");
@@ -150,8 +149,8 @@ export async function submitQuoteInquiry(inquiryData: {
       });
 
       if (sbRes.ok) {
-        directSuccess = true;
         console.log("✅ [AgriPort] Direct Supabase write SUCCESS!");
+        return { success: true, inquiry: payload };
       } else {
         const errorText = await sbRes.text();
         console.error("❌ [AgriPort] Direct Supabase write FAILED:", sbRes.status, errorText);
@@ -165,18 +164,18 @@ export async function submitQuoteInquiry(inquiryData: {
     );
   }
 
-  // 2. Also submit to local API endpoint /api/inquiries (server-side push)
+  // 2. Fallback to /api/inquiries ONLY if direct client-side write was not used or failed
   try {
     const res = await fetch("/api/inquiries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(inquiryData),
+      body: JSON.stringify({ ...inquiryData, id: payload.id }),
     });
     const result = await res.json();
-    console.log("📡 [AgriPort] /api/inquiries response:", result);
-    return { success: directSuccess || Boolean(result?.success), ...result };
+    console.log("📡 [AgriPort] Fallback /api/inquiries response:", result);
+    return result;
   } catch (err) {
     console.error("❌ [AgriPort] /api/inquiries submission error:", err);
-    return { success: directSuccess, error: err };
+    return { success: false, error: err };
   }
 }

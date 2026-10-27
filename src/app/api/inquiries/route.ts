@@ -22,7 +22,7 @@ export async function POST(request: Request) {
             Prefer: "return=minimal",
           },
           body: JSON.stringify({
-            id: "inq-" + Date.now(),
+            id: data.id || ("inq-" + Date.now()),
             date: new Date().toISOString().split("T")[0],
             name: data.name,
             company: data.company || "Individual / Private Buyer",
