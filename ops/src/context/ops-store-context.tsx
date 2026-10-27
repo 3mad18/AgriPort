@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useCallback,
+  useEffect,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
@@ -307,6 +308,67 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     window.dispatchEvent(new Event(STORE_EVENT));
   };
 
+  // 1. Cloud Sync: Automatically fetch & listen for inquiries from Supabase
+  useEffect(() => {
+    let isMounted = true;
+
+    async function syncInquiriesFromCloud() {
+      try {
+        const res = await fetch("/api/inquiries", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && Array.isArray(data.inquiries) && isMounted) {
+          const local = getInquiriesSnapshot();
+          const localIds = new Set(local.map((i) => i.id));
+          const hasNew = data.inquiries.some((item: Inquiry) => !localIds.has(item.id));
+
+          // Merge cloud inquiries, preserving any non-conflicting local inquiries
+          const cloudIds = new Set(data.inquiries.map((i: any) => i.id));
+          const merged = [...data.inquiries];
+          local.forEach((loc) => {
+            if (!cloudIds.has(loc.id) && !loc.id.startsWith("demo-")) {
+              merged.push(loc);
+            }
+          });
+
+          merged.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+          localStorage.setItem(INQUIRIES_KEY, JSON.stringify(merged));
+          cachedInquiries = merged;
+          cachedInquiriesRaw = JSON.stringify(merged);
+          notifyChange();
+
+          if (hasNew && typeof window !== "undefined") {
+            const newest = data.inquiries[0];
+            window.dispatchEvent(
+              new CustomEvent("agriport_new_inquiry_event", { detail: newest })
+            );
+          }
+        }
+      } catch (err) {
+        // Silently skip if network offline
+      }
+    }
+
+    // Initial fetch
+    syncInquiriesFromCloud();
+
+    // Poll every 15s
+    const timer = setInterval(syncInquiriesFromCloud, 15000);
+
+    // Sync on tab focus / visibility
+    const handleFocus = () => syncInquiriesFromCloud();
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, []);
+
   const addProduct = useCallback(
     (item: Omit<Product, "id">) => {
       const current = getProductsSnapshot();
@@ -370,6 +432,13 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
           new CustomEvent("agriport_new_inquiry_event", { detail: newInquiry })
         );
       }
+
+      // Sync to cloud
+      fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newInquiry),
+      }).catch(() => {});
     },
     [],
   );
@@ -383,6 +452,12 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     cachedInquiries = updated;
     cachedInquiriesRaw = JSON.stringify(updated);
     notifyChange();
+
+    fetch("/api/inquiries", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, read: true }),
+    }).catch(() => {});
   }, []);
 
   const markAllInquiriesRead = useCallback(() => {
@@ -404,6 +479,12 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedInquiries = updated;
       cachedInquiriesRaw = JSON.stringify(updated);
       notifyChange();
+
+      fetch("/api/inquiries", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status, read: true }),
+      }).catch(() => {});
     },
     [],
   );
@@ -416,6 +497,10 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedInquiries = updated;
       cachedInquiriesRaw = JSON.stringify(updated);
       notifyChange();
+
+      fetch(`/api/inquiries?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      }).catch(() => {});
     },
     [],
   );

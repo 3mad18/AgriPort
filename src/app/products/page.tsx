@@ -8,8 +8,13 @@ import { useLanguage } from "@/context/language-context";
 
 export default function ProductsPage() {
   const { t, dir } = useLanguage();
-  const products = EXPORT_CATALOG;
   const p = t.productsPage;
+
+  // Localize products if translation list exists
+  const products = EXPORT_CATALOG.map((cat) => {
+    const loc = p.productsList?.find((item) => item.id === cat.id);
+    return loc ? { ...cat, ...loc } : cat;
+  });
 
   return (
     <PageShell title={p.title} description={p.description}>
@@ -100,7 +105,7 @@ export default function ProductsPage() {
               {/* Action Button */}
               <div className="p-6 pt-0">
                 <Link
-                  href={`/contact?crop=${encodeURIComponent(item.name)}`}
+                  href={`/contact?id=${encodeURIComponent(item.id)}&crop=${encodeURIComponent(item.name)}`}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-emerald-600 py-3 text-xs font-semibold text-white transition-all shadow-xs"
                 >
                   <span>{p.requestQuoteBtn}</span>

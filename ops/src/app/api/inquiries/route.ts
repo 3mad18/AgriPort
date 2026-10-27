@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
   };
 }
 
@@ -13,10 +13,82 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders() });
 }
 
+function getSupabaseConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return { url, key };
+}
+
+// 1. GET: Fetch inquiries from Supabase
+export async function GET() {
+  const { url, key } = getSupabaseConfig();
+
+  if (!url || !key) {
+    return NextResponse.json(
+      {
+        success: false,
+        inquiries: [],
+        message: "Supabase environment variables not configured yet",
+      },
+      { headers: corsHeaders() }
+    );
+  }
+
+  try {
+    const res = await fetch(`${url}/rest/v1/inquiries?select=*&order=created_at.desc`, {
+      method: "GET",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json(
+        { success: false, error: err },
+        { status: res.status, headers: corsHeaders() }
+      );
+    }
+
+    const data = await res.json();
+    const formatted = data.map((item: any) => ({
+      id: item.id,
+      date: item.date,
+      name: item.name,
+      company: item.company || "",
+      country: item.country || "",
+      email: item.email,
+      phone: item.phone || "",
+      product: item.product,
+      quantity: item.quantity || "",
+      incoterms: item.incoterms || "FOB",
+      destinationPort: item.destination_port || item.destinationPort || "",
+      message: item.message || "",
+      status: item.status || "جديد",
+      read: item.read ?? false,
+      createdAt: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
+    }));
+
+    return NextResponse.json(
+      { success: true, inquiries: formatted },
+      { headers: corsHeaders() }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch inquiries from Supabase" },
+      { status: 500, headers: corsHeaders() }
+    );
+  }
+}
+
+// 2. POST: Insert new inquiry
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
     const {
       name,
       company,
@@ -32,7 +104,7 @@ export async function POST(request: Request) {
 
     if (!name || !email) {
       return NextResponse.json(
-        { error: "الاسم والبريد الإلكتروني مطلوبان لإتمام الطلب" },
+        { error: "Name and Email are required" },
         { status: 400, headers: corsHeaders() }
       );
     }
@@ -45,52 +117,102 @@ export async function POST(request: Request) {
       country: String(country || "International"),
       email: String(email),
       phone: String(phone || ""),
-      product: String(product || "طلب تسعير عام"),
-      quantity: String(quantity || "حسب الاتفاق"),
-      incoterms: String(incoterms || "FOB / CIF"),
-      destinationPort: String(destinationPort || "To be specified"),
+      product: String(product || "General Quotation"),
+      quantity: String(quantity || "As agreed"),
+      incoterms: String(incoterms || "FOB"),
+      destination_port: String(destinationPort || ""),
       message: String(message || ""),
       status: "جديد",
       read: false,
-      createdAt: Date.now(),
     };
 
-    // If Supabase is configured via environment variables, write to Supabase
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (supabaseUrl && supabaseKey) {
+    const { url, key } = getSupabaseConfig();
+    if (url && key) {
       try {
-        await fetch(`${supabaseUrl}/rest/v1/inquiries`, {
+        await fetch(`${url}/rest/v1/inquiries`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
+            apikey: key,
+            Authorization: `Bearer ${key}`,
             Prefer: "return=minimal",
           },
           body: JSON.stringify(newInquiry),
         });
       } catch (err) {
-        console.warn("Failed to forward inquiry to Supabase:", err);
+        console.warn("Could not insert into Supabase:", err);
       }
     }
 
     return NextResponse.json(
-      { success: true, inquiry: newInquiry },
+      { success: true, inquiry: { ...newInquiry, destinationPort: newInquiry.destination_port } },
       { status: 201, headers: corsHeaders() }
     );
   } catch (error) {
     return NextResponse.json(
-      { error: "حدث خطأ أثناء معالجة الطلب" },
+      { error: "Failed to process inquiry" },
       { status: 500, headers: corsHeaders() }
     );
   }
 }
 
-export async function GET() {
-  return NextResponse.json(
-    { message: "AgriPort Ops Inquiries API is active" },
-    { headers: corsHeaders() }
-  );
+// 3. PATCH: Update inquiry status or read state
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status, read } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing inquiry ID" }, { status: 400, headers: corsHeaders() });
+    }
+
+    const { url, key } = getSupabaseConfig();
+    if (url && key) {
+      const updates: Record<string, any> = {};
+      if (status !== undefined) updates.status = status;
+      if (read !== undefined) updates.read = read;
+
+      await fetch(`${url}/rest/v1/inquiries?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify(updates),
+      });
+    }
+
+    return NextResponse.json({ success: true }, { headers: corsHeaders() });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to update inquiry" }, { status: 500, headers: corsHeaders() });
+  }
+}
+
+// 4. DELETE: Remove inquiry
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing inquiry ID" }, { status: 400, headers: corsHeaders() });
+    }
+
+    const { url, key } = getSupabaseConfig();
+    if (url && key) {
+      await fetch(`${url}/rest/v1/inquiries?id=eq.${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+      });
+    }
+
+    return NextResponse.json({ success: true }, { headers: corsHeaders() });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to delete inquiry" }, { status: 500, headers: corsHeaders() });
+  }
 }

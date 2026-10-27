@@ -1,36 +1,120 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
-import { submitQuoteInquiry } from "@/lib/catalog";
+import { EXPORT_CATALOG, submitQuoteInquiry } from "@/lib/catalog";
 import { useLanguage } from "@/context/language-context";
 
-export default function ContactPage() {
+function ContactFormInner() {
   const { t, dir } = useLanguage();
   const c = t.contactPage;
   const f = c.fields;
+  const p = t.productsPage;
+  const searchParams = useSearchParams();
 
+  const cropParam = searchParams.get("crop") || searchParams.get("product") || "";
+  const idParam = searchParams.get("id") || "";
+  const emailParam = searchParams.get("email") || "";
+
+  // Locate product from EXPORT_CATALOG if matched
+  const matchedProduct = EXPORT_CATALOG.find((item) => {
+    if (idParam && item.id.toLowerCase() === idParam.toLowerCase()) return true;
+    if (cropParam) {
+      const lowerCrop = cropParam.toLowerCase();
+      const lowerName = item.name.toLowerCase();
+      const lowerId = item.id.toLowerCase();
+      return (
+        lowerId === lowerCrop ||
+        lowerName.includes(lowerCrop) ||
+        lowerCrop.includes(lowerName) ||
+        item.variety.toLowerCase().includes(lowerCrop)
+      );
+    }
+    return false;
+  });
+
+  const localizedItem = matchedProduct
+    ? p.productsList?.find((item) => item.id === matchedProduct.id)
+    : null;
+
+  const resolvedProductName =
+    localizedItem?.name || matchedProduct?.name || cropParam;
+  const resolvedVariety =
+    localizedItem?.variety || matchedProduct?.variety || "";
+
+  const [isCleared, setIsCleared] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     company: "",
     country: "",
-    email: "",
+    email: emailParam,
     phone: "",
-    product: "",
+    product: resolvedProductName,
     quantity: "",
     incoterms: "FOB",
     destinationPort: "",
     message: "",
   });
 
+  // Sync state if search params arrive
+  useEffect(() => {
+    if (!isCleared && (resolvedProductName || emailParam)) {
+      setFormData((prev) => ({
+        ...prev,
+        product: prev.product ? prev.product : resolvedProductName,
+        email: prev.email ? prev.email : emailParam,
+      }));
+    }
+  }, [isCleared, resolvedProductName, emailParam]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
   ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // If user completely clears the product input, also clear URL so refresh doesn't bring it back
+    if (name === "product" && value.trim() === "") {
+      setIsCleared(true);
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("id");
+        url.searchParams.delete("crop");
+        url.searchParams.delete("product");
+        window.history.replaceState(
+          {},
+          "",
+          url.pathname + (url.searchParams.toString() ? `?${url.searchParams.toString()}` : "")
+        );
+      }
+    }
+  };
+
+  const handleClearSelectedProduct = () => {
+    setIsCleared(true);
+    setFormData((prev) => ({
+      ...prev,
+      product: "",
+    }));
+
+    // Clean URL in the browser so refresh doesn't bring it back
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("id");
+      url.searchParams.delete("crop");
+      url.searchParams.delete("product");
+      window.history.replaceState(
+        {},
+        "",
+        url.pathname + (url.searchParams.toString() ? `?${url.searchParams.toString()}` : "")
+      );
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +128,6 @@ export default function ContactPage() {
   return (
     <PageShell title={c.title} description={c.description}>
       <div className="grid gap-8 lg:grid-cols-12">
-        
         {/* Direct Contact Info Sidebar (5 Cols) */}
         <div className="space-y-6 lg:col-span-5">
           <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
@@ -129,6 +212,55 @@ export default function ContactPage() {
               {c.formDesc}
             </p>
 
+            {/* Active Selected Product Badge */}
+            {!isCleared && resolvedProductName && formData.product && (
+              <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-50/70 p-4 shadow-2xs">
+                <div className="flex items-center gap-3.5">
+                  {matchedProduct?.imageUrl ? (
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-emerald-500/20 shadow-2xs">
+                      <img
+                        src={matchedProduct.imageUrl}
+                        alt={resolvedProductName}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-2xl">
+                      🌿
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+                        {c.selectedCropBadge}
+                      </span>
+                      {(localizedItem?.category || matchedProduct?.category) && (
+                        <span className="rounded-full bg-emerald-200/60 px-2 py-0.5 text-[10px] font-bold text-emerald-900">
+                          {localizedItem?.category || matchedProduct?.category}
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                      {resolvedProductName}
+                    </h4>
+                    {resolvedVariety && (
+                      <p className="text-xs text-slate-600 line-clamp-1 mt-0.5 font-medium">
+                        {resolvedVariety}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleClearSelectedProduct}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-400 hover:text-rose-600 shadow-2xs border border-slate-200/60 hover:border-rose-200 transition-colors"
+                  title={c.clearSelection}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
             {submitted ? (
               <div className="mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-8 text-center animate-in fade-in duration-200">
                 <span className="text-4xl">🎉</span>
@@ -140,12 +272,11 @@ export default function ContactPage() {
                   onClick={() => setSubmitted(false)}
                   className="mt-4 rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold text-white hover:bg-emerald-600 transition-colors"
                 >
-                  إرسال طلب آخر / Submit Another Inquiry
+                  {f.submitAnotherBtn}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                
                 {/* Name & Company */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
@@ -299,30 +430,45 @@ export default function ContactPage() {
                     {f.message}
                   </label>
                   <textarea
-                    rows={3}
+                    rows={4}
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     placeholder={f.messagePlaceholder}
-                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none leading-relaxed"
                   />
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 py-3.5 text-sm font-semibold text-white shadow-xs hover:shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 py-3.5 text-sm font-semibold text-white shadow-xs hover:shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
                 >
-                  <span>{f.submitBtn}</span>
+                  <span>
+                    {isSubmitting ? f.submittingBtn : f.submitBtn}
+                  </span>
                   <span className={dir === "rtl" ? "rotate-180" : ""}>→</span>
                 </button>
-
               </form>
             )}
           </div>
         </div>
-
       </div>
     </PageShell>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-6 py-20 text-center text-sm font-medium text-slate-400">
+          <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        </div>
+      }
+    >
+      <ContactFormInner />
+    </Suspense>
   );
 }

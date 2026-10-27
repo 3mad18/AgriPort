@@ -55,31 +55,17 @@ export function Header() {
   useEffect(() => {
     const checkScroll = () => {
       if (typeof window !== "undefined") {
-        setIsScrolled(window.scrollY > 20);
+        setIsScrolled(window.scrollY > 15);
       }
     };
 
-    // 1. Immediately check scroll position on mount
     checkScroll();
-
-    // 2. Multiple checks to catch browser scroll restoration upon refresh
-    const rafId = requestAnimationFrame(checkScroll);
-    const timer1 = setTimeout(checkScroll, 50);
-    const timer2 = setTimeout(checkScroll, 150);
-    const timer3 = setTimeout(checkScroll, 350);
-
     window.addEventListener("scroll", checkScroll, { passive: true });
     window.addEventListener("resize", checkScroll, { passive: true });
-    window.addEventListener("pageshow", checkScroll, { passive: true });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
       window.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
-      window.removeEventListener("pageshow", checkScroll);
     };
   }, []);
 
@@ -117,10 +103,10 @@ export function Header() {
     <>
       {/* 1. Glassmorphic Navbar */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-lg border-b border-slate-200/60 shadow-xs ${
           isScrolled
-            ? "bg-white/70 backdrop-blur-lg border-b border-slate-200/50 py-3 shadow-xs"
-            : "bg-transparent py-5"
+            ? "py-3 bg-white/90 shadow-sm"
+            : "py-4"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">

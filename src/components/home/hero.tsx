@@ -38,9 +38,11 @@ export function Hero() {
       </div>
 
       {/* Massive Heading */}
-      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] font-extrabold tracking-tighter text-slate-900 mb-6 leading-[1.05] max-w-4xl">
-        {t.hero.headlineMain} <br />
-        <span className="text-slate-400">{t.hero.headlineSub}</span>
+      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] font-extrabold tracking-tighter text-slate-900 mb-8 leading-[1.25] sm:leading-[1.2] max-w-4xl">
+        <span className="block">{t.hero.headlineMain}</span>
+        <span className="block text-slate-400 mt-2 sm:mt-3 lg:mt-4">
+          {t.hero.headlineSub}
+        </span>
       </h1>
 
       {/* Subtitle */}

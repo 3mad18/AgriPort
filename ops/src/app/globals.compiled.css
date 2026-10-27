@@ -1077,6 +1077,9 @@
   .text-start {
     text-align: start;
   }
+  .font-\[\'Space_Grotesk\'\,sans-serif\] {
+    font-family: 'Space Grotesk',sans-serif;
+  }
   .font-mono {
     font-family: var(--font-mono);
   }

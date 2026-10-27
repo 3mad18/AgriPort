@@ -26,32 +26,40 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
 -- 2. Enable Row Level Security (RLS)
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 
+-- Drop old policies if they exist to avoid duplication errors
+DROP POLICY IF EXISTS "Allow public insert of inquiries" ON public.inquiries;
+DROP POLICY IF EXISTS "Allow ops read all inquiries" ON public.inquiries;
+DROP POLICY IF EXISTS "Allow ops update inquiries" ON public.inquiries;
+DROP POLICY IF EXISTS "Allow ops delete inquiries" ON public.inquiries;
+
 -- 3. Policy: Allow Anyone (Public Visitors) to INSERT new inquiries
 CREATE POLICY "Allow public insert of inquiries"
 ON public.inquiries
 FOR INSERT
-TO anon, authenticated
+TO anon, authenticated, service_role
 WITH CHECK (true);
 
--- 4. Policy: Allow Service Role and Authenticated Ops to SELECT, UPDATE, DELETE
+-- 4. Policy: Allow Ops Dashboard to SELECT all inquiries
 CREATE POLICY "Allow ops read all inquiries"
 ON public.inquiries
 FOR SELECT
-TO authenticated, service_role
+TO anon, authenticated, service_role
 USING (true);
 
+-- 5. Policy: Allow Ops Dashboard to UPDATE inquiries (status, read state)
 CREATE POLICY "Allow ops update inquiries"
 ON public.inquiries
 FOR UPDATE
-TO authenticated, service_role
+TO anon, authenticated, service_role
 USING (true)
 WITH CHECK (true);
 
+-- 6. Policy: Allow Ops Dashboard to DELETE inquiries
 CREATE POLICY "Allow ops delete inquiries"
 ON public.inquiries
 FOR DELETE
-TO authenticated, service_role
+TO anon, authenticated, service_role
 USING (true);
 
--- 5. Enable Supabase Realtime for instant alerts on new inquiries
+-- 7. Enable Supabase Realtime for instant alerts on new inquiries
 ALTER PUBLICATION supabase_realtime ADD TABLE public.inquiries;
