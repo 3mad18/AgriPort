@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BrandLogo } from "@/components/brand-logo";
@@ -15,6 +15,33 @@ import { OpsToast } from "@/components/ops-toast";
 
 export type OpsTab = "overview" | "notifications" | "products" | "settings";
 
+const OPS_TAB_STORAGE_KEY = "agriport_ops_persisted_tab";
+
+function getInitialOpsTab(): OpsTab {
+  if (typeof window === "undefined") return "overview";
+  try {
+    // 1. Check URL hash (e.g. #settings, #products, #notifications, #overview)
+    const hash = window.location.hash.replace(/^#/, "").toLowerCase() as OpsTab;
+    if (["overview", "notifications", "products", "settings"].includes(hash)) {
+      return hash;
+    }
+
+    // 2. Check query param (e.g. ?tab=settings)
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab")?.toLowerCase() as OpsTab;
+    if (["overview", "notifications", "products", "settings"].includes(tabParam)) {
+      return tabParam;
+    }
+
+    // 3. Check localStorage
+    const saved = localStorage.getItem(OPS_TAB_STORAGE_KEY) as OpsTab;
+    if (["overview", "notifications", "products", "settings"].includes(saved)) {
+      return saved;
+    }
+  } catch (e) {}
+  return "overview";
+}
+
 export function OpsShell() {
   const { isAuthenticated, isLoading, user, logout } = useOpsAuth();
   const router = useRouter();
@@ -26,11 +53,24 @@ export function OpsShell() {
     markAllInquiriesRead,
   } = useOpsStore();
 
-  const [activeTab, setActiveTab] = useState<OpsTab>("overview");
+  const [activeTab, setActiveTab] = useState<OpsTab>(getInitialOpsTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  const handleTabChange = useCallback((tab: OpsTab) => {
+    setActiveTab(tab);
+    setIsMobileSidebarOpen(false);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(OPS_TAB_STORAGE_KEY, tab);
+        if (window.location.hash !== `#${tab}`) {
+          window.history.replaceState(null, "", `#${tab}`);
+        }
+      } catch (e) {}
+    }
+  }, []);
 
   // Authentication Guard
   useEffect(() => {
@@ -53,38 +93,27 @@ export function OpsShell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Guarantee always returning to Overview (القائمة الرئيسية) on page refresh
+  // Preserve and sync active tab across refreshes and history navigation
   useEffect(() => {
-    setActiveTab("overview");
-    setIsMobileSidebarOpen(false);
-    setIsNotifDropdownOpen(false);
-
-    if (typeof window !== "undefined") {
-      if (window.location.hash || window.location.search) {
-        window.history.replaceState(null, "", window.location.pathname);
+    const tab = getInitialOpsTab();
+    setActiveTab(tab);
+    try {
+      if (window.location.hash !== `#${tab}`) {
+        window.history.replaceState(null, "", `#${tab}`);
       }
+    } catch (e) {}
 
-      const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
-      const isReload =
-        (navEntries.length > 0 && navEntries[0].type === "reload") ||
-        (performance as any).navigation?.type === 1;
+    const handleHashChange = () => {
+      const current = getInitialOpsTab();
+      setActiveTab(current);
+    };
 
-      if (isReload) {
-        setActiveTab("overview");
-      }
-
-      const handleBeforeUnload = () => {
-        sessionStorage.setItem("agriport_ops_reload", "true");
-      };
-      window.addEventListener("beforeunload", handleBeforeUnload);
-
-      if (sessionStorage.getItem("agriport_ops_reload") === "true") {
-        sessionStorage.removeItem("agriport_ops_reload");
-        setActiveTab("overview");
-      }
-
-      return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-    }
+    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("popstate", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("popstate", handleHashChange);
+    };
   }, []);
 
   if (isLoading) {
@@ -173,10 +202,7 @@ export function OpsShell() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setIsMobileSidebarOpen(false);
-                  }}
+                  onClick={() => handleTabChange(item.id)}
                   className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-xs font-bold transition-all ${
                     isActive
                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
@@ -355,7 +381,7 @@ export function OpsShell() {
                           key={item.id}
                           onClick={() => {
                             markInquiryRead(item.id);
-                            setActiveTab("notifications");
+                            handleTabChange("notifications");
                             setIsNotifDropdownOpen(false);
                           }}
                           className={`p-3 rounded-2xl border transition-all cursor-pointer ${
@@ -391,7 +417,7 @@ export function OpsShell() {
                     <button
                       type="button"
                       onClick={() => {
-                        setActiveTab("notifications");
+                        handleTabChange("notifications");
                         setIsNotifDropdownOpen(false);
                       }}
                       className="text-xs font-bold text-emerald-600 hover:text-emerald-700 block w-full py-1"
@@ -418,7 +444,7 @@ export function OpsShell() {
         {/* Dynamic Section Container */}
         <main className="flex-1 p-6 sm:p-8 max-w-7xl mx-auto w-full">
           {activeTab === "overview" && (
-            <OpsOverview onNavigateTab={setActiveTab} />
+            <OpsOverview onNavigateTab={handleTabChange} />
           )}
 
           {activeTab === "notifications" && (

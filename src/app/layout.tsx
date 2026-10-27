@@ -49,23 +49,6 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  // If page was reloaded/refreshed, always redirect to homepage '/'
-                  var nav = window.performance && window.performance.getEntriesByType ? window.performance.getEntriesByType("navigation") : [];
-                  var isReload = (nav.length > 0 && nav[0].type === "reload") || (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
-                  var wasRefreshed = sessionStorage.getItem("agriport_refresh_subpage") === "true";
-                  if (wasRefreshed) {
-                    sessionStorage.removeItem("agriport_refresh_subpage");
-                  }
-                  if ((isReload || wasRefreshed) && window.location.pathname !== "/" && !window.location.pathname.startsWith("/api")) {
-                    window.location.replace("/");
-                    return;
-                  }
-
-                  // Track page reloads
-                  window.addEventListener("beforeunload", function() {
-                    sessionStorage.setItem("agriport_refresh_subpage", "true");
-                  });
-
                   var saved = localStorage.getItem("agrinile_preferred_language") || "en";
                   if (saved === "ar") {
                     document.documentElement.lang = "ar";
