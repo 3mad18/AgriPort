@@ -12,7 +12,7 @@ export function getVisitorSiteUrl(path: string = ""): string {
 
     // Local development: ops is on 3001, visitor site is on 3000
     if (hostname === "localhost" || hostname === "127.0.0.1") {
-      return `http://localhost:3000${cleanPath}`;
+      return `https://agri-port-zeta.vercel.app${cleanPath}`;
     }
 
     // Production subdomain (e.g. ops.agriport.com -> agriport.com)
@@ -23,5 +23,5 @@ export function getVisitorSiteUrl(path: string = ""): string {
   }
 
   // 3. Default fallback
-  return `http://localhost:3000${cleanPath}`;
+  return `https://agri-port-zeta.vercel.app${cleanPath}`;
 }

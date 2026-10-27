@@ -248,12 +248,12 @@ export function OpsSettings() {
               👁️ معاينة الشارة في واجهة الموقع (كما تظهر للزوار تماماً)
             </h4>
             <a
-              href="http://localhost:3000"
+              href="https://agri-port-zeta.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1"
             >
-              <span>فتح موقع الزوار (Port 3000) للتحقق</span>
+              <span>فتح موقع الزوار للتحقق</span>
               <span>↗</span>
             </a>
           </div>
