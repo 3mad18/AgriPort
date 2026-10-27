@@ -53,6 +53,40 @@ export function OpsShell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Guarantee always returning to Overview (القائمة الرئيسية) on page refresh
+  useEffect(() => {
+    setActiveTab("overview");
+    setIsMobileSidebarOpen(false);
+    setIsNotifDropdownOpen(false);
+
+    if (typeof window !== "undefined") {
+      if (window.location.hash || window.location.search) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+
+      const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+      const isReload =
+        (navEntries.length > 0 && navEntries[0].type === "reload") ||
+        (performance as any).navigation?.type === 1;
+
+      if (isReload) {
+        setActiveTab("overview");
+      }
+
+      const handleBeforeUnload = () => {
+        sessionStorage.setItem("agriport_ops_reload", "true");
+      };
+      window.addEventListener("beforeunload", handleBeforeUnload);
+
+      if (sessionStorage.getItem("agriport_ops_reload") === "true") {
+        sessionStorage.removeItem("agriport_ops_reload");
+        setActiveTab("overview");
+      }
+
+      return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center" dir="rtl">
