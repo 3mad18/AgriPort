@@ -205,11 +205,11 @@ export function OpsSettings() {
           </div>
         </div>
 
-        {/* Box 3: Export Season Announcement Banner */}
+        {/* Box 3: Export Season Announcement Badge */}
         <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-base font-bold text-slate-900">
-              شريط إعلانات المواسم التصديرية
+              شارة إعلان المواسم التصديرية (أعلى واجهة الموقع)
             </h3>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -221,7 +221,7 @@ export function OpsSettings() {
                 className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500"
               />
               <span className="text-xs font-bold text-slate-700">
-                تفعيل الإعلان أعلى الموقع
+                تفعيل ظهور الشارة في واجهة الموقع
               </span>
             </label>
           </div>
@@ -241,11 +241,11 @@ export function OpsSettings() {
           </div>
         </div>
 
-        {/* Live Preview of Banner & Settings */}
+        {/* Live Preview of the exact Pill Badge in Hero */}
         <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-6 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              👁️ معاينة فورية لشريط الإعلان أعلى الموقع
+              👁️ معاينة الشارة في واجهة الموقع (كما تظهر للزوار تماماً)
             </h4>
             <a
               href="http://localhost:3000"
@@ -258,21 +258,21 @@ export function OpsSettings() {
             </a>
           </div>
 
-          {form.showExportBanner ? (
-            <div className="rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 p-3 text-white text-xs font-bold flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-white animate-ping" />
-                <span>{form.exportBannerText || "نص الإعلان التصديري..."}</span>
+          <div className="flex justify-center p-6 bg-white rounded-2xl border border-slate-100">
+            {form.showExportBanner ? (
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs sm:text-sm font-semibold tracking-wide shadow-2xs">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>{form.exportBannerText || "موسم تصدير البرتقال والبصل مفتوح حالياً للشحن الفوري إلى أوروبا ودول الخليج!"}</span>
               </div>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-[11px]">
-                تصدير الآن ←
-              </span>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-slate-300 p-3 text-center text-xs text-slate-400 font-medium">
-              شريط الإعلان معطّل حالياً ولن يظهر للزوار
-            </div>
-          )}
+            ) : (
+              <div className="text-xs text-slate-400 font-medium py-1">
+                (الشارة معطّلة حالياً ولن تظهر في الصفحة الرئيسية)
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Save Button */}
