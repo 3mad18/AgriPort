@@ -38,12 +38,12 @@ export function OpsToast() {
         type: customEvent.detail.type || "success",
       };
 
-      // Keep at most 2 toasts simultaneously
-      setToasts((prev) => [...prev.slice(-1), newToast]);
+      // Keep at most 1 toast in center
+      setToasts([newToast]);
 
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== newToast.id));
-      }, 3500);
+      }, 2800);
     };
 
     window.addEventListener(TOAST_EVENT, handleToast);
@@ -54,35 +54,35 @@ export function OpsToast() {
 
   return (
     <div
-      className="fixed bottom-7 inset-x-0 z-[9999] pointer-events-none flex flex-col items-center gap-2 px-4"
+      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] pointer-events-none flex flex-col items-center gap-3 px-4"
       dir="rtl"
     >
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto flex items-center gap-3 rounded-full py-2.5 px-5 shadow-2xl backdrop-blur-md border text-xs font-semibold animate-in fade-in slide-in-from-bottom-5 duration-300 transition-all ${
+          className={`pointer-events-auto flex items-center gap-3.5 rounded-2xl py-3.5 px-6 shadow-2xl backdrop-blur-xl border text-sm font-bold animate-in fade-in zoom-in-95 duration-200 transition-all ${
             toast.type === "error"
-              ? "bg-rose-950/95 text-rose-100 border-rose-500/30 shadow-rose-950/30"
+              ? "bg-slate-900/95 text-rose-200 border-rose-500/40 shadow-rose-950/40"
               : toast.type === "info"
-              ? "bg-slate-900/95 text-slate-100 border-slate-700/60 shadow-slate-950/30"
-              : "bg-slate-950/95 text-white border-emerald-500/30 shadow-emerald-950/20"
+              ? "bg-slate-900/95 text-sky-200 border-sky-500/40 shadow-sky-950/40"
+              : "bg-slate-900/95 text-white border-emerald-500/40 shadow-black/30 ring-1 ring-emerald-500/20"
           }`}
         >
           {/* Status Dot / Icon */}
           <span
-            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-extrabold shadow-sm ${
               toast.type === "error"
                 ? "bg-rose-500 text-white"
                 : toast.type === "info"
                 ? "bg-sky-500 text-white"
-                : "bg-emerald-500 text-white shadow-xs shadow-emerald-500/40"
+                : "bg-emerald-500 text-white shadow-emerald-500/50"
             }`}
           >
             {toast.type === "error" ? "✕" : toast.type === "info" ? "ℹ" : "✓"}
           </span>
 
           {/* Toast Message Text */}
-          <span className="tracking-wide">{toast.message}</span>
+          <span className="tracking-wide text-sm font-bold">{toast.message}</span>
 
           {/* Dismiss button */}
           <button
@@ -90,7 +90,7 @@ export function OpsToast() {
             onClick={() =>
               setToasts((prev) => prev.filter((t) => t.id !== toast.id))
             }
-            className="text-white/40 hover:text-white transition-colors text-[10px] pr-1"
+            className="text-white/40 hover:text-white transition-colors text-xs pr-2"
             title="إغلاق"
           >
             ✕
