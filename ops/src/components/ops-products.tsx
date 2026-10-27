@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useOpsStore, type Product } from "@/context/ops-store-context";
 
 export function OpsProducts({
@@ -14,6 +14,10 @@ export function OpsProducts({
   const [selectedCategory, setSelectedCategory] = useState<string>("الكل");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<Omit<Product, "id">>({
     name: "",
@@ -44,6 +48,7 @@ export function OpsProducts({
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
+    setShowUrlInput(false);
     setForm({
       name: "",
       category: "موالح",
@@ -61,6 +66,7 @@ export function OpsProducts({
 
   const handleOpenEdit = (item: Product) => {
     setEditingProduct(item);
+    setShowUrlInput(false);
     setForm({
       name: item.name,
       category: item.category,
@@ -74,6 +80,58 @@ export function OpsProducts({
       featured: item.featured || false,
     });
     setIsModalOpen(true);
+  };
+
+  const processImageFile = (file: File) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    setIsProcessingImage(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+        const MAX_DIM = 1200;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+          setForm((prev) => ({ ...prev, imageUrl: dataUrl }));
+        }
+        setIsProcessingImage(false);
+      };
+      img.onerror = () => setIsProcessingImage(false);
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => setIsProcessingImage(false);
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -374,18 +432,101 @@ export function OpsProducts({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  رابط صورة المحصول (Image URL)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  صورة المحصول (من المعرض / الجهاز)
                 </label>
+
+                {/* Hidden File Input */}
                 <input
-                  type="url"
-                  value={form.imageUrl}
-                  onChange={(e) =>
-                    setForm({ ...form, imageUrl: e.target.value })
-                  }
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
                 />
+
+                {form.imageUrl ? (
+                  /* Image Preview Card */
+                  <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-2">
+                    <div className="relative h-44 w-full overflow-hidden rounded-xl bg-slate-100">
+                      <img
+                        src={form.imageUrl}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute bottom-3 start-3 end-3 flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-slate-800 hover:bg-white hover:text-emerald-600 transition-all shadow-sm"
+                        >
+                          <span>🔄</span>
+                          <span>تغيير الصورة من المعرض</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setForm((prev) => ({ ...prev, imageUrl: "" }))}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/90 backdrop-blur-md px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-600 transition-all shadow-sm"
+                        >
+                          <span>🗑</span>
+                          <span>حذف الصورة</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Drop & Upload Area */
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragging(true);
+                    }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition-all ${
+                      isDragging
+                        ? "border-emerald-500 bg-emerald-50/50"
+                        : "border-slate-300 hover:border-emerald-500 hover:bg-slate-50/80 bg-slate-50/40"
+                    }`}
+                  >
+                    <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 text-2xl">
+                      {isProcessingImage ? "⏳" : "🖼️"}
+                    </div>
+                    <div className="text-xs font-bold text-slate-800">
+                      {isProcessingImage
+                        ? "جاري تجهيز الصورة..."
+                        : "اضغط هنا لاختيار صورة من المعرض أو جهازك"}
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-400">
+                      أو اسحب الصورة وأفلتها هنا (يدعم جميع صيغ الصور)
+                    </p>
+                  </div>
+                )}
+
+                {/* Optional toggle for URL */}
+                <div className="mt-2 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput(!showUrlInput)}
+                    className="text-[11px] font-semibold text-slate-400 hover:text-emerald-600 transition-colors"
+                  >
+                    {showUrlInput ? "▲ إخفاء رابط الصورة" : "▼ أو إدخال رابط صورة خارجي (URL)"}
+                  </button>
+                </div>
+
+                {showUrlInput && (
+                  <input
+                    type="url"
+                    value={form.imageUrl}
+                    onChange={(e) =>
+                      setForm({ ...form, imageUrl: e.target.value })
+                    }
+                    placeholder="https://images.unsplash.com/..."
+                    className="mt-2 w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"
+                  />
+                )}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
