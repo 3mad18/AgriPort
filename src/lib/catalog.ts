@@ -92,6 +92,8 @@ export const EXPORT_CATALOG: ExportProduct[] = [
   },
 ];
 
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config";
+
 export async function submitQuoteInquiry(inquiryData: {
   name: string;
   company: string;
@@ -104,10 +106,8 @@ export async function submitQuoteInquiry(inquiryData: {
   destinationPort: string;
   message: string;
 }) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = SUPABASE_URL;
+  const supabaseKey = SUPABASE_ANON_KEY;
 
   console.log("📤 [AgriPort] Submitting inquiry...", {
     product: inquiryData.product,

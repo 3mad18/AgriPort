@@ -2,9 +2,14 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { EXPORT_CATALOG, ExportProduct } from "./catalog";
-
-const STORAGE_KEY = "agriport_live_products_cache";
-const CHANGE_EVENT = "agriport_live_products_change";
+import {
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  PRODUCTS_KEY,
+  PRODUCTS_CACHE_KEY,
+  PRODUCTS_EVENT,
+  OPS_STORE_EVENT,
+} from "./supabase-config";
 
 let cachedProducts: ExportProduct[] | null = null;
 let cachedRaw: string | null = null;
@@ -12,16 +17,21 @@ let cachedRaw: string | null = null;
 function subscribe(callback: () => void) {
   if (typeof window === "undefined") return () => {};
   window.addEventListener("storage", callback);
-  window.addEventListener(CHANGE_EVENT, callback);
+  window.addEventListener(PRODUCTS_EVENT, callback);
+  window.addEventListener(OPS_STORE_EVENT, callback);
   return () => {
     window.removeEventListener("storage", callback);
-    window.removeEventListener(CHANGE_EVENT, callback);
+    window.removeEventListener(PRODUCTS_EVENT, callback);
+    window.removeEventListener(OPS_STORE_EVENT, callback);
   };
 }
 
 function getSnapshot(): ExportProduct[] {
   if (typeof window === "undefined") return EXPORT_CATALOG;
-  const raw = localStorage.getItem(STORAGE_KEY);
+  const raw =
+    localStorage.getItem(PRODUCTS_KEY) ||
+    localStorage.getItem(PRODUCTS_CACHE_KEY);
+
   if (raw === cachedRaw && cachedProducts) return cachedProducts;
   if (!raw) return EXPORT_CATALOG;
   try {
@@ -46,20 +56,15 @@ export function useLiveProducts() {
 
   useEffect(() => {
     let isMounted = true;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey =
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     async function fetchProducts() {
-      if (!supabaseUrl || !supabaseKey) return;
       try {
         const res = await fetch(
-          `${supabaseUrl}/rest/v1/products?select=*&order=sort_order.asc,created_at.asc`,
+          `${SUPABASE_URL}/rest/v1/products?select=*&order=sort_order.asc,created_at.asc`,
           {
             headers: {
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             },
             cache: "no-store",
           }
@@ -81,22 +86,23 @@ export function useLiveProducts() {
             }));
 
             const raw = JSON.stringify(mapped);
-            if (raw !== localStorage.getItem(STORAGE_KEY)) {
-              localStorage.setItem(STORAGE_KEY, raw);
+            if (raw !== localStorage.getItem(PRODUCTS_KEY)) {
+              localStorage.setItem(PRODUCTS_KEY, raw);
+              localStorage.setItem(PRODUCTS_CACHE_KEY, raw);
               cachedProducts = mapped;
               cachedRaw = raw;
-              console.log("📦 [AgriPort Live Products] Updated from Supabase:", mapped.map(p => `${p.name} (${p.status})`));
-              window.dispatchEvent(new Event(CHANGE_EVENT));
+              window.dispatchEvent(new Event(PRODUCTS_EVENT));
+              window.dispatchEvent(new Event(OPS_STORE_EVENT));
             }
           }
         }
       } catch (err) {
-        console.warn("Could not fetch live products from Supabase:", err);
+        // silent
       }
     }
 
     fetchProducts();
-    const interval = setInterval(fetchProducts, 3000); // Check every 3 seconds
+    const interval = setInterval(fetchProducts, 2500);
 
     const handleFocus = () => fetchProducts();
     window.addEventListener("focus", handleFocus);
