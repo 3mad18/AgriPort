@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
-import { WhatsAppFloat } from "@/components/ui/whatsapp-float";
-import { LanguageProvider } from "@/context/language-context";
+import { SiteChrome } from "@/components/layout/site-chrome";
 import { siteConfig } from "@/config/site";
 import "./globals.compiled.css";
 
@@ -49,6 +46,12 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  var p = window.location.pathname;
+                  if (p.startsWith("/ops") || p.startsWith("/secure-login")) {
+                    document.documentElement.lang = "ar";
+                    document.documentElement.dir = "rtl";
+                    return;
+                  }
                   var saved = localStorage.getItem("agrinile_preferred_language") || "en";
                   if (saved === "ar") {
                     document.documentElement.lang = "ar";
@@ -70,12 +73,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col font-sans bg-white text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
-        <LanguageProvider>
-          <Header />
-          <main className="flex-1 flex flex-col">{children}</main>
-          <Footer />
-          <WhatsAppFloat />
-        </LanguageProvider>
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

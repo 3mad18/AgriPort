@@ -149,10 +149,21 @@ export function Footer() {
             </span>
           </div>
 
-          <p>
-            &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
-            {footer.rights}.
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm">
+            <p>
+              &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
+              {footer.rights}.
+            </p>
+            <span className="text-slate-700 hidden sm:inline">|</span>
+            <Link
+              href="/ops"
+              className="text-xs text-slate-500 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800/40 hover:bg-slate-800"
+              title="بوابة إدارة العمليات والموقع"
+            >
+              <span>🔒</span>
+              <span>لوحة العمليات</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
