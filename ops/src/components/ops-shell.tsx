@@ -11,6 +11,7 @@ import { OpsOverview } from "@/components/ops-overview";
 import { OpsNotificationsCenter } from "@/components/ops-notifications-center";
 import { OpsProducts } from "@/components/ops-products";
 import { OpsSettings } from "@/components/ops-settings";
+import { OpsToast } from "@/components/ops-toast";
 
 export type OpsTab = "overview" | "notifications" | "products" | "settings";
 
@@ -397,6 +398,9 @@ export function OpsShell() {
           {activeTab === "settings" && <OpsSettings />}
         </main>
       </div>
+
+      {/* Global Toast Notification */}
+      <OpsToast />
     </div>
   );
 }

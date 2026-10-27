@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { triggerOpsToast } from "@/components/ops-toast";
 
 export type Product = {
   id: string;
@@ -65,6 +66,7 @@ type OpsStoreContextType = {
   markAllInquiriesRead: () => void;
   deleteInquiry: (id: string) => void;
   updateSettings: (settings: Partial<SiteSettings>) => Promise<{ success: boolean; error?: string }>;
+  showToast: (message: string, type?: "success" | "error" | "info") => void;
 };
 
 const DEFAULT_PRODUCTS: Product[] = [
@@ -537,6 +539,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
+      triggerOpsToast(`تمت إضافة منتج "${newProduct.name}" بنجاح! 🌿`);
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey =
@@ -585,6 +588,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
+      triggerOpsToast("تم حفظ وتحديث بيانات المنتج بنجاح! ✏️");
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey =
@@ -630,6 +634,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
+      triggerOpsToast("تم حذف المنتج من الكتالوج بنجاح 🗑️");
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey =
@@ -708,6 +713,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     cachedInquiries = updated;
     cachedInquiriesRaw = JSON.stringify(updated);
     notifyChange();
+    triggerOpsToast("تم تمييز جميع الطلبات كمقروءة ✓");
   }, []);
 
   const updateInquiryStatus = useCallback(
@@ -720,6 +726,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedInquiries = updated;
       cachedInquiriesRaw = JSON.stringify(updated);
       notifyChange();
+      triggerOpsToast(`تم تحديث حالة الطلب إلى "${status}" 📋`);
 
       fetch("/api/inquiries", {
         method: "PATCH",
@@ -738,6 +745,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedInquiries = updated;
       cachedInquiriesRaw = JSON.stringify(updated);
       notifyChange();
+      triggerOpsToast("تم حذف الطلب بنجاح 🗑️");
 
       fetch(`/api/inquiries?id=${encodeURIComponent(id)}`, {
         method: "DELETE",
@@ -796,15 +804,18 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
           }
 
           console.log("✅ [AgriPort Ops] site_settings successfully synced to Supabase:", updated);
+          triggerOpsToast("تم حفظ ونشر إعدادات الموقع بنجاح! ✨");
           return { success: true };
         } catch (e: any) {
           console.error("Failed to update site_settings in Supabase:", e);
+          triggerOpsToast("تعذر الحفظ في السحابة", "error");
           return {
             success: false,
             error: e?.message || "خطأ أثناء محاولة الاتصال بـ Supabase",
           };
         }
       }
+      triggerOpsToast("تم حفظ إعدادات الموقع محلياً بنجاح! ✨");
       return { success: true };
     },
     [],
@@ -830,6 +841,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         markAllInquiriesRead,
         deleteInquiry,
         updateSettings,
+        showToast: triggerOpsToast,
       }}
     >
       {children}
