@@ -539,7 +539,11 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
-      triggerOpsToast(`تمت إضافة منتج "${newProduct.name}" بنجاح! 🌿`);
+      triggerOpsToast(
+        `تمت إضافة منتج "${newProduct.name}" بنجاح إلى الموقع.`,
+        "success",
+        "تم الحفظ بنجاح"
+      );
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey =
@@ -588,7 +592,11 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
-      triggerOpsToast("تم حفظ وتحديث بيانات المنتج بنجاح! ✏️");
+      triggerOpsToast(
+        "تم حفظ وتحديث بيانات المنتج في الموقع بنجاح.",
+        "success",
+        "تم الحفظ بنجاح"
+      );
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey =
@@ -804,18 +812,26 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
           }
 
           console.log("✅ [AgriPort Ops] site_settings successfully synced to Supabase:", updated);
-          triggerOpsToast("تم حفظ ونشر إعدادات الموقع بنجاح! ✨");
+          triggerOpsToast(
+            "تم حفظ ونشر إعدادات الموقع والتصدير بنجاح، وستنعكس فوراً على موقع الزوار.",
+            "success",
+            "تم الحفظ بنجاح"
+          );
           return { success: true };
         } catch (e: any) {
           console.error("Failed to update site_settings in Supabase:", e);
-          triggerOpsToast("تعذر الحفظ في السحابة", "error");
+          triggerOpsToast("تعذر الحفظ في السحابة", "error", "خطأ في الحفظ");
           return {
             success: false,
             error: e?.message || "خطأ أثناء محاولة الاتصال بـ Supabase",
           };
         }
       }
-      triggerOpsToast("تم حفظ إعدادات الموقع محلياً بنجاح! ✨");
+      triggerOpsToast(
+        "تم حفظ ونشر إعدادات الموقع بنجاح.",
+        "success",
+        "تم الحفظ بنجاح"
+      );
       return { success: true };
     },
     [],
