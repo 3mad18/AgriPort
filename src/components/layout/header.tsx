@@ -50,6 +50,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const mobileLangRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -72,10 +73,10 @@ export function Header() {
   // Close language dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        langMenuRef.current &&
-        !langMenuRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const insideDesktop = langMenuRef.current?.contains(target);
+      const insideMobile = mobileLangRef.current?.contains(target);
+      if (!insideDesktop && !insideMobile) {
         setLangMenuOpen(false);
       }
     }
@@ -109,7 +110,7 @@ export function Header() {
             : "py-4"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           {/* Logo */}
           <BrandLogo />
 
@@ -122,10 +123,10 @@ export function Header() {
               {t.nav.products}
             </Link>
             <Link
-              href={isHome ? "#capabilities" : "/about"}
+              href="/facilities"
               className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
             >
-              {t.nav.capabilities}
+              {t.nav.facilities}
             </Link>
             <Link
               href="/about"
@@ -222,109 +223,128 @@ export function Header() {
 
           {/* Mobile Right Controls: Language Pill + Menu Toggle */}
           <div className="flex items-center gap-2 md:hidden">
-            {/* Mobile Language Button */}
-            <button
-              type="button"
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-xs"
-            >
-              <FlagIcon code={language} className="h-3 w-4.5 rounded-xs" />
-              <span>{currentLangInfo.code.toUpperCase()}</span>
-            </button>
+            {/* Mobile Language Button & Popover */}
+            <div className="relative" ref={mobileLangRef}>
+              <button
+                type="button"
+                onClick={() => setLangMenuOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-xs active:scale-95 transition-all"
+                aria-expanded={langMenuOpen}
+                aria-label="Change language"
+              >
+                <FlagIcon code={language} className="h-3 w-4.5 rounded-xs" />
+                <span>{currentLangInfo.code.toUpperCase()}</span>
+                <svg
+                  className={`h-2.5 w-2.5 text-slate-400 transition-transform duration-200 ${
+                    langMenuOpen ? "rotate-180" : ""
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {langMenuOpen && (
+                <div
+                  className={`absolute top-full mt-2 ${
+                    dir === "rtl" ? "left-0" : "right-0"
+                  } w-52 overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-1.5 shadow-2xl ring-1 ring-black/10 z-50 animate-fade-in text-start`}
+                >
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+                    {t.language} / Language
+                  </div>
+                  <div className="max-h-60 overflow-y-auto space-y-0.5">
+                    {SUPPORTED_LANGUAGES.map((lang) => {
+                      const isSelected = lang.code === language;
+                      return (
+                        <button
+                          key={lang.code}
+                          type="button"
+                          onClick={() => handleSelectLanguage(lang.code)}
+                          className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors ${
+                            isSelected
+                              ? "bg-emerald-50 text-emerald-900 font-bold"
+                              : "text-slate-700 hover:bg-slate-50 active:bg-slate-100"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <FlagIcon
+                              code={lang.code}
+                              className="h-3.5 w-5 rounded-xs"
+                            />
+                            <span>{lang.nativeName}</span>
+                          </div>
+                          {isSelected && (
+                            <svg
+                              className="h-3.5 w-3.5 text-emerald-600"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Mobile Toggle */}
             <button
               className="p-1.5 text-slate-900 hover:text-emerald-600 transition-colors"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => {
+                setIsMobileMenuOpen((prev) => !prev);
+                setLangMenuOpen(false);
+              }}
               aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Language Popup if clicked on mobile */}
-        {langMenuOpen && (
-          <div className="md:hidden border-t border-slate-100 bg-white px-6 py-3 shadow-md">
-            <div className="flex flex-wrap gap-2">
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => handleSelectLanguage(lang.code)}
-                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium border ${
-                    lang.code === language
-                      ? "bg-emerald-500 text-white border-emerald-500 font-bold"
-                      : "bg-slate-50 text-slate-700 border-slate-200"
-                  }`}
-                >
-                  <FlagIcon code={lang.code} className="h-3 w-4.5" />
-                  <span>{lang.nativeName}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden animate-fade-in flex flex-col justify-between pb-8">
-          <div className="flex flex-col gap-6 text-lg font-medium">
-            <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
-              <BrandLogo />
-            </div>
+        <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden animate-fade-in flex flex-col justify-start gap-8 pb-8 overflow-y-auto">
+          <div className="flex flex-col gap-6 text-lg font-medium text-start">
             <Link
               href={isHome ? "#products" : "/products"}
-              className="text-slate-600 hover:text-emerald-600 transition-colors"
+              className="text-slate-700 hover:text-emerald-600 transition-colors py-1"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t.nav.products}
             </Link>
             <Link
-              href={isHome ? "#capabilities" : "/about"}
-              className="text-slate-600 hover:text-emerald-600 transition-colors"
+              href="/facilities"
+              className="text-slate-700 hover:text-emerald-600 transition-colors py-1"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              {t.nav.capabilities}
+              {t.nav.facilities}
             </Link>
             <Link
               href="/about"
-              className="text-slate-600 hover:text-emerald-600 transition-colors"
+              className="text-slate-700 hover:text-emerald-600 transition-colors py-1"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t.nav.company}
             </Link>
             <Link
               href="/contact"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-full text-center font-semibold text-base shadow-sm mt-4"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3.5 rounded-full text-center font-semibold text-base shadow-sm mt-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t.nav.contactSales}
             </Link>
-          </div>
-
-          <div className="border-t border-slate-100 pt-6">
-            <p className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
-              {t.language}
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => handleSelectLanguage(lang.code)}
-                  className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium border ${
-                    lang.code === language
-                      ? "bg-emerald-50 text-emerald-900 border-emerald-300 font-bold"
-                      : "bg-slate-50 text-slate-700 border-slate-200"
-                  }`}
-                >
-                  <FlagIcon code={lang.code} className="h-3.5 w-5" />
-                  <span>{lang.nativeName}</span>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       )}

@@ -1,13 +1,62 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useOpsStore, type Product } from "@/context/ops-store-context";
+
+export const EMOJI_OPTIONS = [
+  // 1. الموالح والحمضيات (Citrus)
+  { emoji: "🍊", label: "برتقال وموالح صيفية (Oranges & Citrus)", category: "موالح" },
+  { emoji: "🍋", label: "ليمون أصفر وأخضر (Lemons & Limes)", category: "موالح" },
+  { emoji: "🍈", label: "يوسفي وكلمنتينا وشمام (Mandarins & Melons)", category: "موالح" },
+
+  // 2. الخضروات الرئيسية (Vegetables)
+  { emoji: "🧅", label: "بصل أحمر وذهبي (Red & Golden Onions)", category: "خضروات" },
+  { emoji: "🧄", label: "ثوم طازج وأبيض وأحمر (Fresh Garlic)", category: "خضروات" },
+  { emoji: "🥔", label: "بطاطس مائدة وتصنيع (Fresh Potatoes)", category: "خضروات" },
+  { emoji: "🌱", label: "خرشوف ونباتات مجهزة (Artichoke & Plants)", category: "خضروات" },
+  { emoji: "🍅", label: "طماطم تصدير وشيري (Fresh Tomatoes)", category: "خضروات" },
+  { emoji: "🥒", label: "خيار صيفي وشتوي (Fresh Cucumbers)", category: "خضروات" },
+  { emoji: "🫑", label: "فلفل ألوان ورومي (Bell Peppers)", category: "خضروات" },
+  { emoji: "🌶️", label: "فلفل حار وشطة (Chili Peppers)", category: "خضروات" },
+  { emoji: "🥕", label: "جزر أصفر وبرتقالي (Carrots)", category: "خضروات" },
+  { emoji: "🥬", label: "خس وخضروات ورقية (Lettuce & Cabbage)", category: "خضروات" },
+  { emoji: "🥦", label: "بروكلي وقرنبيط (Broccoli & Cauliflower)", category: "خضروات" },
+  { emoji: "🍆", label: "باذنجان رومي وأبيض (Eggplants)", category: "خضروات" },
+  { emoji: "🌽", label: "ذرة سكرية وصفراء (Sweet Corn)", category: "خضروات" },
+  { emoji: "🫒", label: "زيتون مائدة وزيت (Fresh Olives)", category: "خضروات" },
+  { emoji: "🌿", label: "أعشاب ونباتات طبية وعطرية (Herbs & Mint)", category: "خضروات" },
+
+  // 3. الفواكه الطازجة (Fresh Fruits)
+  { emoji: "🍓", label: "فراولة طازجة (Fresh Strawberries)", category: "فواكه" },
+  { emoji: "🍇", label: "عنب مائدة أبيض وأحمر (Table Grapes)", category: "فواكه" },
+  { emoji: "🥭", label: "مانجو مصري فاخر (Fresh Mangoes)", category: "فواكه" },
+  { emoji: "🍉", label: "بطيخ طازج (Fresh Watermelon)", category: "فواكه" },
+  { emoji: "🍎", label: "تفاح أحمر وأخضر (Apples)", category: "فواكه" },
+  { emoji: "🍐", label: "كمثرى (Pears)", category: "فواكه" },
+  { emoji: "🍑", label: "خوخ ونكتارين (Peaches & Nectarines)", category: "فواكه" },
+  { emoji: "🍒", label: "كرز وبرقوق ومشمش (Cherries & Plums)", category: "فواكه" },
+  { emoji: "🥑", label: "أفوكادو (Avocado)", category: "فواكه" },
+  { emoji: "🍌", label: "موز طازج (Bananas)", category: "فواكه" },
+  { emoji: "🍍", label: "أنـاناس (Pineapple)", category: "فواكه" },
+  { emoji: "🥝", label: "كيـوي (Kiwi)", category: "فواكه" },
+
+  // 4. التعبئة واللوجستيات (Packaging & Logistics)
+  { emoji: "🌾", label: "حبوب وغلال وبقوليات (Grains & Wheat)", category: "أخرى" },
+  { emoji: "📦", label: "كرتون وعبوات تصدير (Packaged Goods)", category: "أخرى" },
+  { emoji: "❄️", label: "سلسلة تبريد وشحنات مبردة (Cold Chain)", category: "أخرى" },
+  { emoji: "🏭", label: "محطة تعبئة وتجهيز (Packing Station)", category: "أخرى" },
+  { emoji: "🚢", label: "حاويات وشحن بحري (Maritime Reefer)", category: "أخرى" },
+];
 
 export function OpsProducts({
   searchQuery,
+  initialOpenAddModal = false,
+  onResetOpenAddModal,
 }: {
   searchQuery: string;
+  initialOpenAddModal?: boolean;
+  onResetOpenAddModal?: () => void;
 }) {
   const { products, addProduct, updateProduct, deleteProduct } = useOpsStore();
 
@@ -46,7 +95,7 @@ export function OpsProducts({
     return matchesCat && matchesSearch;
   });
 
-  const handleOpenAdd = () => {
+  const handleOpenAdd = useCallback(() => {
     setEditingProduct(null);
     setShowUrlInput(false);
     setForm({
@@ -62,7 +111,14 @@ export function OpsProducts({
       featured: false,
     });
     setIsModalOpen(true);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (initialOpenAddModal) {
+      handleOpenAdd();
+      onResetOpenAddModal?.();
+    }
+  }, [initialOpenAddModal, handleOpenAdd, onResetOpenAddModal]);
 
   const handleOpenEdit = (item: Product) => {
     setEditingProduct(item);
@@ -175,7 +231,7 @@ export function OpsProducts({
       </div>
 
       {/* Category Filter Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto no-scrollbar">
         {categories.map((cat) => {
           const isActive = selectedCategory === cat;
           const count =
@@ -188,7 +244,7 @@ export function OpsProducts({
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
                 isActive
                   ? "bg-slate-900 text-white shadow-xs"
                   : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
@@ -455,19 +511,19 @@ export function OpsProducts({
                         className="h-full w-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-3 start-3 end-3 flex items-center justify-between">
+                      <div className="absolute bottom-3 start-3 end-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-slate-800 hover:bg-white hover:text-emerald-600 transition-all shadow-sm"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-md px-3 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-bold text-slate-800 hover:bg-white hover:text-emerald-600 transition-all shadow-sm"
                         >
                           <span>🔄</span>
-                          <span>تغيير الصورة من المعرض</span>
+                          <span>تغيير الصورة</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setForm((prev) => ({ ...prev, imageUrl: "" }))}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/90 backdrop-blur-md px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-600 transition-all shadow-sm"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/90 backdrop-blur-md px-3 py-1.5 text-[11px] sm:text-xs font-bold text-white hover:bg-rose-600 transition-all shadow-sm"
                         >
                           <span>🗑</span>
                           <span>حذف الصورة</span>
@@ -532,15 +588,92 @@ export function OpsProducts({
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    أيقونة الإيموجي
+                    أيقونة الإيموجي للمحصول
                   </label>
-                  <input
-                    type="text"
-                    value={form.icon}
-                    onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                    placeholder="🍊 أو 🍓 أو 🧅"
-                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"
-                  />
+                  <div className="flex items-center gap-2">
+                    {/* Big Preview Box */}
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-xl shadow-2xs">
+                      {form.icon || "🌱"}
+                    </div>
+
+                    {/* Dropdown Select List */}
+                    <select
+                      value={form.icon}
+                      onChange={(e) => setForm({ ...form, icon: e.target.value })}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900 focus:border-emerald-500 focus:outline-none"
+                    >
+                      {form.icon &&
+                        !EMOJI_OPTIONS.some((o) => o.emoji === form.icon) && (
+                          <option value={form.icon}>
+                            {form.icon} (إيموجي حالي مخصص)
+                          </option>
+                        )}
+
+                      <optgroup label="🍊 الموالح والحمضيات (Citrus)">
+                        {EMOJI_OPTIONS.filter((o) => o.category === "موالح").map(
+                          (o) => (
+                            <option key={o.emoji} value={o.emoji}>
+                              {o.emoji} {o.label}
+                            </option>
+                          )
+                        )}
+                      </optgroup>
+
+                      <optgroup label="🥗 الخضروات والمحاصيل الحقلية (Vegetables)">
+                        {EMOJI_OPTIONS.filter((o) => o.category === "خضروات").map(
+                          (o) => (
+                            <option key={o.emoji} value={o.emoji}>
+                              {o.emoji} {o.label}
+                            </option>
+                          )
+                        )}
+                      </optgroup>
+
+                      <optgroup label="🍓 الفواكه الطازجة (Fresh Fruits)">
+                        {EMOJI_OPTIONS.filter((o) => o.category === "فواكه").map(
+                          (o) => (
+                            <option key={o.emoji} value={o.emoji}>
+                              {o.emoji} {o.label}
+                            </option>
+                          )
+                        )}
+                      </optgroup>
+
+                      <optgroup label="📦 التعبئة واللوجستيات (Packaging & Logistics)">
+                        {EMOJI_OPTIONS.filter((o) => o.category === "أخرى").map(
+                          (o) => (
+                            <option key={o.emoji} value={o.emoji}>
+                              {o.emoji} {o.label}
+                            </option>
+                          )
+                        )}
+                      </optgroup>
+                    </select>
+                  </div>
+
+                  {/* Quick Pick Chips for top Egyptian crops */}
+                  <div className="mt-2 flex flex-wrap items-center gap-1">
+                    <span className="text-[10px] text-slate-400 font-semibold me-0.5">
+                      شائع:
+                    </span>
+                    {["🍊", "🍋", "🧅", "🧄", "🍓", "🥔", "🌱", "🍇", "🥭", "🍅"].map(
+                      (em) => (
+                        <button
+                          key={em}
+                          type="button"
+                          onClick={() => setForm({ ...form, icon: em })}
+                          className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs transition-all ${
+                            form.icon === em
+                              ? "bg-emerald-600 text-white shadow-xs scale-110"
+                              : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                          }`}
+                          title={em}
+                        >
+                          {em}
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -565,17 +698,17 @@ export function OpsProducts({
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-full border border-slate-200 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
+                  className="w-full sm:w-auto text-center rounded-full border border-slate-200 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
-                  className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-6 py-2 text-xs font-bold text-white shadow-xs"
+                  className="w-full sm:w-auto text-center rounded-full bg-emerald-500 hover:bg-emerald-600 px-6 py-2 text-xs font-bold text-white shadow-xs"
                 >
                   {editingProduct ? "حفظ التعديلات" : "إضافة المحصول للكتالوج"}
                 </button>

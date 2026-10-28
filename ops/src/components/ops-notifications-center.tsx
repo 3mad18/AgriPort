@@ -6,13 +6,16 @@ import {
   useOpsStore,
   type Inquiry,
 } from "@/context/ops-store-context";
+import { isFacilityVisit } from "@/components/ops-visits-center";
 
 export function OpsNotificationsCenter({
   searchQuery,
   onOpenInquiry,
+  onNavigateToVisits,
 }: {
   searchQuery: string;
   onOpenInquiry?: (inquiry: Inquiry) => void;
+  onNavigateToVisits?: () => void;
 }) {
   const {
     inquiries,
@@ -20,16 +23,19 @@ export function OpsNotificationsCenter({
     deleteInquiry,
     markInquiryRead,
     markAllInquiriesRead,
-    addInquiry,
-    unreadInquiriesCount,
   } = useOpsStore();
 
   const [statusFilter, setStatusFilter] = useState<string>("الكل");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Filtered inquiries
-  const filtered = inquiries.filter((item) => {
+  const visitInquiries = inquiries.filter(isFacilityVisit);
+  const quoteInquiries = inquiries.filter((i) => !isFacilityVisit(i));
+  const unreadQuotesCount = quoteInquiries.filter((i) => !i.read).length;
+  const unreadVisitsCount = visitInquiries.filter((v) => !v.read).length;
+
+  // Filtered quote inquiries
+  const filtered = quoteInquiries.filter((item) => {
     const matchesStatus =
       statusFilter === "الكل" ? true : item.status === statusFilter;
     const q = searchQuery.toLowerCase().trim();
@@ -43,52 +49,401 @@ export function OpsNotificationsCenter({
     return matchesStatus && matchesSearch;
   });
 
-  const handleSimulateInquiry = () => {
-    const demoInquiries = [
-      {
-        name: "David Smith",
-        company: "British Produce Direct Ltd",
-        country: "المملكة المتحدة 🇬🇧",
-        email: "d.smith@britishproduce.co.uk",
-        phone: "+44 7700 900123",
-        product: "برتقال صيفي فالنسيا",
-        quantity: "5 حاويات مبردة (125 طن)",
-        incoterms: "CIF",
-        destinationPort: "Port of Felixstowe",
-        message:
-          "نحتاج كاليبر 56 و 64 في كراتين 15 كجم مع فحص Phyto معتمد وجاهزية الشحن خلال 10 أيام.",
-      },
-      {
-        name: "Hassan Al-Zahrani",
-        company: "مؤسسة الأغذية الطازجة الخليجية",
-        country: "السعودية 🇸🇦",
-        email: "hassan@gulf-fresh.com",
-        phone: "+966 55 123 4567",
-        product: "بصل أحمر إيطالي مصري",
-        quantity: "10 حاويات (250 طن)",
-        incoterms: "CFR",
-        destinationPort: "ميناء جدة الإسلامي",
-        message:
-          "أكياس شبكية 25 كجم، أحجام 60/80 مم، مطلوب شحن أسبوعي مجدول لمدة شهرين.",
-      },
-      {
-        name: "Alessandro Conti",
-        company: "ItalFruit Import Srl",
-        country: "إيطاليا 🇮🇹",
-        email: "alessandro@italfruit.it",
-        phone: "+39 333 4567890",
-        product: "فراولة طازجة فاخرة",
-        quantity: "8 أطنان شحن جوي مبرد",
-        incoterms: "FOB",
-        destinationPort: "Milan Malpensa Airport",
-        message:
-          "مطلوب بانيتات 250 جم داخل كراتين 2.5 كجم، خالية تماماً من متبقيات المبيدات وفق معايير الاتحاد الأوروبي.",
-      },
-    ];
+  const handleGeneratePdfReport = () => {
+    const listToExport = filtered.length > 0 ? filtered : inquiries;
+    if (listToExport.length === 0) {
+      alert("لا توجد طلبات لتصديرها في تقرير PDF حالياً.");
+      return;
+    }
 
-    const random =
-      demoInquiries[Math.floor(Math.random() * demoInquiries.length)];
-    addInquiry(random);
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      alert("تعذر فتح نافذة الطباعة. يرجى السماح بالنوافذ المنبثقة (Popups) من إعدادات المتصفح.");
+      return;
+    }
+
+    const escape = (val?: string) => {
+      if (!val) return "-";
+      return String(val)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
+    const newCount = inquiries.filter((i) => i.status === "جديد").length;
+    const inProgressCount = inquiries.filter((i) => i.status === "قيد المتابعة").length;
+    const completedCount = inquiries.filter((i) => i.status === "تم الاتفاق").length;
+    const archivedCount = inquiries.filter((i) => i.status === "مؤرشف").length;
+
+    const now = new Date();
+    const reportDate =
+      now.toLocaleDateString("ar-EG", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }) +
+      " - " +
+      now.toLocaleTimeString("ar-EG", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+    const filterDescription =
+      statusFilter !== "الكل" || searchQuery
+        ? `تصفية مخصصة (${statusFilter !== "الكل" ? `الحالة: ${statusFilter}` : ""}${searchQuery ? ` | البحث: "${searchQuery}"` : ""})`
+        : "جميع الطلبات المسجلة";
+
+    const rowsHtml = listToExport
+      .map((item, index) => {
+        let badgeBg = "#ecfdf5";
+        let badgeColor = "#065f46";
+        let badgeBorder = "#a7f3d0";
+
+        if (item.status === "قيد المتابعة") {
+          badgeBg = "#fffbeb";
+          badgeColor = "#92400e";
+          badgeBorder = "#fde68a";
+        } else if (item.status === "تم الاتفاق") {
+          badgeBg = "#eff6ff";
+          badgeColor = "#1e40af";
+          badgeBorder = "#bfdbfe";
+        } else if (item.status === "مؤرشف") {
+          badgeBg = "#f1f5f9";
+          badgeColor = "#475569";
+          badgeBorder = "#cbd5e1";
+        }
+
+        return `
+          <tr>
+            <td style="text-align: center; font-weight: bold; color: #64748b;">${index + 1}</td>
+            <td style="font-weight: 600; white-space: nowrap;">${escape(item.date)}</td>
+            <td>
+              <div style="font-weight: 700; color: #0f172a;">${escape(item.name)}</div>
+              <div style="font-size: 11px; color: #475569; margin-top: 2px;">${escape(item.company)}</div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: #1e293b;">${escape(item.country)}</div>
+              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">⚓ ${escape(item.destinationPort)}</div>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #047857;">${escape(item.product)}</div>
+              <div style="font-size: 11px; color: #334155; margin-top: 2px;">📦 ${escape(item.quantity)}</div>
+            </td>
+            <td style="text-align: center;">
+              <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; color: #334155;">
+                ${escape(item.incoterms || "FOB")}
+              </span>
+            </td>
+            <td style="font-size: 11px; direction: ltr; text-align: left;">
+              <div style="font-weight: 600; color: #0f172a;">${escape(item.phone)}</div>
+              <div style="color: #64748b; margin-top: 2px;">${escape(item.email)}</div>
+            </td>
+            <td style="text-align: center;">
+              <span style="display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 700; border-radius: 9999px; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; white-space: nowrap;">
+                ${escape(item.status)}
+              </span>
+            </td>
+            <td style="font-size: 11px; color: #475569; max-width: 180px; line-height: 1.4;">
+              ${escape(item.message || "-")}
+            </td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تقرير طلبات واستفسارات التصدير - AgriPort</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 12mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .print-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .print-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .print-btn:hover {
+      background: #059669;
+    }
+    .close-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      background: #475569;
+    }
+    .report-sheet {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 16px;
+    }
+    .header-table td {
+      vertical-align: middle;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #065f46;
+      letter-spacing: -0.5px;
+    }
+    .brand-subtitle {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .report-meta {
+      text-align: left;
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.6;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      text-align: center;
+    }
+    .stat-card.primary {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+    .stat-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .stat-card.primary .stat-num {
+      color: #065f46;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .data-table th {
+      background: #f1f5f9;
+      color: #334155;
+      padding: 10px 8px;
+      font-weight: 700;
+      text-align: right;
+      border: 1px solid #e2e8f0;
+      font-size: 11px;
+    }
+    .data-table td {
+      padding: 10px 8px;
+      border: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    .data-table tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+    .footer-note {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .report-sheet {
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+      table {
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      thead {
+        display: table-header-group;
+      }
+      tfoot {
+        display: table-footer-group;
+      }
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print print-actions">
+    <div style="font-size: 13px; font-weight: 600;">
+      📄 تم توليد تقرير طلبات التصدير بنجاح (${listToExport.length} طلب) • يمكنك حفظه كملف PDF
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button onclick="window.print()" class="print-btn">
+        🖨️ طباعة / حفظ بتنسيق PDF
+      </button>
+      <button onclick="window.close()" class="close-btn">
+        إغلاق
+      </button>
+    </div>
+  </div>
+
+  <div class="report-sheet">
+    <table class="header-table">
+      <tr>
+        <td style="width: 60%;">
+          <div class="brand-title">AgriPort Operations • أجريبورت للصادرات الزراعية</div>
+          <div class="brand-subtitle">نظام تتبع وإدارة طلبات التسعير والتصدير الدولي الزراعي</div>
+        </td>
+        <td style="width: 40%; text-align: left;">
+          <div class="report-meta">
+            <div><strong>تاريخ الإصدار:</strong> ${reportDate}</div>
+            <div><strong>نطاق التقرير:</strong> ${escape(filterDescription)}</div>
+            <div><strong>عدد السجلات بالتقرير:</strong> ${listToExport.length} طلب</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-num">${inquiries.length}</div>
+        <div class="stat-label">إجمالي الطلبات بالمنظومة</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #059669;">${newCount}</div>
+        <div class="stat-label">طلبات جديدة</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #d97706;">${inProgressCount}</div>
+        <div class="stat-label">قيد المتابعة والتسعير</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #2563eb;">${completedCount}</div>
+        <div class="stat-label">تم الاتفاق والتعاقد</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #64748b;">${archivedCount}</div>
+        <div class="stat-label">طلبات مؤرشفة</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 32px; text-align: center;">#</th>
+          <th style="width: 85px;">التاريخ</th>
+          <th>المستورد والشركة</th>
+          <th>دولة وميناء الوصول</th>
+          <th>المنتج والكمية</th>
+          <th style="width: 65px; text-align: center;">الشحن</th>
+          <th style="width: 170px;">بيانات الاتصال</th>
+          <th style="width: 95px; text-align: center;">الحالة</th>
+          <th>ملاحظات واشتراطات</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+
+    <div class="footer-note">
+      <div>تم استخراج هذا التقرير آلياً عبر لوحة تحكم AgriPort Operations • معتمد لإدارة التصدير والشحن الدولي</div>
+      <div>صفحة رسمية موثقة داخلياً • سرّي ومخصص للاستخدام الإداري</div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    });
+  </script>
+</body>
+</html>`;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   const getWhatsAppLink = (inquiry: Inquiry) => {
@@ -127,7 +482,7 @@ export function OpsNotificationsCenter({
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                مركز تلقي الطلبات والإشعارات
+                مركز تلقي الطلبات
               </h2>
               <p className="text-xs text-slate-500 font-medium">
                 متابعة وإدارة طلبات التسعير الواردة من المستوردين الدوليين في الوقت الفعلي
@@ -137,7 +492,7 @@ export function OpsNotificationsCenter({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {unreadInquiriesCount > 0 && (
+          {unreadQuotesCount > 0 && (
             <button
               type="button"
               onClick={markAllInquiriesRead}
@@ -150,54 +505,36 @@ export function OpsNotificationsCenter({
 
           <button
             type="button"
-            onClick={handleSimulateInquiry}
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:shadow-emerald-500/20 active:scale-95 transition-all"
-            title="إنشاء طلب تجريبي فوري لتجربة وصول الإشعارات"
+            onClick={handleGeneratePdfReport}
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:shadow-emerald-600/20 active:scale-95 transition-all"
+            title="تصدير تقرير رسمي بصيغة PDF للطلبات الحالية"
           >
-            <span>+</span>
-            <span>محاكاة طلب جديد (Live Demo)</span>
+            <span>📄</span>
+            <span>تصدير تقرير PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Unread Alert Bar if any */}
-      {unreadInquiriesCount > 0 && (
-        <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 px-5 py-3 text-xs text-emerald-900 font-semibold animate-fade-in">
-          <div className="flex items-center gap-2.5">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
-            </span>
-            <span>
-              لديك <strong className="text-emerald-700 font-bold">{unreadInquiriesCount}</strong> طلبات جديدة بانتظار المراجعة والرد!
-            </span>
-          </div>
-          <span className="text-[11px] text-emerald-700 font-normal">
-            يتم تحديث الطلبات لحظياً عند إرسالها من صفحة التواصل
-          </span>
-        </div>
-      )}
-
       {/* Filter Tabs & Counters */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto no-scrollbar">
         {[
-          { key: "الكل", label: "جميع الطلبات", count: inquiries.length },
+          { key: "الكل", label: "جميع عروض الأسعار", count: quoteInquiries.length },
           {
             key: "جديد",
             label: "طلبات جديدة",
-            count: inquiries.filter((i) => i.status === "جديد").length,
+            count: quoteInquiries.filter((i) => i.status === "جديد").length,
             color: "text-emerald-600 bg-emerald-50",
           },
           {
             key: "قيد المتابعة",
             label: "قيد المتابعة",
-            count: inquiries.filter((i) => i.status === "قيد المتابعة").length,
+            count: quoteInquiries.filter((i) => i.status === "قيد المتابعة").length,
             color: "text-amber-600 bg-amber-50",
           },
           {
             key: "تم الاتفاق",
             label: "تم الاتفاق",
-            count: inquiries.filter((i) => i.status === "تم الاتفاق").length,
+            count: quoteInquiries.filter((i) => i.status === "تم الاتفاق").length,
             color: "text-blue-600 bg-blue-50",
           },
           {
@@ -213,7 +550,7 @@ export function OpsNotificationsCenter({
               key={tab.key}
               type="button"
               onClick={() => setStatusFilter(tab.key)}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
                 isActive
                   ? "bg-slate-900 text-white shadow-xs"
                   : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
@@ -250,7 +587,7 @@ export function OpsNotificationsCenter({
       ) : (
         <div className="grid gap-4">
           {filtered.map((item) => {
-            const isUnread = item.read === false || item.status === "جديد";
+            const isUnread = item.read === false;
 
             return (
               <div
@@ -550,9 +887,9 @@ export function OpsNotificationsCenter({
               )}
 
               {/* Status Update in Modal */}
-              <div className="flex items-center justify-between border-t border-slate-100 pt-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-100 pt-5">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-700">
+                  <span className="text-xs font-bold text-slate-700 shrink-0">
                     تحديث حالة الطلب:
                   </span>
                   <select
@@ -574,18 +911,18 @@ export function OpsNotificationsCenter({
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <a
                     href={getWhatsAppLink(selectedInquiry)}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors"
+                    className="flex-1 sm:flex-initial text-center rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors"
                   >
                     محادثة واتساب 💬
                   </a>
                   <a
                     href={getEmailLink(selectedInquiry)}
-                    className="rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition-colors"
+                    className="flex-1 sm:flex-initial text-center rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition-colors"
                   >
                     إرسال إيميل ✉️
                   </a>

@@ -2,31 +2,47 @@
 
 import { useLanguage } from "@/context/language-context";
 import { useSiteSettings } from "@/lib/use-site-settings";
+import type { Language } from "@/lib/i18n";
+
+const whatsappMessages: Record<Language, string> = {
+  ar: "مرحباً AgriPort، أود الاستفسار عن تصدير الحاصلات الزراعية والتسعير الحالي",
+  en: "Hello AgriPort, I would like to inquire about export products, availability, and pricing",
+  fr: "Bonjour AgriPort, je souhaite me renseigner sur les produits d'exportation et les tarifs actuels",
+  it: "Buongiorno AgriPort, vorrei richiedere informazioni sui prodotti da esportazione e sui prezzi",
+  es: "Hola AgriPort, quisiera consultar sobre los productos de exportación y precios actuales",
+};
+
+const whatsappTooltips: Record<Language, string> = {
+  ar: "تواصل فوري عبر واتساب",
+  en: "Direct WhatsApp",
+  fr: "WhatsApp Direct",
+  it: "WhatsApp Diretto",
+  es: "WhatsApp Directo",
+};
 
 export function WhatsAppFloat() {
-  const { dir } = useLanguage();
+  const { dir, language } = useLanguage();
   const { settings } = useSiteSettings();
   const isRTL = dir === "rtl";
 
   const rawPhone = settings.phone || "+20 100 720 2636";
   const cleanPhone = rawPhone.replace(/\D/g, "");
 
-  const message = isRTL
-    ? "مرحباً AgriPort، أود الاستفسار عن تصدير الحاصلات الزراعية والتسعير الحالي"
-    : "Hello AgriPort, I would like to inquire about export products, availability, and pricing";
+  const message = whatsappMessages[language] || whatsappMessages.en;
+  const tooltipText = whatsappTooltips[language] || whatsappTooltips.en;
 
   const href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 
   return (
     <aside
-      className={`fixed bottom-6 ${
-        isRTL ? "left-6" : "right-6"
+      className={`fixed bottom-5 sm:bottom-6 ${
+        isRTL ? "left-4 sm:left-6" : "right-4 sm:right-6"
       } z-40 flex items-center gap-2 group print:hidden`}
       aria-label="WhatsApp Contact"
     >
       {/* Tooltip on hover */}
       <span className="hidden sm:inline-block pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap">
-        {isRTL ? "تواصل فوري عبر واتساب" : "Direct WhatsApp"}
+        {tooltipText}
       </span>
 
       {/* Floating Action Button */}
@@ -35,14 +51,14 @@ export function WhatsAppFloat() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Direct WhatsApp Contact"
-        className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-900/20 hover:scale-110 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+        className="relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-900/20 hover:scale-110 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-300"
       >
         {/* Radar Pulse */}
         <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-30 animate-ping pointer-events-none" />
 
         {/* WhatsApp SVG Icon */}
         <svg
-          className="h-7 w-7 fill-current relative z-10"
+          className="h-6 w-6 sm:h-7 sm:w-7 fill-current relative z-10"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >

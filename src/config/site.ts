@@ -6,6 +6,7 @@ export const siteConfig = {
   nav: [
     { href: "/", label: "الرئيسية", enLabel: "Home" },
     { href: "/products", label: "المنتجات", enLabel: "Products" },
+    { href: "/facilities", label: "المرافق والمحطات", enLabel: "Facilities" },
     { href: "/about", label: "عن الشركة", enLabel: "About Us" },
     { href: "/contact", label: "تواصل معنا", enLabel: "Contact" },
   ],

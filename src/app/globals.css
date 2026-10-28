@@ -21,12 +21,25 @@ html.lang-hydrating body {
   visibility: hidden !important;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background-color: #ffffff;
   color: #0f172a;
   font-family: var(--font-sans);
-  overflow-x: hidden;
   transition: opacity 0.12s ease-out;
+}
+
+/* Hide scrollbar for touch-scrolling tabs */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Animations matching modern SaaS */

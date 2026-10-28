@@ -5,6 +5,12 @@ import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { useLiveProducts } from "@/lib/use-live-products";
 import { useLanguage } from "@/context/language-context";
+import {
+  getProductStatusTranslation,
+  getProductCategoryTranslation,
+  getProductSeasonTranslation,
+  translateAgriText,
+} from "@/lib/i18n";
 
 export default function ProductsPage() {
   const { t, dir, language } = useLanguage();
@@ -17,15 +23,67 @@ export default function ProductsPage() {
     if (language === "ar") {
       return cat;
     }
-    const loc = p.productsList?.find((item) => item.id === cat.id);
-    return loc ? { ...cat, name: loc.name || cat.name, variety: loc.variety || cat.variety, pack: loc.pack || cat.pack, specs: loc.specs || cat.specs } : cat;
+
+    // 1. Try to find a curated translation in productsList by id or crop keyword
+    const loc = p.productsList?.find((item) => {
+      if (item.id === cat.id) return true;
+      const lowerCatName = (cat.name || "").toLowerCase();
+      const lowerItemName = (item.name || "").toLowerCase();
+      if (lowerCatName && lowerCatName === lowerItemName) return true;
+
+      if (
+        (lowerCatName.includes("خرشوف") || cat.id.toLowerCase().includes("artichoke")) &&
+        (item.id === "artichoke" || lowerItemName.includes("artichoke") || lowerItemName.includes("خرشوف"))
+      ) {
+        return true;
+      }
+      if (lowerCatName.includes("موالح") && item.id === "citrus") return true;
+      if (lowerCatName.includes("بصل") && item.id === "onions") return true;
+      if (lowerCatName.includes("فراولة") && item.id === "strawberries") return true;
+      if (lowerCatName.includes("رمان") && item.id === "pomegranates") return true;
+      if (lowerCatName.includes("بطاطس") && item.id === "potatoes") return true;
+      if (lowerCatName.includes("عنب") && item.id === "grapes") return true;
+      return false;
+    });
+
+    const translatedName =
+      loc?.name && !/[\u0600-\u06FF]/.test(loc.name)
+        ? loc.name
+        : translateAgriText(cat.name, language);
+
+    const translatedVariety =
+      loc?.variety && loc.variety !== cat.variety && !/[\u0600-\u06FF]/.test(loc.variety)
+        ? loc.variety
+        : translateAgriText(cat.variety, language);
+
+    const translatedPack =
+      loc?.pack && loc.pack !== cat.pack && !/[\u0600-\u06FF]/.test(loc.pack)
+        ? loc.pack
+        : translateAgriText(cat.pack, language);
+
+    const translatedSpecs =
+      loc?.specs && loc.specs !== cat.specs && !/[\u0600-\u06FF]/.test(loc.specs)
+        ? loc.specs
+        : translateAgriText(cat.specs, language);
+
+    return {
+      ...cat,
+      name: translatedName,
+      variety: translatedVariety,
+      pack: translatedPack,
+      specs: translatedSpecs,
+      category:
+        loc?.category || getProductCategoryTranslation(cat.category, language),
+      season:
+        loc?.season || getProductSeasonTranslation(cat.season, language),
+    };
   });
 
   return (
     <PageShell title={p.title} description={p.description}>
       <div className="space-y-8">
         {/* Intro Banner */}
-        <div className="rounded-[2rem] border border-slate-100 bg-[#F7F9FC] p-6 sm:p-8">
+        <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-[#F7F9FC] p-5 sm:p-8">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white text-lg font-bold">
               🌿
@@ -47,11 +105,11 @@ export default function ProductsPage() {
             <div
               key={item.id}
               id={item.id}
-              className="group flex flex-col justify-between overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-sm transition-all hover:border-slate-200 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white shadow-sm transition-all hover:border-slate-200 hover:shadow-md hover:-translate-y-1"
             >
               <div>
                 {/* Product Image */}
-                <div className="relative h-56 w-full overflow-hidden bg-slate-100">
+                <div className="relative h-52 sm:h-56 w-full overflow-hidden bg-slate-100">
                   <img
                     src={
                       item.imageUrl ||
@@ -73,27 +131,31 @@ export default function ProductsPage() {
                           : "bg-rose-500/90 text-white"
                       }`}
                     >
-                      {item.status || "متاح للتصدير"}
+                      {getProductStatusTranslation(
+                        item.status || "متاح للتصدير",
+                        language
+                      )}
                     </span>
                   </div>
 
                   {/* Season Badge (Top End) */}
                   <div className="absolute top-4 end-4">
                     <span className="rounded-full bg-white/90 backdrop-blur-md px-3.5 py-1 text-[11px] font-bold text-slate-900 shadow-xs">
-                      {item.season}
+                      {getProductSeasonTranslation(item.season, language)}
                     </span>
                   </div>
 
                   {/* Category / Icon */}
                   <div className="absolute bottom-4 start-4">
                     <span className="rounded-lg bg-slate-900/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-xs">
-                      {item.icon} {item.category}
+                      {item.icon}{" "}
+                      {getProductCategoryTranslation(item.category, language)}
                     </span>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="p-5 sm:p-6">
                   <h3 className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-emerald-600 transition-colors">
                     {item.name}
                   </h3>
@@ -107,7 +169,7 @@ export default function ProductsPage() {
                         {p.packagingLabel}:
                       </span>{" "}
                       <span className="text-slate-500 font-medium">
-                        {item.pack}
+                        {translateAgriText(item.pack, language)}
                       </span>
                     </div>
                     <div>
@@ -115,7 +177,7 @@ export default function ProductsPage() {
                         {p.specsLabel}:
                       </span>{" "}
                       <span className="text-slate-500 font-medium">
-                        {item.specs}
+                        {translateAgriText(item.specs, language)}
                       </span>
                     </div>
                   </div>
@@ -123,7 +185,7 @@ export default function ProductsPage() {
               </div>
 
               {/* Action Button */}
-              <div className="p-6 pt-0">
+              <div className="p-5 sm:p-6 pt-0">
                 <Link
                   href={`/contact?id=${encodeURIComponent(item.id)}&crop=${encodeURIComponent(item.name)}`}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-emerald-600 py-3 text-xs font-semibold text-white transition-all shadow-xs"

@@ -280,7 +280,7 @@ export function OpsSettings() {
           <button
             type="submit"
             disabled={isSaving}
-            className="flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 px-8 py-3 text-xs font-bold text-white shadow-xs hover:shadow-emerald-500/20 active:scale-95 transition-all"
+            className="flex items-center justify-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 w-full sm:w-auto px-8 py-3 text-xs font-bold text-white shadow-xs hover:shadow-emerald-500/20 active:scale-95 transition-all"
           >
             {isSaving ? (
               <>

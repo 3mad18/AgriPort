@@ -16,7 +16,10 @@ export function FarmList() {
           <div className="flex items-start justify-between gap-3">
             <h2 className="text-lg font-bold text-slate-900">{farm.name}</h2>
             <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-100">
-              {farm.status === "Active" || farm.status === "نشطة" ? f.activeStatus : f.monitoringStatus}
+              {farm.status === f.activeStatus ||
+              ["Active", "نشطة", "Attiva", "Activa"].includes(farm.status)
+                ? f.activeStatus
+                : f.monitoringStatus}
             </span>
           </div>
           <p className="mt-2 text-sm text-slate-500 font-medium">{farm.location}</p>

@@ -165,9 +165,48 @@ const DEFAULT_PRODUCTS: Product[] = [
     status: "متاح للتصدير",
     featured: false,
   },
+  {
+    id: "artichoke",
+    name: "خرشوف مصري",
+    category: "خضروات",
+    variety: "خرشوف فرنساوي، خرشوف بلدي",
+    season: "نوفمبر — مايو",
+    pack: "براميل حفظ غذائية، كراتين تبريد، أكياس مجهزة",
+    specs: "أحجام كاليبر: 50، 60 و 55 مم نخب أول",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80",
+    icon: "🌱",
+    status: "متاح للتصدير",
+    featured: false,
+  },
 ];
 
 const DEFAULT_INQUIRIES: Inquiry[] = [
+  {
+    id: "inq-visit-1",
+    date: "2026-10-28",
+    name: "Hans Weber",
+    company: "Bavaria Fresh Fruits GmbH",
+    country: "ألمانيا",
+    email: "h.weber@bavaria-fruit.de",
+    phone: "+49 170 5544332",
+    product: "حجز زيارة ميدانية للمرافق ومحطات التعبئة",
+    quantity: "3 إلى 5 أشخاص (وفد فني وتجاري)",
+    incoterms: "Facility Visit",
+    destinationPort: "Date: 2026-11-12",
+    message: `[Facility Visit Reservation]
+Lead Visitor: Hans Weber
+Company: Bavaria Fresh Fruits GmbH (ألمانيا)
+Preferred Visit Date: 2026-11-12
+Delegation Size: 3 إلى 5 أشخاص (وفد فني وتجاري)
+Facilities to Inspect: محطة فرز وتعبئة الموالح الإلكترونية | غرف التبريد السريع وأرصفة الشحن المبرد | مختبر مراقبة الجودة
+Target Crops: برتقال فالنسيا الصيفي، ثوم طازج، فراولة
+Airport Pickup Required: YES
+Special Notes: نصل إلى مطار القاهرة الدولي على رحلة لوفتهانزا LH582 الساعة 2:30 ظهراً، ونطلب استقبال المطار والتوصيل لمقر المحطات.`,
+    status: "جديد",
+    read: false,
+    createdAt: 1761645600000,
+  },
   {
     id: "inq-1",
     date: "2026-10-25",
@@ -715,12 +754,34 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
 
   const markAllInquiriesRead = useCallback(() => {
     const current = getInquiriesSnapshot();
+    // Preserve item.status exactly as is! Only update read: true
     const updated = current.map((item) => ({ ...item, read: true }));
     localStorage.setItem(INQUIRIES_KEY, JSON.stringify(updated));
     cachedInquiries = updated;
     cachedInquiriesRaw = JSON.stringify(updated);
     notifyChange();
     triggerOpsToast("تم تمييز جميع الطلبات كمقروءة ✓");
+
+    // Sync to Supabase directly
+    if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+      fetch(`${SUPABASE_URL}/rest/v1/inquiries?read=eq.false`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ read: true }),
+      }).catch(() => {});
+    }
+
+    // Fallback sync via local API route
+    fetch("/api/inquiries", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ all: true, read: true }),
+    }).catch(() => {});
   }, []);
 
   const updateInquiryStatus = useCallback(
@@ -835,7 +896,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const unreadInquiriesCount = inquiries.filter(
-    (item) => item.read === false || item.status === "جديد"
+    (item) => item.read === false
   ).length;
 
   return (

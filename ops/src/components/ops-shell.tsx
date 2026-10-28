@@ -9,11 +9,12 @@ import { useOpsAuth } from "@/context/ops-auth-context";
 import { useOpsStore } from "@/context/ops-store-context";
 import { OpsOverview } from "@/components/ops-overview";
 import { OpsNotificationsCenter } from "@/components/ops-notifications-center";
+import { OpsVisitsCenter, isFacilityVisit } from "@/components/ops-visits-center";
 import { OpsProducts } from "@/components/ops-products";
 import { OpsSettings } from "@/components/ops-settings";
 import { OpsToast } from "@/components/ops-toast";
 
-export type OpsTab = "overview" | "notifications" | "products" | "settings";
+export type OpsTab = "overview" | "notifications" | "visits" | "products" | "settings";
 
 const OPS_TAB_STORAGE_KEY = "agriport_ops_persisted_tab";
 
@@ -30,22 +31,22 @@ function subscribeOpsTab(callback: () => void) {
 function getInitialOpsTab(): OpsTab {
   if (typeof window === "undefined") return "overview";
   try {
-    // 1. Check URL hash (e.g. #settings, #products, #notifications, #overview)
+    // 1. Check URL hash (e.g. #settings, #products, #notifications, #visits, #overview)
     const hash = window.location.hash.replace(/^#/, "").toLowerCase() as OpsTab;
-    if (["overview", "notifications", "products", "settings"].includes(hash)) {
+    if (["overview", "notifications", "visits", "products", "settings"].includes(hash)) {
       return hash;
     }
 
     // 2. Check query param (e.g. ?tab=settings)
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get("tab")?.toLowerCase() as OpsTab;
-    if (["overview", "notifications", "products", "settings"].includes(tabParam)) {
+    if (["overview", "notifications", "visits", "products", "settings"].includes(tabParam)) {
       return tabParam;
     }
 
     // 3. Check localStorage
     const saved = localStorage.getItem(OPS_TAB_STORAGE_KEY) as OpsTab;
-    if (["overview", "notifications", "products", "settings"].includes(saved)) {
+    if (["overview", "notifications", "visits", "products", "settings"].includes(saved)) {
       return saved;
     }
   } catch (e) {}
@@ -71,6 +72,7 @@ export function OpsShell() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
+  const [openAddProductModal, setOpenAddProductModal] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const handleTabChange = useCallback((tab: OpsTab) => {
@@ -85,6 +87,11 @@ export function OpsShell() {
       } catch (e) {}
     }
   }, []);
+
+  const handleOpenAddProduct = useCallback(() => {
+    handleTabChange("products");
+    setOpenAddProductModal(true);
+  }, [handleTabChange]);
 
   // Authentication Guard
   useEffect(() => {
@@ -139,6 +146,11 @@ export function OpsShell() {
     return null;
   }
 
+  const visitInquiries = inquiries.filter(isFacilityVisit);
+  const priceQuoteInquiries = inquiries.filter((i) => !isFacilityVisit(i));
+  const unreadVisitsCount = visitInquiries.filter((v) => !v.read).length;
+  const unreadPriceQuotesCount = priceQuoteInquiries.filter((q) => !q.read).length;
+
   const navItems = [
     {
       id: "overview" as OpsTab,
@@ -147,9 +159,15 @@ export function OpsShell() {
     },
     {
       id: "notifications" as OpsTab,
-      label: "مركز الطلبات والإشعارات",
+      label: "طلبات عروض الأسعار",
       icon: "🔔",
-      badge: unreadInquiriesCount > 0 ? `${unreadInquiriesCount} جديد` : undefined,
+      badge: unreadPriceQuotesCount > 0 ? `${unreadPriceQuotesCount} جديد` : undefined,
+    },
+    {
+      id: "visits" as OpsTab,
+      label: "حجوزات الزيارات الميدانية",
+      icon: "🏛️",
+      badge: unreadVisitsCount > 0 ? `${unreadVisitsCount} جديد` : undefined,
     },
     {
       id: "products" as OpsTab,
@@ -164,7 +182,7 @@ export function OpsShell() {
   ];
 
   const recentUnreadInquiries = inquiries.filter(
-    (i) => i.read === false || i.status === "جديد"
+    (i) => i.read === false
   );
 
   return (
@@ -292,23 +310,23 @@ export function OpsShell() {
       {/* 2. Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 md:ps-72 transition-all">
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-20 h-20 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-20 h-16 sm:h-20 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 flex items-center justify-between gap-3">
           {/* Left / Start: Mobile Toggle & Breadcrumb */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0"
               aria-label="Open sidebar"
             >
               ☰
             </button>
 
-            <div className="text-start">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="text-start min-w-0">
+              <div className="hidden sm:block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 منظومة عمل AgriPort Ops
               </div>
-              <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+              <h1 className="text-sm sm:text-lg font-bold text-slate-900 leading-tight truncate">
                 {activeTab === "overview" && "نظرة عامة وإحصائيات التصدير"}
                 {activeTab === "notifications" && "مركز تلقي الطلبات والإشعارات"}
                 {activeTab === "products" && "إدارة كتالوج المحاصيل"}
@@ -318,7 +336,7 @@ export function OpsShell() {
           </div>
 
           {/* Right / End: Search Bar, Notifications Center Bell, Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Search Input */}
             <div className="relative hidden sm:block w-48 lg:w-64">
               <input
@@ -338,7 +356,7 @@ export function OpsShell() {
               <button
                 type="button"
                 onClick={() => setIsNotifDropdownOpen(!isNotifDropdownOpen)}
-                className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-all text-slate-700 shadow-xs"
+                className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-all text-slate-700 shadow-xs"
                 title="مركز الإشعارات السريعة"
               >
                 <span>🔔</span>
@@ -351,7 +369,7 @@ export function OpsShell() {
 
               {/* Notifications Dropdown Window */}
               {isNotifDropdownOpen && (
-                <div className="absolute end-0 mt-3 w-80 sm:w-96 rounded-3xl border border-slate-200 bg-white p-4 shadow-2xl ring-1 ring-black/5 animate-fade-in z-50 text-start">
+                <div className="absolute end-0 mt-3 w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-3xl border border-slate-200 bg-white p-4 shadow-2xl ring-1 ring-black/5 animate-fade-in z-50 text-start">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-sm text-slate-900">
@@ -375,37 +393,48 @@ export function OpsShell() {
                   </div>
 
                   <div className="max-h-72 overflow-y-auto space-y-2">
-                    {inquiries.slice(0, 5).map((item) => {
-                      const isUnread =
-                        item.read === false || item.status === "جديد";
+                    {inquiries.slice(0, 6).map((item) => {
+                      const isUnread = item.read === false;
+                      const isVisit = isFacilityVisit(item);
                       return (
                         <div
                           key={item.id}
                           onClick={() => {
                             markInquiryRead(item.id);
-                            handleTabChange("notifications");
+                            handleTabChange(isVisit ? "visits" : "notifications");
                             setIsNotifDropdownOpen(false);
                           }}
                           className={`p-3 rounded-2xl border transition-all cursor-pointer ${
                             isUnread
-                              ? "bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50"
+                              ? isVisit
+                                ? "bg-teal-50/80 border-teal-200 hover:bg-teal-50"
+                                : "bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50"
                               : "bg-slate-50/60 border-slate-100 hover:bg-slate-100/70"
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-xs text-slate-900">
-                              {item.name}
+                            <span className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                              <span>{isVisit ? "🏛️" : "📦"}</span>
+                              <span>{item.name}</span>
                             </span>
                             <span className="text-[10px] text-slate-400">
                               {item.date}
                             </span>
                           </div>
                           <div className="text-xs text-slate-600 font-medium mt-1">
-                            طلب تسعير:{" "}
-                            <strong className="text-emerald-700">
-                              {item.product}
-                            </strong>{" "}
-                            ({item.quantity})
+                            {isVisit ? (
+                              <span className="text-teal-800 font-bold">
+                                حجز زيارة ميدانية للمرافق
+                              </span>
+                            ) : (
+                              <>
+                                طلب تسعير:{" "}
+                                <strong className="text-emerald-700">
+                                  {item.product}
+                                </strong>{" "}
+                                ({item.quantity})
+                              </>
+                            )}
                           </div>
                           <div className="text-[11px] text-slate-400 mt-0.5">
                             {item.company} • {item.country}
@@ -415,16 +444,26 @@ export function OpsShell() {
                     })}
                   </div>
 
-                  <div className="border-t border-slate-100 pt-3 mt-3 text-center">
+                  <div className="border-t border-slate-100 pt-3 mt-3 grid grid-cols-2 gap-2 text-center text-xs">
                     <button
                       type="button"
                       onClick={() => {
                         handleTabChange("notifications");
                         setIsNotifDropdownOpen(false);
                       }}
-                      className="text-xs font-bold text-emerald-600 hover:text-emerald-700 block w-full py-1"
+                      className="font-bold text-slate-700 hover:text-emerald-600 p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
                     >
-                      فتح مركز الطلبات الكامل ←
+                      عروض الأسعار ({priceQuoteInquiries.length}) ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleTabChange("visits");
+                        setIsNotifDropdownOpen(false);
+                      }}
+                      className="font-bold text-teal-700 hover:text-teal-800 p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 transition-colors"
+                    >
+                      الزيارات ({visitInquiries.length}) ←
                     </button>
                   </div>
                 </div>
@@ -444,17 +483,31 @@ export function OpsShell() {
         </header>
 
         {/* Dynamic Section Container */}
-        <main className="flex-1 p-6 sm:p-8 max-w-7xl mx-auto w-full">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           {activeTab === "overview" && (
-            <OpsOverview onNavigateTab={handleTabChange} />
+            <OpsOverview
+              onNavigateTab={handleTabChange}
+              onOpenAddProduct={handleOpenAddProduct}
+            />
           )}
 
           {activeTab === "notifications" && (
-            <OpsNotificationsCenter searchQuery={searchQuery} />
+            <OpsNotificationsCenter
+              searchQuery={searchQuery}
+              onNavigateToVisits={() => handleTabChange("visits")}
+            />
+          )}
+
+          {activeTab === "visits" && (
+            <OpsVisitsCenter searchQuery={searchQuery} />
           )}
 
           {activeTab === "products" && (
-            <OpsProducts searchQuery={searchQuery} />
+            <OpsProducts
+              searchQuery={searchQuery}
+              initialOpenAddModal={openAddProductModal}
+              onResetOpenAddModal={() => setOpenAddProductModal(false)}
+            />
           )}
 
           {activeTab === "settings" && <OpsSettings />}

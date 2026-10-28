@@ -4,13 +4,22 @@
 import Link from "next/link";
 import { getVisitorSiteUrl } from "@/lib/urls";
 import { useOpsStore, type Inquiry } from "@/context/ops-store-context";
+import { isFacilityVisit } from "@/components/ops-visits-center";
 
 export function OpsOverview({
   onNavigateTab,
+  onOpenAddProduct,
 }: {
-  onNavigateTab: (tab: "overview" | "notifications" | "products" | "settings") => void;
+  onNavigateTab: (tab: "overview" | "notifications" | "visits" | "products" | "settings") => void;
+  onOpenAddProduct?: () => void;
 }) {
-  const { inquiries, products, unreadInquiriesCount } = useOpsStore();
+  const { inquiries, products } = useOpsStore();
+
+  const visitInquiries = inquiries.filter(isFacilityVisit);
+  const priceQuoteInquiries = inquiries.filter((i) => !isFacilityVisit(i));
+
+  const unreadVisitsCount = visitInquiries.filter((v) => !v.read).length;
+  const unreadPriceQuotesCount = priceQuoteInquiries.filter((q) => !q.read).length;
 
   const closedDealsCount = inquiries.filter(
     (i) => i.status === "تم الاتفاق"
@@ -20,17 +29,20 @@ export function OpsOverview({
     (i) => i.status === "قيد المتابعة"
   ).length;
 
-  const recentInquiries = inquiries.slice(0, 4);
+  const recentInquiries = inquiries.slice(0, 5);
 
   return (
     <div className="space-y-8">
       {/* KPI Stats Grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1: Total Inquiries */}
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs text-start">
+      <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+        {/* Card 1: Total Price Quotes */}
+        <div
+          onClick={() => onNavigateTab("notifications")}
+          className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs text-start cursor-pointer hover:border-slate-300 transition-all"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              إجمالي طلبات التوريد
+              طلبات عروض الأسعار
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-lg">
               📈
@@ -38,25 +50,25 @@ export function OpsOverview({
           </div>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {inquiries.length}
+              {priceQuoteInquiries.length}
             </span>
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-              صفقات دولية
+              عروض تسعير
             </span>
           </div>
           <p className="mt-2 text-xs text-slate-400 font-medium">
-            واردة عبر موقع التصدير الرسمي
+            واردة عبر موقع التصدير
           </p>
         </div>
 
-        {/* Card 2: New Unread Inquiries */}
+        {/* Card 2: New Unread Price Quotes */}
         <div
           onClick={() => onNavigateTab("notifications")}
-          className="rounded-3xl border border-emerald-300/80 bg-gradient-to-br from-emerald-50/50 to-white p-6 shadow-xs text-start cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all group"
+          className="rounded-3xl border border-emerald-300/80 bg-gradient-to-br from-emerald-50/50 to-white p-5 sm:p-6 shadow-xs text-start cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              طلبات جديدة غير مقروءة
+              تسعير غير مقروء
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white text-lg group-hover:scale-110 transition-transform">
               🔔
@@ -64,11 +76,13 @@ export function OpsOverview({
           </div>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-emerald-700 tracking-tight">
-              {unreadInquiriesCount}
+              {unreadPriceQuotesCount}
             </span>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full animate-pulse">
-              تحتاج متابعة فورا
-            </span>
+            {unreadPriceQuotesCount > 0 && (
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full animate-pulse">
+                جديد
+              </span>
+            )}
           </div>
           <p className="mt-2 text-xs text-emerald-600/80 font-medium flex items-center gap-1">
             <span>انقر للمعاينة والرد</span>
@@ -76,8 +90,44 @@ export function OpsOverview({
           </p>
         </div>
 
-        {/* Card 3: Active Produce Catalog */}
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs text-start">
+        {/* Card 3: Dedicated Field Visits KPI */}
+        <div
+          onClick={() => onNavigateTab("visits")}
+          className="rounded-3xl border border-teal-300/80 bg-gradient-to-br from-teal-50/60 to-white p-5 sm:p-6 shadow-xs text-start cursor-pointer hover:border-teal-400 hover:shadow-md transition-all group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-teal-800 uppercase tracking-wider">
+              الزيارات الميدانية
+            </span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-600 text-white text-lg group-hover:scale-110 transition-transform">
+              🏛️
+            </span>
+          </div>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-teal-900 tracking-tight">
+              {visitInquiries.length}
+            </span>
+            {unreadVisitsCount > 0 ? (
+              <span className="text-xs font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full animate-pulse">
+                {unreadVisitsCount} جديد
+              </span>
+            ) : (
+              <span className="text-xs font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-md">
+                وفود تجارية
+              </span>
+            )}
+          </div>
+          <p className="mt-2 text-xs text-teal-700/80 font-medium flex items-center gap-1">
+            <span>تفقد المحطات والمزارع</span>
+            <span>←</span>
+          </p>
+        </div>
+
+        {/* Card 4: Active Produce Catalog */}
+        <div
+          onClick={() => onNavigateTab("products")}
+          className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs text-start cursor-pointer hover:border-slate-300 transition-all"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               المحاصيل بالكتالوج
@@ -95,15 +145,15 @@ export function OpsOverview({
             </span>
           </div>
           <p className="mt-2 text-xs text-slate-400 font-medium">
-            موالح، بصل، ثوم، فراولة، رمان، بطاطس
+            موالح، بصل، ثوم، فراولة...
           </p>
         </div>
 
-        {/* Card 4: Closed Deals */}
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs text-start">
+        {/* Card 5: Closed Deals */}
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs text-start">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              صفقات تم الاتفاق عليها
+              عقود تم الاتفاق عليها
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 text-lg">
               🤝
@@ -146,55 +196,67 @@ export function OpsOverview({
           </div>
 
           <div className="space-y-3">
-            {recentInquiries.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => onNavigateTab("notifications")}
-                className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/60 p-4 hover:bg-slate-100/70 hover:border-slate-200 transition-all cursor-pointer group"
-              >
-                <div className="flex items-center gap-3.5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200 text-lg shadow-xs">
-                    📦
-                  </span>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm">
-                        {item.name}
-                      </span>
-                      <span className="text-xs text-slate-500">
-                        ({item.company})
-                      </span>
-                    </div>
-                    <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-                      <span className="font-semibold text-emerald-700">
-                        {item.product}
-                      </span>
-                      <span>•</span>
-                      <span>{item.quantity}</span>
-                      <span>•</span>
-                      <span>{item.country}</span>
+            {recentInquiries.map((item) => {
+              const isVisit = isFacilityVisit(item);
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => onNavigateTab(isVisit ? "visits" : "notifications")}
+                  className={`flex items-center justify-between gap-3 rounded-2xl border p-3.5 sm:p-4 transition-all cursor-pointer group ${
+                    isVisit
+                      ? "border-teal-200/80 bg-teal-50/40 hover:bg-teal-50"
+                      : "border-slate-100 bg-slate-50/60 hover:bg-slate-100/70"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                    <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200 text-base sm:text-lg shadow-xs">
+                      {isVisit ? "🏛️" : "📦"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                        <span className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                          {item.name}
+                        </span>
+                        <span className="text-[11px] sm:text-xs text-slate-500 truncate">
+                          ({item.company})
+                        </span>
+                        {isVisit && (
+                          <span className="rounded-md bg-teal-100 text-teal-800 px-1.5 py-0.5 text-[10px] font-bold">
+                            زيارة ميدانية
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] sm:text-xs text-slate-500 flex flex-wrap items-center gap-1.5 sm:gap-2 mt-0.5">
+                        <span className="font-semibold text-emerald-700">
+                          {isVisit ? "تفقد المحطات والمزارع" : item.product}
+                        </span>
+                        <span>•</span>
+                        <span>{item.quantity}</span>
+                        <span>•</span>
+                        <span>{item.country}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
-                      item.status === "جديد"
-                        ? "bg-emerald-100 text-emerald-800"
-                        : item.status === "قيد المتابعة"
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                  <span className="text-slate-400 text-xs group-hover:translate-x-1 transition-transform">
-                    ←
-                  </span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <span
+                      className={`rounded-full px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] font-bold ${
+                        item.status === "جديد"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : item.status === "قيد المتابعة"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                    <span className="text-slate-400 text-xs group-hover:translate-x-1 transition-transform">
+                      ←
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -276,11 +338,26 @@ export function OpsOverview({
             <div className="grid grid-cols-2 gap-3 text-xs">
               <button
                 type="button"
-                onClick={() => onNavigateTab("products")}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 font-semibold text-white transition-colors"
+                onClick={() => {
+                  if (onOpenAddProduct) {
+                    onOpenAddProduct();
+                  } else {
+                    onNavigateTab("products");
+                  }
+                }}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 font-semibold text-white transition-colors cursor-pointer"
               >
                 <span>➕</span>
                 <span>إضافة محصول</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab("visits")}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-teal-800/80 hover:bg-teal-700 border border-teal-600/50 p-3 font-semibold text-white transition-colors cursor-pointer"
+              >
+                <span>🏛️</span>
+                <span>جدول الزيارات</span>
               </button>
 
               <button
@@ -305,10 +382,10 @@ export function OpsOverview({
               <button
                 type="button"
                 onClick={() => onNavigateTab("notifications")}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 p-3 font-semibold text-white transition-colors"
+                className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 p-3 font-semibold text-white transition-colors"
               >
                 <span>🔔</span>
-                <span>مركز الإشعارات</span>
+                <span>مركز طلبات عروض الأسعار</span>
               </button>
             </div>
           </div>

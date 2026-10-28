@@ -164,9 +164,9 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { id, status, read } = body;
+    const { id, status, read, all } = body;
 
-    if (!id) {
+    if (!id && !all) {
       return NextResponse.json({ error: "Missing inquiry ID" }, { status: 400, headers: corsHeaders() });
     }
 
@@ -176,7 +176,11 @@ export async function PATCH(request: Request) {
       if (status !== undefined) updates.status = status;
       if (read !== undefined) updates.read = read;
 
-      await fetch(`${url}/rest/v1/inquiries?id=eq.${encodeURIComponent(id)}`, {
+      const targetUrl = all
+        ? `${url}/rest/v1/inquiries?read=eq.false`
+        : `${url}/rest/v1/inquiries?id=eq.${encodeURIComponent(id)}`;
+
+      await fetch(targetUrl, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

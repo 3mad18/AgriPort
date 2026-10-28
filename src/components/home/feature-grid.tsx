@@ -67,46 +67,46 @@ export function FeatureGrid() {
   const bento = t.bento;
 
   return (
-    <section id="products" className="py-24 bg-[#F7F9FC]">
-      <div id="capabilities" className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section id="products" className="py-16 sm:py-24 bg-[#F7F9FC]">
+      <div id="capabilities" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="mb-16 max-w-2xl text-start">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">
+        <div className="mb-10 sm:mb-16 max-w-2xl text-start">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-3 sm:mb-4">
             {bento.title}
           </h2>
-          <p className="text-lg text-slate-500 font-medium leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-slate-500 font-medium leading-relaxed">
             {bento.subtitle}
           </p>
         </div>
 
         {/* Asymmetrical Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[320px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 md:auto-rows-[320px]">
           {/* Box 1: Large Product (Span 2 cols, 2 rows) */}
           <Link
             href="/products#citrus"
-            className="md:col-span-2 md:row-span-2 bg-white rounded-[2rem] p-1 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col group overflow-hidden relative cursor-pointer"
+            className="md:col-span-2 md:row-span-2 min-h-[300px] md:min-h-0 bg-white rounded-2xl sm:rounded-[2rem] p-1 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col group overflow-hidden relative cursor-pointer"
           >
-            <div className="absolute top-8 start-8 z-10 max-w-[70%] text-start">
-              <div className="text-emerald-400 font-semibold text-sm mb-2 uppercase tracking-wider">
+            <div className="absolute top-6 start-6 sm:top-8 sm:start-8 z-10 max-w-[85%] sm:max-w-[70%] text-start">
+              <div className="text-emerald-400 font-semibold text-xs sm:text-sm mb-1 sm:mb-2 uppercase tracking-wider">
                 {bento.card1Tag}
               </div>
-              <h3 className="text-3xl font-bold tracking-tight text-white drop-shadow-md mb-2">
+              <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-md mb-2">
                 {bento.card1Title}
               </h3>
-              <p className="text-white/90 text-sm drop-shadow font-medium">
+              <p className="text-white/90 text-xs sm:text-sm drop-shadow font-medium">
                 {bento.card1Desc}
               </p>
             </div>
             <img
               src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=1000&q=80"
               alt="Citrus Exports"
-              className="w-full h-full object-cover rounded-[1.8rem] group-hover:scale-105 transition-transform duration-700"
+              className="w-full h-full min-h-[300px] md:min-h-0 object-cover rounded-[1.3rem] sm:rounded-[1.8rem] group-hover:scale-105 transition-transform duration-700"
             />
-            <div className="absolute inset-1 rounded-[1.8rem] bg-gradient-to-t from-black/60 via-black/20 to-black/60 pointer-events-none" />
+            <div className="absolute inset-1 rounded-[1.3rem] sm:rounded-[1.8rem] bg-gradient-to-t from-black/60 via-black/20 to-black/60 pointer-events-none" />
           </Link>
 
           {/* Box 2: Feature (Cold Chain) */}
-          <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group text-start">
+          <div className="bg-white rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group text-start min-h-[220px] md:min-h-0">
             <div className="w-12 h-12 bg-[#F7F9FC] rounded-xl flex items-center justify-center text-slate-900 mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-colors">
               <Snowflake />
             </div>
@@ -123,7 +123,7 @@ export function FeatureGrid() {
           {/* Box 3: Product (Potatoes) */}
           <Link
             href="/products#potatoes"
-            className="bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden relative group cursor-pointer"
+            className="bg-white rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden relative group cursor-pointer min-h-[240px] md:min-h-0"
           >
             <div className="absolute bottom-6 start-6 z-10 text-start">
               <h3 className="text-xl font-bold tracking-tight text-white mb-1 drop-shadow-md">
@@ -136,13 +136,13 @@ export function FeatureGrid() {
             <img
               src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80"
               alt="Potatoes"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              className="w-full h-full min-h-[240px] md:min-h-0 object-cover group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent pointer-events-none" />
           </Link>
 
           {/* Box 4: Global Sourcing Map/Feature (Span 2 cols) */}
-          <div className="md:col-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center justify-between overflow-hidden relative group text-white text-start">
+          <div className="md:col-span-2 bg-slate-900 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 border border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center justify-between overflow-hidden relative group text-white text-start">
             <div className="relative z-10 md:w-3/5">
               <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-emerald-400 mb-6">
                 <Globe />

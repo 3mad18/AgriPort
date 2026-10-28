@@ -8,9 +8,30 @@ import { submitQuoteInquiry } from "@/lib/catalog";
 import { useLiveProducts } from "@/lib/use-live-products";
 import { useSiteSettings } from "@/lib/use-site-settings";
 import { useLanguage } from "@/context/language-context";
+import {
+  getProductCategoryTranslation,
+  translateAgriText,
+  type Language,
+} from "@/lib/i18n";
+
+const waMessages: Record<Language, string> = {
+  ar: "مرحباً، أود الاستفسار عن تفاصيل وأسعار تصدير الحاصلات الزراعية",
+  en: "Hello, I would like to inquire about export quotes and specifications",
+  fr: "Bonjour, je souhaite me renseigner sur les devis et spécifications d'exportation",
+  it: "Buongiorno, vorrei informazioni su preventivi e specifiche di esportazione",
+  es: "Hola, quisiera consultar sobre cotizaciones y especificaciones de exportación",
+};
+
+const waButtons: Record<Language, string> = {
+  ar: "محادثة واتساب فورية",
+  en: "Instant WhatsApp Chat",
+  fr: "Chat WhatsApp instantané",
+  it: "Chat WhatsApp istantanea",
+  es: "Chat de WhatsApp directo",
+};
 
 function ContactFormInner() {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const c = t.contactPage;
   const f = c.fields;
   const p = t.productsPage;
@@ -40,13 +61,33 @@ function ContactFormInner() {
   });
 
   const localizedItem = matchedProduct
-    ? p.productsList?.find((item) => item.id === matchedProduct.id)
+    ? p.productsList?.find((item) => {
+        if (item.id === matchedProduct.id) return true;
+        const lowerName = (matchedProduct.name || "").toLowerCase();
+        if (lowerName.includes("خرشوف") && item.id === "artichoke") return true;
+        if (lowerName.includes("موالح") && item.id === "citrus") return true;
+        if (lowerName.includes("بصل") && item.id === "onions") return true;
+        if (lowerName.includes("فراولة") && item.id === "strawberries") return true;
+        if (lowerName.includes("رمان") && item.id === "pomegranates") return true;
+        if (lowerName.includes("بطاطس") && item.id === "potatoes") return true;
+        if (lowerName.includes("عنب") && item.id === "grapes") return true;
+        return false;
+      })
     : null;
 
-  const resolvedProductName =
+  const rawProductName =
     localizedItem?.name || matchedProduct?.name || cropParam;
-  const resolvedVariety =
+  const rawVariety =
     localizedItem?.variety || matchedProduct?.variety || "";
+
+  const resolvedProductName =
+    language !== "ar"
+      ? translateAgriText(rawProductName, language)
+      : rawProductName;
+  const resolvedVariety =
+    language !== "ar"
+      ? translateAgriText(rawVariety, language)
+      : rawVariety;
 
   const [isCleared, setIsCleared] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -136,7 +177,7 @@ function ContactFormInner() {
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Direct Contact Info Sidebar (5 Cols) */}
         <div className="space-y-6 lg:col-span-5">
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-8 shadow-sm">
             <h3 className="text-xl font-bold tracking-tight text-slate-900">
               {c.directTitle}
             </h3>
@@ -181,16 +222,14 @@ function ContactFormInner() {
                   </a>
                   <a
                     href={`https://wa.me/${(siteSettings.phone || "201007202636").replace(/\D/g, "")}?text=${encodeURIComponent(
-                      dir === "rtl"
-                        ? "مرحباً، أود الاستفسار عن تفاصيل وأسعار تصدير الحاصلات الزراعية"
-                        : "Hello, I would like to inquire about export quotes and specifications"
+                      waMessages[language] || waMessages.en
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 mt-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg transition-colors"
                   >
                     <span>💬</span>
-                    <span>{dir === "rtl" ? "محادثة واتساب فورية" : "Instant WhatsApp Chat"}</span>
+                    <span>{waButtons[language] || waButtons.en}</span>
                   </a>
                 </div>
               </div>
@@ -205,7 +244,9 @@ function ContactFormInner() {
                     {c.locationLabel}
                   </div>
                   <div className="text-sm font-medium text-slate-600">
-                    {siteSettings.location || c.locationValue}
+                    {language === "ar" && siteSettings.location
+                      ? siteSettings.location
+                      : c.locationValue}
                   </div>
                 </div>
               </div>
@@ -223,7 +264,7 @@ function ContactFormInner() {
 
         {/* Interactive Quote Request Form (7 Cols) */}
         <div className="lg:col-span-7">
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-8 shadow-sm">
             <h3 className="text-xl font-bold tracking-tight text-slate-900">
               {c.formTitle}
             </h3>
@@ -233,10 +274,10 @@ function ContactFormInner() {
 
             {/* Active Selected Product Badge */}
             {!isCleared && resolvedProductName && formData.product && (
-              <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-50/70 p-4 shadow-2xs">
-                <div className="flex items-center gap-3.5">
+              <div className="mt-5 flex items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-50/70 p-3 sm:p-4 shadow-2xs">
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
                   {matchedProduct?.imageUrl ? (
-                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-emerald-500/20 shadow-2xs">
+                    <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-emerald-500/20 shadow-2xs">
                       <img
                         src={matchedProduct.imageUrl}
                         alt={resolvedProductName}
@@ -248,22 +289,25 @@ function ContactFormInner() {
                       🌿
                     </div>
                   )}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
                         {c.selectedCropBadge}
                       </span>
                       {(localizedItem?.category || matchedProduct?.category) && (
                         <span className="rounded-full bg-emerald-200/60 px-2 py-0.5 text-[10px] font-bold text-emerald-900">
-                          {localizedItem?.category || matchedProduct?.category}
+                          {getProductCategoryTranslation(
+                            localizedItem?.category || matchedProduct?.category || "",
+                            language
+                          )}
                         </span>
                       )}
                     </div>
-                    <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                    <h4 className="text-sm font-bold text-slate-900 mt-0.5 truncate">
                       {resolvedProductName}
                     </h4>
                     {resolvedVariety && (
-                      <p className="text-xs text-slate-600 line-clamp-1 mt-0.5 font-medium">
+                      <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">
                         {resolvedVariety}
                       </p>
                     )}

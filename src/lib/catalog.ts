@@ -90,6 +90,19 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     icon: "🍇",
     status: "متاح للتصدير",
   },
+  {
+    id: "artichoke",
+    name: "الخرشوف المصري الفاخر",
+    category: "خضروات",
+    variety: "خرشوف فرنساوي، خرشوف بلدي",
+    season: "نوفمبر — مايو",
+    pack: "براميل حفظ غذائية، كراتين مبردة، أكياس مجهزة",
+    specs: "أحجام كاليبر: 50، 60، 55 مم نخب أول",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80",
+    icon: "🌱",
+    status: "متاح للتصدير",
+  },
 ];
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config";

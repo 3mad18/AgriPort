@@ -11,7 +11,7 @@ export default function AboutPage() {
     <PageShell title={about.title} description={about.subtitle}>
       <div className="space-y-8">
         {/* Company Overview Story */}
-        <div className="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm sm:p-10">
+        <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-10 shadow-sm">
           <p className="max-w-4xl text-base sm:text-lg leading-relaxed text-slate-600 font-medium">
             {about.description}
           </p>
@@ -22,7 +22,7 @@ export default function AboutPage() {
           {about.pillars.map((pillar) => (
             <div
               key={pillar.title}
-              className="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm transition-all hover:border-slate-200 hover:shadow-md"
+              className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-8 shadow-sm transition-all hover:border-slate-200 hover:shadow-md"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-2xl">
                 {pillar.icon}

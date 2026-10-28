@@ -9,7 +9,7 @@ import { useSiteSettings } from "@/lib/use-site-settings";
 const CURRENT_YEAR = 2026;
 
 export function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { settings: siteSettings } = useSiteSettings();
   const pathname = usePathname();
   const router = useRouter();
@@ -29,16 +29,16 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-slate-900 text-white pt-24 pb-12 border-t border-slate-800"
+      className="bg-slate-900 text-white pt-16 sm:pt-24 pb-12 border-t border-slate-800"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24 text-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 mb-16 sm:mb-24 text-start">
           {/* CTA Text & Contact input */}
           <div>
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tighter mb-6 leading-tight text-white">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter mb-4 sm:mb-6 leading-tight text-white">
               {footer.ctaTitle}
             </h2>
-            <p className="text-lg text-slate-400 font-medium mb-8 max-w-md leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg text-slate-400 font-medium mb-6 sm:mb-8 max-w-md leading-relaxed">
               {footer.ctaDesc}
             </p>
             <form onSubmit={handleContactSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md">
@@ -47,7 +47,7 @@ export function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={footer.emailPlaceholder}
-                className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all w-full max-w-xs placeholder:text-slate-500 text-sm"
+                className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all w-full sm:flex-1 placeholder:text-slate-500 text-sm"
               />
               <button
                 type="submit"
@@ -61,7 +61,11 @@ export function Footer() {
             <div className="mt-6 flex flex-col gap-2.5 text-xs text-slate-400 font-medium">
               <div className="flex items-center gap-2">
                 <span className="text-emerald-400">📍</span>
-                <span>{siteSettings.location || t.contactPage.locationValue}</span>
+                <span>
+                  {language === "ar" && siteSettings.location
+                    ? siteSettings.location
+                    : t.contactPage.locationValue}
+                </span>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-slate-300">
                 <a
@@ -96,7 +100,7 @@ export function Footer() {
                 {footer.linkProducts}
               </Link>
               <Link
-                href="/#capabilities"
+                href="/facilities"
                 className="text-slate-300 hover:text-emerald-400 transition-colors"
               >
                 {footer.linkColdChain}
@@ -120,7 +124,7 @@ export function Footer() {
                 {footer.linkAbout}
               </Link>
               <Link
-                href="/farms"
+                href="/facilities"
                 className="text-slate-300 hover:text-emerald-400 transition-colors"
               >
                 {footer.linkFarms}
@@ -158,10 +162,14 @@ export function Footer() {
             <Link
               href="/ops"
               className="text-xs text-slate-500 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800/40 hover:bg-slate-800"
-              title="بوابة إدارة العمليات والموقع"
+              title={
+                language === "ar"
+                  ? "بوابة إدارة العمليات والموقع"
+                  : "Operations Suite Portal"
+              }
             >
               <span>🔒</span>
-              <span>لوحة العمليات</span>
+              <span>{language === "ar" ? "لوحة العمليات" : "Ops Portal"}</span>
             </Link>
           </div>
         </div>
