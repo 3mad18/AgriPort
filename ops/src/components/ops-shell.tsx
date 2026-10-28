@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BrandLogo } from "@/components/brand-logo";
 import { getVisitorSiteUrl } from "@/lib/urls";
 import { useOpsAuth } from "@/context/ops-auth-context";
-import { useOpsStore, type Inquiry } from "@/context/ops-store-context";
+import { useOpsStore } from "@/context/ops-store-context";
 import { OpsOverview } from "@/components/ops-overview";
 import { OpsNotificationsCenter } from "@/components/ops-notifications-center";
 import { OpsProducts } from "@/components/ops-products";
@@ -16,6 +16,16 @@ import { OpsToast } from "@/components/ops-toast";
 export type OpsTab = "overview" | "notifications" | "products" | "settings";
 
 const OPS_TAB_STORAGE_KEY = "agriport_ops_persisted_tab";
+
+function subscribeOpsTab(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("hashchange", callback);
+  window.addEventListener("popstate", callback);
+  return () => {
+    window.removeEventListener("hashchange", callback);
+    window.removeEventListener("popstate", callback);
+  };
+}
 
 function getInitialOpsTab(): OpsTab {
   if (typeof window === "undefined") return "overview";
@@ -53,20 +63,24 @@ export function OpsShell() {
     markAllInquiriesRead,
   } = useOpsStore();
 
-  const [activeTab, setActiveTab] = useState<OpsTab>(getInitialOpsTab);
+  const activeTab = useSyncExternalStore(
+    subscribeOpsTab,
+    getInitialOpsTab,
+    () => "overview"
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const handleTabChange = useCallback((tab: OpsTab) => {
-    setActiveTab(tab);
     setIsMobileSidebarOpen(false);
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(OPS_TAB_STORAGE_KEY, tab);
         if (window.location.hash !== `#${tab}`) {
           window.history.replaceState(null, "", `#${tab}`);
+          window.dispatchEvent(new Event("hashchange"));
         }
       } catch (e) {}
     }
@@ -93,28 +107,16 @@ export function OpsShell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Preserve and sync active tab across refreshes and history navigation
+  // Ensure hash matches initial state on first load if authenticated
   useEffect(() => {
-    const tab = getInitialOpsTab();
-    setActiveTab(tab);
+    if (!isAuthenticated) return;
     try {
-      if (window.location.hash !== `#${tab}`) {
-        window.history.replaceState(null, "", `#${tab}`);
+      const current = getInitialOpsTab();
+      if (window.location.hash !== `#${current}`) {
+        window.history.replaceState(null, "", `#${current}`);
       }
     } catch (e) {}
-
-    const handleHashChange = () => {
-      const current = getInitialOpsTab();
-      setActiveTab(current);
-    };
-
-    window.addEventListener("hashchange", handleHashChange);
-    window.addEventListener("popstate", handleHashChange);
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-      window.removeEventListener("popstate", handleHashChange);
-    };
-  }, []);
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (

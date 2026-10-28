@@ -36,23 +36,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600&display=swap"
           rel="stylesheet"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var session = localStorage.getItem("agriport_ops_auth_session");
-                  var p = window.location.pathname;
-                  if (!session && p !== "/secure-login" && !p.startsWith("/api")) {
-                    window.location.replace("/secure-login");
-                  } else if (session && p === "/secure-login") {
-                    window.location.replace("/");
-                  }
-                } catch(e) {}
-              })();
-            `,
-          }}
-        />
       </head>
       <body className="antialiased min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900">
         <OpsAuthProvider>

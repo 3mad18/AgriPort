@@ -3,8 +3,6 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
@@ -66,12 +64,14 @@ function getAuthSnapshot(): OpsUser | null {
   }
 }
 
-export function OpsAuthProvider({ children }: { children: ReactNode }) {
-  const [isHydrated, setIsHydrated] = useState(false);
+const emptySubscribe = () => () => {};
 
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+export function OpsAuthProvider({ children }: { children: ReactNode }) {
+  const isHydrated = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   const user = useSyncExternalStore(subscribeAuth, getAuthSnapshot, () => null);
 

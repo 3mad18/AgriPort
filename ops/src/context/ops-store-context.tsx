@@ -9,6 +9,17 @@ import {
   type ReactNode,
 } from "react";
 import { triggerOpsToast } from "@/components/ops-toast";
+import {
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  SETTINGS_KEY,
+  SETTINGS_CACHE_KEY,
+  SETTINGS_EVENT,
+  OPS_STORE_EVENT as STORE_EVENT,
+  PRODUCTS_KEY,
+  PRODUCTS_CACHE_KEY,
+  PRODUCTS_EVENT,
+} from "@/lib/supabase-config";
 
 export type Product = {
   id: string;
@@ -220,10 +231,10 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showExportBanner: true,
 };
 
-const PRODUCTS_KEY = "agriport_ops_products";
+// PRODUCTS_KEY imported
 const INQUIRIES_KEY = "agriport_ops_inquiries";
-const SETTINGS_KEY = "agriport_ops_settings";
-const STORE_EVENT = "agriport_ops_store_change";
+// SETTINGS_KEY imported
+// STORE_EVENT imported
 
 function subscribeStore(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -315,10 +326,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     async function syncInquiriesFromCloud() {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
 
       console.log("🔄 [AgriPort Ops] Cloud sync triggered...", {
         hasSupabaseUrl: Boolean(supabaseUrl),
@@ -417,10 +426,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     }
 
     async function syncProductsFromCloud() {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
       if (!supabaseUrl || !supabaseKey) return;
       try {
         const res = await fetch(
@@ -461,10 +468,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     }
 
     async function syncSettingsFromCloud() {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
       if (!supabaseUrl || !supabaseKey) return;
       try {
         const res = await fetch(`${supabaseUrl}/rest/v1/site_settings?limit=1`, {
@@ -545,10 +550,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         "تم الحفظ بنجاح"
       );
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
           await fetch(`${supabaseUrl}/rest/v1/products`, {
@@ -598,10 +601,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         "تم الحفظ بنجاح"
       );
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
           const payload: Record<string, any> = {};
@@ -644,10 +645,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       notifyChange();
       triggerOpsToast("تم حذف المنتج من الكتالوج بنجاح 🗑️");
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
           await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
@@ -771,10 +770,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       cachedSettingsRaw = JSON.stringify(updated);
       notifyChange();
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey =
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
           const res = await fetch(`${supabaseUrl}/rest/v1/site_settings`, {

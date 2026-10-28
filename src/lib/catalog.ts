@@ -94,6 +94,19 @@ export const EXPORT_CATALOG: ExportProduct[] = [
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config";
 
+function syncLocalInquiry(item: any) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = localStorage.getItem("agriport_ops_inquiries");
+    const list = raw ? JSON.parse(raw) : [];
+    if (!list.some((existing: any) => existing.id === item.id)) {
+      const updated = [item, ...list];
+      localStorage.setItem("agriport_ops_inquiries", JSON.stringify(updated));
+      window.dispatchEvent(new Event("agriport_ops_store_change"));
+    }
+  } catch (e) {}
+}
+
 export async function submitQuoteInquiry(inquiryData: {
   name: string;
   company: string;
@@ -150,6 +163,7 @@ export async function submitQuoteInquiry(inquiryData: {
 
       if (sbRes.ok) {
         console.log("✅ [AgriPort] Direct Supabase write SUCCESS!");
+        syncLocalInquiry(payload);
         return { success: true, inquiry: payload };
       } else {
         const errorText = await sbRes.text();
@@ -173,6 +187,9 @@ export async function submitQuoteInquiry(inquiryData: {
     });
     const result = await res.json();
     console.log("📡 [AgriPort] Fallback /api/inquiries response:", result);
+    if (result?.success) {
+      syncLocalInquiry(payload);
+    }
     return result;
   } catch (err) {
     console.error("❌ [AgriPort] /api/inquiries submission error:", err);

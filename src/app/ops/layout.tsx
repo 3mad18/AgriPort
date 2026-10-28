@@ -20,24 +20,6 @@ export default function OpsLayout({
   return (
     <OpsAuthProvider>
       <OpsStoreProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var session = localStorage.getItem("agriport_ops_auth_session");
-                  var p = window.location.pathname;
-                  var isLogin = p.includes("/login") || p.includes("/secure-login");
-                  if (!session && !isLogin && !p.startsWith("/api")) {
-                    window.location.replace("/ops/login");
-                  } else if (session && isLogin) {
-                    window.location.replace("/ops");
-                  }
-                } catch(e) {}
-              })();
-            `,
-          }}
-        />
         <div dir="rtl" className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900">
           {children}
         </div>
