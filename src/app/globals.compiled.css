@@ -1336,9 +1336,6 @@
       border-color: color-mix(in oklab, var(--color-teal-600) 50%, transparent);
     }
   }
-  .border-transparent {
-    border-color: transparent;
-  }
   .border-white {
     border-color: var(--color-white);
   }
@@ -2867,6 +2864,14 @@
     @supports (color: color-mix(in lab, red, red)) {
       .hover\:bg-slate-200\/80:hover {
         background-color: color-mix(in oklab, var(--color-slate-200) 80%, transparent);
+      }
+    }
+    .hover\:bg-slate-200\/90:hover {
+      background-color: color-mix(in srgb, oklch(92.9% 0.013 255.508) 90%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-slate-200\/90:hover {
+        background-color: color-mix(in oklab, var(--color-slate-200) 90%, transparent);
       }
     }
     .hover\:bg-slate-300:hover {

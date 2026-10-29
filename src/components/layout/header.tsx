@@ -252,7 +252,15 @@ export function Header() {
               )}
             </div>
 
-            {/* Visitor Auth: User Dropdown OR Sign In button */}
+            {/* Contact Sales Pill Button */}
+            <Link
+              href="/contact"
+              className="text-sm font-medium bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-full transition-all flex items-center gap-2 shadow-xs hover:shadow-emerald-500/20 active:scale-95"
+            >
+              {t.nav.contactSales}
+            </Link>
+
+            {/* Visitor Auth: User Dropdown OR Sign In button (Placed after Contact) */}
             {isAuthenticated && user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
@@ -334,20 +342,12 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="text-xs font-semibold text-slate-600 hover:text-emerald-600 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-slate-100/70 border border-transparent hover:border-slate-200"
+                className="text-xs font-semibold text-slate-700 hover:text-emerald-700 transition-all flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/80 shadow-2xs"
               >
                 <UserIcon />
                 <span>{loginLabel}</span>
               </Link>
             )}
-
-            {/* Contact Sales Pill Button */}
-            <Link
-              href="/contact"
-              className="text-sm font-medium bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-full transition-all flex items-center gap-2 shadow-xs hover:shadow-emerald-500/20 active:scale-95"
-            >
-              {t.nav.contactSales}
-            </Link>
           </div>
 
           {/* Mobile Right Controls: Language Pill + Menu Toggle */}
@@ -445,47 +445,7 @@ export function Header() {
       {/* Mobile Menu Drawer */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden animate-fade-in flex flex-col justify-start gap-6 pb-8 overflow-y-auto">
-          {/* User Status Bar in Mobile Menu */}
-          {isAuthenticated && user ? (
-            <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex items-center justify-between text-start">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
-                  {user.avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    user.name.charAt(0).toUpperCase()
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-900">{user.name}</p>
-                  <p className="text-xs text-slate-500 font-mono dir-ltr">{user.email}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-colors"
-              >
-                {language === "ar" ? "خروج" : "Logout"}
-              </button>
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-5 py-3 rounded-2xl font-semibold text-sm transition-colors border border-slate-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <UserIcon />
-              <span>{language === "ar" ? "تسجيل الدخول / حساب جديد" : "Sign In / Register"}</span>
-            </Link>
-          )}
-
-          <div className="flex flex-col gap-5 text-lg font-medium text-start">
+          <div className="flex flex-col gap-4 text-lg font-medium text-start">
             <Link
               href={isHome ? "#products" : "/products"}
               className="text-slate-700 hover:text-emerald-600 transition-colors py-1"
@@ -509,11 +469,51 @@ export function Header() {
             </Link>
             <Link
               href="/contact"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3.5 rounded-full text-center font-semibold text-base shadow-sm mt-3"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3.5 rounded-full text-center font-semibold text-base shadow-sm mt-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t.nav.contactSales}
             </Link>
+
+            {/* User Status Bar or Sign In in Mobile Menu (Placed after Contact) */}
+            {isAuthenticated && user ? (
+              <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex items-center justify-between text-start mt-2">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+                    {user.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                    <p className="text-xs text-slate-500 font-mono dir-ltr">{user.email}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-colors"
+                >
+                  {language === "ar" ? "خروج" : "Logout"}
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-5 py-3 rounded-2xl font-semibold text-sm transition-colors border border-slate-200 mt-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <UserIcon />
+                <span>{language === "ar" ? "تسجيل الدخول / حساب جديد" : "Sign In / Register"}</span>
+              </Link>
+            )}
           </div>
         </div>
       )}
