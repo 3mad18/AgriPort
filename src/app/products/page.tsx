@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { useLiveProducts } from "@/lib/use-live-products";
 import { useLanguage } from "@/context/language-context";
+import { useVisitorAuth } from "@/context/visitor-auth-context";
 import {
   getProductStatusTranslation,
   getProductCategoryTranslation,
@@ -14,6 +15,7 @@ import {
 
 export default function ProductsPage() {
   const { t, dir, language } = useLanguage();
+  const { isAuthenticated } = useVisitorAuth();
   const p = t.productsPage;
   const { products: liveCatalog } = useLiveProducts();
 
@@ -187,7 +189,13 @@ export default function ProductsPage() {
               {/* Action Button */}
               <div className="p-5 sm:p-6 pt-0">
                 <Link
-                  href={`/contact?id=${encodeURIComponent(item.id)}&crop=${encodeURIComponent(item.name)}`}
+                  href={
+                    isAuthenticated
+                      ? `/contact?id=${encodeURIComponent(item.id)}&crop=${encodeURIComponent(item.name)}`
+                      : `/login?tab=register&redirect=${encodeURIComponent(
+                          `/contact?id=${encodeURIComponent(item.id)}&crop=${encodeURIComponent(item.name)}`
+                        )}&cropName=${encodeURIComponent(item.name)}`
+                  }
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-emerald-600 py-3 text-xs font-semibold text-white transition-all shadow-xs"
                 >
                   <span>{p.requestQuoteBtn}</span>

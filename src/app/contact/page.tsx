@@ -2,12 +2,14 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { submitQuoteInquiry } from "@/lib/catalog";
 import { useLiveProducts } from "@/lib/use-live-products";
 import { useSiteSettings } from "@/lib/use-site-settings";
 import { useLanguage } from "@/context/language-context";
+import { useVisitorAuth } from "@/context/visitor-auth-context";
 import {
   getProductCategoryTranslation,
   translateAgriText,
@@ -31,6 +33,8 @@ const waButtons: Record<Language, string> = {
 };
 
 function ContactFormInner() {
+  const router = useRouter();
+  const { user, isAuthenticated } = useVisitorAuth();
   const { t, dir, language } = useLanguage();
   const c = t.contactPage;
   const f = c.fields;
@@ -116,6 +120,18 @@ function ContactFormInner() {
     }
   }, [isCleared, resolvedProductName, emailParam]);
 
+  // Auto-fill from authenticated visitor user
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || user.name || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || (user.phone ? `${user.countryCode || ""} ${user.phone}`.trim() : ""),
+      }));
+    }
+  }, [user]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -164,6 +180,16 @@ function ContactFormInner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If requesting a quote for a product and not authenticated: redirect to register first!
+    if (!isAuthenticated && (formData.product || cropParam || idParam)) {
+      const returnUrl = `/contact?id=${encodeURIComponent(idParam)}&crop=${encodeURIComponent(formData.product || cropParam)}`;
+      router.push(
+        `/login?tab=register&redirect=${encodeURIComponent(returnUrl)}&cropName=${encodeURIComponent(formData.product || cropParam)}`
+      );
+      return;
+    }
+
     console.log("📝 [Contact Form] Submit clicked, data:", formData);
     setIsSubmitting(true);
     const res = await submitQuoteInquiry(formData);
@@ -339,7 +365,54 @@ function ContactFormInner() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <>
+                {/* Notice if requesting a quote while not logged in */}
+                {!isAuthenticated && (cropParam || idParam || formData.product) && (
+                  <div className="mt-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in text-start">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl shrink-0 mt-0.5">🔒</span>
+                      <div>
+                        <h4 className="text-sm font-bold text-amber-950">
+                          {language === "ar"
+                            ? "تسجيل الدخول مطلوب لإتمام طلب عرض السعر"
+                            : "Sign in required to request a quote"}
+                        </h4>
+                        <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                          {language === "ar"
+                            ? `لطلب تسعير محصول «${resolvedProductName || formData.product || "المحدد"}»، يُرجى إنشاء حساب سريعاً أو تسجيل الدخول للمتابعة.`
+                            : `To request a quote for ${resolvedProductName || formData.product || "the selected crop"}, please register or sign in first.`}
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/login?tab=register&redirect=${encodeURIComponent(
+                        `/contact?id=${encodeURIComponent(idParam)}&crop=${encodeURIComponent(cropParam || formData.product)}`
+                      )}&cropName=${encodeURIComponent(resolvedProductName || cropParam || formData.product)}`}
+                      className="shrink-0 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-xs text-center whitespace-nowrap active:scale-95"
+                    >
+                      {language === "ar" ? "تسجيل الدخول / إنشاء حساب" : "Sign In / Register"}
+                    </Link>
+                  </div>
+                )}
+
+                {/* Verified user badge */}
+                {isAuthenticated && user && (
+                  <div className="mt-5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 p-3 sm:p-4 flex items-center justify-between gap-3 text-start animate-fade-in">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
+                      <p className="text-xs font-semibold text-emerald-950 truncate">
+                        {language === "ar" ? "طلب تسعير بحساب: " : "Quoting as: "}
+                        <span className="font-bold text-slate-900">{user.name}</span>
+                        <span className="text-emerald-700 font-mono text-[11px] ms-1.5 dir-ltr">({user.email})</span>
+                      </p>
+                    </div>
+                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full shrink-0 border border-emerald-200/50">
+                      {language === "ar" ? "عميل معتمد" : "Verified"}
+                    </span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 {/* Name & Company */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
@@ -514,7 +587,8 @@ function ContactFormInner() {
                   <span className={dir === "rtl" ? "rotate-180" : ""}>→</span>
                 </button>
               </form>
-            )}
+            </>
+          )}
           </div>
         </div>
       </div>
