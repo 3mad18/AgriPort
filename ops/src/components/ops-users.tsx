@@ -3,6 +3,22 @@
 import { useState, useMemo } from "react";
 import { useOpsStore, type RegisteredUserRecord } from "@/context/ops-store-context";
 import { triggerOpsToast } from "@/components/ops-toast";
+import {
+  Users,
+  UserPlus,
+  FileSpreadsheet,
+  Search,
+  X,
+  Copy,
+  Check,
+  MessageCircle,
+  Package,
+  Eye,
+  Trash2,
+  Sparkles,
+  Globe,
+  AlertCircle,
+} from "lucide-react";
 
 // Popular countries data helper for ops subproject
 const POPULAR_COUNTRIES = [
@@ -20,6 +36,7 @@ const POPULAR_COUNTRIES = [
   { code: "+1", dialCode: "+1", iso: "US", flag: "🇺🇸", nameAr: "الولايات المتحدة" },
 ];
 const DEFAULT_COUNTRY = POPULAR_COUNTRIES[0];
+type CountryPhone = (typeof POPULAR_COUNTRIES)[0];
 
 export function OpsUsers() {
   const { registeredUsers, deleteRegisteredUser, addRegisteredUser, inquiries } = useOpsStore();
@@ -39,7 +56,7 @@ export function OpsUsers() {
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPhone, setNewPhone] = useState("");
-  const [newCountry, setNewCountry] = useState(DEFAULT_COUNTRY);
+  const [newCountry, setNewCountry] = useState<CountryPhone>(DEFAULT_COUNTRY);
   const [newPassword, setNewPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -176,7 +193,7 @@ export function OpsUsers() {
         name: newName.trim(),
         email: newEmail.trim(),
         phone: newPhone.trim(),
-        countryCode: newCountry.code,
+        countryCode: newCountry.dialCode,
         countryIso: newCountry.iso,
         password: newPassword.trim() || "12345678",
       });
@@ -228,8 +245,8 @@ export function OpsUsers() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 text-lg">
-              👥
+            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600">
+              <Users className="w-5 h-5" />
             </span>
             <h2 className="text-xl font-bold text-slate-900">
               قاعدة بيانات العملاء والمستخدمين المسجلين
@@ -247,7 +264,7 @@ export function OpsUsers() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-xs hover:shadow-md transition-all active:scale-[0.98]"
             title="تصدير كملف إكسل متوافق مع اللغة العربية"
           >
-            <span>📊</span>
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>تصدير Excel (CSV)</span>
           </button>
 
@@ -259,7 +276,7 @@ export function OpsUsers() {
             }}
             className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all active:scale-[0.98]"
           >
-            <span className="text-base leading-none">＋</span>
+            <UserPlus className="w-4 h-4" />
             <span>إضافة عميل يدوياً</span>
           </button>
         </div>
@@ -273,8 +290,8 @@ export function OpsUsers() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               إجمالي الحسابات
             </span>
-            <span className="h-9 w-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
-              👤
+            <span className="h-9 w-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Users className="w-4.5 h-4.5" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -296,8 +313,8 @@ export function OpsUsers() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               تسجيلات هذا الأسبوع
             </span>
-            <span className="h-9 w-9 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-base">
-              ✨
+            <span className="h-9 w-9 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+              <Sparkles className="w-4.5 h-4.5" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -319,8 +336,8 @@ export function OpsUsers() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               متاحون عبر واتساب
             </span>
-            <span className="h-9 w-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
-              💬
+            <span className="h-9 w-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <MessageCircle className="w-4.5 h-4.5" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -342,8 +359,8 @@ export function OpsUsers() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               الدول والأسواق
             </span>
-            <span className="h-9 w-9 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-              🌍
+            <span className="h-9 w-9 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Globe className="w-4.5 h-4.5" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -371,8 +388,8 @@ export function OpsUsers() {
             placeholder="بحث بالاسم، الإيميل أو رقم الهاتف..."
             className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 py-2.5 ps-10 pe-4 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none transition-all"
           />
-          <span className="absolute inset-y-0 start-3.5 flex items-center text-slate-400 text-xs">
-            🔍
+          <span className="absolute inset-y-0 start-3.5 flex items-center text-slate-400">
+            <Search className="w-4 h-4" />
           </span>
           {searchQuery && (
             <button
@@ -380,7 +397,7 @@ export function OpsUsers() {
               onClick={() => setSearchQuery("")}
               className="absolute inset-y-0 end-3 flex items-center text-slate-400 hover:text-slate-600 text-xs"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -418,8 +435,8 @@ export function OpsUsers() {
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         {filteredUsers.length === 0 ? (
           <div className="py-20 px-4 text-center">
-            <div className="mx-auto w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-3xl mb-4 text-slate-400">
-              👥
+            <div className="mx-auto w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-4 text-slate-400">
+              <Users className="w-8 h-8" />
             </div>
             <h3 className="text-base font-bold text-slate-800">
               {searchQuery || selectedCountryFilter !== "all"
@@ -449,9 +466,10 @@ export function OpsUsers() {
                   setFormError(null);
                   setIsAddUserModalOpen(true);
                 }}
-                className="mt-5 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20"
+                className="mt-5 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20 inline-flex items-center gap-2"
               >
-                ＋ إضافة أول عميل الآن
+                <UserPlus className="w-4 h-4" />
+                <span>إضافة أول عميل الآن</span>
               </button>
             )}
           </div>
@@ -517,7 +535,11 @@ export function OpsUsers() {
                             className="p-1 text-slate-400 hover:text-emerald-600 rounded-md transition-colors"
                             title="نسخ البريد"
                           >
-                            {copiedEmailId === user.id ? "✓" : "📋"}
+                            {copiedEmailId === user.id ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
                           </button>
                         </div>
                       </td>
@@ -534,10 +556,10 @@ export function OpsUsers() {
                                 href={waLink}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-colors border border-emerald-200"
+                                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-colors border border-emerald-200"
                                 title="مراسلة عبر واتساب"
                               >
-                                <span>💬</span>
+                                <MessageCircle className="w-3 h-3" />
                                 <span>واتساب</span>
                               </a>
                             )}
@@ -579,8 +601,8 @@ export function OpsUsers() {
                       {/* Associated Inquiries */}
                       <td className="py-4 px-6">
                         {userInquiries.length > 0 ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-teal-50 text-teal-800 text-[11px] font-bold border border-teal-200">
-                            <span>📦</span>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-teal-50 text-teal-800 text-[11px] font-bold border border-teal-200">
+                            <Package className="w-3.5 h-3.5 text-teal-600" />
                             <span>{userInquiries.length} طلب تصدير</span>
                           </span>
                         ) : (
@@ -599,7 +621,7 @@ export function OpsUsers() {
                             className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-colors"
                             title="عرض تفاصيل الحساب"
                           >
-                            👁️
+                            <Eye className="w-4 h-4" />
                           </button>
                           <button
                             type="button"
@@ -607,7 +629,7 @@ export function OpsUsers() {
                             className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
                             title="حذف الحساب"
                           >
-                            🗑️
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -627,9 +649,9 @@ export function OpsUsers() {
             <button
               type="button"
               onClick={() => setSelectedUserDetail(null)}
-              className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 text-lg font-bold p-1"
+              className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 p-1"
             >
-              ✕
+              <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
@@ -711,7 +733,7 @@ export function OpsUsers() {
                   rel="noreferrer"
                   className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
                 >
-                  <span>💬</span>
+                  <MessageCircle className="w-4 h-4" />
                   <span>مراسلة واتساب</span>
                 </a>
               )}
@@ -734,14 +756,14 @@ export function OpsUsers() {
             <button
               type="button"
               onClick={() => setIsAddUserModalOpen(false)}
-              className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 text-lg font-bold p-1"
+              className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 p-1"
             >
-              ✕
+              <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 text-lg">
-                👤
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <UserPlus className="w-5 h-5" />
               </span>
               <div>
                 <h3 className="text-lg font-bold text-slate-900">
@@ -754,8 +776,9 @@ export function OpsUsers() {
             </div>
 
             {formError && (
-              <div className="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
-                ⚠️ {formError}
+              <div className="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{formError}</span>
               </div>
             )}
 
@@ -803,7 +826,7 @@ export function OpsUsers() {
                   >
                     {POPULAR_COUNTRIES.map((c) => (
                       <option key={c.iso} value={c.iso}>
-                        {c.flag} {c.nameAr} ({c.code})
+                        {c.flag} {c.nameAr} ({c.dialCode})
                       </option>
                     ))}
                   </select>
@@ -859,8 +882,8 @@ export function OpsUsers() {
       {deleteCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 text-center animate-in fade-in zoom-in-95 duration-200">
-            <div className="mx-auto w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mb-3">
-              🗑️
+            <div className="mx-auto w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
+              <Trash2 className="w-6 h-6" />
             </div>
             <h3 className="text-base font-bold text-slate-900 mb-1">
               حذف حساب العميل؟

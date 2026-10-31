@@ -3,6 +3,18 @@
 
 import { useState, useMemo } from "react";
 import { useOpsStore, type Inquiry } from "@/context/ops-store-context";
+import {
+  Landmark,
+  CheckCheck,
+  Printer,
+  MessageCircle,
+  Mail,
+  Copy,
+  Check,
+  Eye,
+  Trash2,
+  X,
+} from "lucide-react";
 
 export function isFacilityVisit(inquiry: Inquiry): boolean {
   if (!inquiry) return false;
@@ -381,8 +393,8 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
       {/* 1. Header Card with Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs">
         <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 text-2xl font-bold">
-            🏛️
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 font-bold">
+            <Landmark className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -408,7 +420,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
               onClick={markAllInquiriesRead}
               className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
             >
-              <span>✓✓</span>
+              <CheckCheck className="w-4 h-4 text-emerald-600" />
               <span>تحديد الكل كمقروء</span>
             </button>
           )}
@@ -418,7 +430,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
             onClick={handleGeneratePdf}
             className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 hover:scale-105 active:scale-95 transition-all"
           >
-            <span>🖨️</span>
+            <Printer className="w-4 h-4" />
             <span>تصدير جدول الوفود (PDF)</span>
           </button>
         </div>
@@ -689,7 +701,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 text-xs font-bold transition-colors shadow-2xs"
                     >
-                      <span>💬</span>
+                      <MessageCircle className="w-3.5 h-3.5" />
                       <span>تنسيق عبر واتساب</span>
                     </a>
 
@@ -698,7 +710,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                       href={getEmailLink(v)}
                       className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-3.5 py-2 text-xs font-bold transition-colors"
                     >
-                      <span>✉️</span>
+                      <Mail className="w-3.5 h-3.5" />
                       <span>إرسال دعوة رسمية</span>
                     </a>
 
@@ -708,7 +720,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                       onClick={() => handleCopySummary(v)}
                       className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 px-3 py-2 text-xs font-semibold transition-colors"
                     >
-                      <span>{copiedId === v.inquiry.id ? "✓" : "📋"}</span>
+                      {copiedId === v.inquiry.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{copiedId === v.inquiry.id ? "تم النسخ" : "نسخ الملخص"}</span>
                     </button>
                   </div>
@@ -720,7 +732,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                       onClick={() => setSelectedVisit(v)}
                       className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 text-xs font-bold transition-colors shadow-2xs"
                     >
-                      <span>👁️</span>
+                      <Eye className="w-3.5 h-3.5" />
                       <span>عرض ملف الوفد بالكامل</span>
                     </button>
 
@@ -735,7 +747,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                       className="text-slate-400 hover:text-rose-600 p-2 text-xs transition-colors"
                       title="حذف"
                     >
-                      🗑️
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -773,7 +785,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                 onClick={() => setSelectedVisit(null)}
                 className="rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 text-sm font-bold transition-colors"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 

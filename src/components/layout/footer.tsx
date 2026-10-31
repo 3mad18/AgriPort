@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/context/language-context";
 import { useSiteSettings } from "@/lib/use-site-settings";
+import { MapPin, Mail, Phone, User, ShieldCheck } from "lucide-react";
 
 const CURRENT_YEAR = 2026;
 
@@ -60,7 +61,7 @@ export function Footer() {
             {/* Location & Direct Contact Tag */}
             <div className="mt-6 flex flex-col gap-2.5 text-xs text-slate-400 font-medium">
               <div className="flex items-center gap-2">
-                <span className="text-emerald-400">📍</span>
+                <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
                   {language === "ar" && siteSettings.location
                     ? siteSettings.location
@@ -72,7 +73,7 @@ export function Footer() {
                   href={`mailto:${siteSettings.email || "agriporteg@gmail.com"}`}
                   className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
                 >
-                  <span>✉</span>
+                  <Mail className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>{siteSettings.email || "agriporteg@gmail.com"}</span>
                 </a>
                 <a
@@ -80,7 +81,7 @@ export function Footer() {
                   dir="ltr"
                   className="hover:text-emerald-400 transition-colors font-mono flex items-center gap-1.5"
                 >
-                  <span>📞</span>
+                  <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>{siteSettings.phone || "+20 100 720 2636"}</span>
                 </a>
               </div>
@@ -168,7 +169,7 @@ export function Footer() {
                   : "Visitor & Client Portal"
               }
             >
-              <span>👤</span>
+              <User className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{language === "ar" ? "بوابة الزوار" : "Visitor Login"}</span>
             </Link>
             <span className="text-slate-700 hidden sm:inline">|</span>
@@ -181,7 +182,7 @@ export function Footer() {
                   : "Operations Suite Portal"
               }
             >
-              <span>🔒</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{language === "ar" ? "لوحة العمليات" : "Ops Portal"}</span>
             </Link>
           </div>

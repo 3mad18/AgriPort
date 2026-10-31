@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check, X } from "lucide-react";
 
 export type PopupPayload = {
   title?: string;
@@ -76,18 +77,18 @@ export function OpsToast() {
           className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
           title="إغلاق"
         >
-          ✕
+          <X className="w-4 h-4" />
         </button>
 
         {/* Status Icon Circle */}
         <div
-          className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl shadow-xs text-3xl font-bold ${
+          className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl shadow-xs ${
             isError
               ? "bg-rose-50 text-rose-600"
               : "bg-emerald-50 text-emerald-600"
           }`}
         >
-          {isError ? "✕" : "✓"}
+          {isError ? <X className="w-8 h-8" /> : <Check className="w-8 h-8 stroke-[2.5]" />}
         </div>
 
         {/* Title */}

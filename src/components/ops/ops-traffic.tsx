@@ -2,6 +2,25 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { triggerOpsToast } from "@/components/ops/ops-toast";
+import {
+  Globe2,
+  Radio,
+  TrendingUp,
+  Users,
+  Award,
+  Globe,
+  Package,
+  Smartphone,
+  Monitor,
+  RefreshCw,
+  FileSpreadsheet,
+  Video,
+  Search,
+  ExternalLink,
+  Pencil,
+  Zap,
+  Lightbulb,
+} from "lucide-react";
 
 export type SiteVisit = {
   id: string;
@@ -185,8 +204,8 @@ export function OpsTraffic() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-600 text-lg">
-              🌐
+            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-600">
+              <Globe2 className="w-5 h-5" />
             </span>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-slate-900">
@@ -211,7 +230,7 @@ export function OpsTraffic() {
             className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors"
             title="تحديث البيانات فوراً"
           >
-            <span className={isLoading ? "animate-spin" : ""}>🔄</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
             <span>تحديث حي</span>
           </button>
 
@@ -220,7 +239,7 @@ export function OpsTraffic() {
             onClick={handleExportCSV}
             className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-md shadow-teal-700/20 hover:shadow-lg transition-all active:scale-[0.98]"
           >
-            <span>📊</span>
+            <FileSpreadsheet className="w-4 h-4" />
             <span>تصدير السجل (Excel)</span>
           </button>
         </div>
@@ -234,8 +253,8 @@ export function OpsTraffic() {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-100">
               نشطون الآن بالموقع
             </span>
-            <span className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-sm animate-pulse">
-              🔴
+            <span className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-sm">
+              <Radio className="w-4 h-4 text-white animate-pulse" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -257,8 +276,8 @@ export function OpsTraffic() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               زيارات اليوم
             </span>
-            <span className="h-8 w-8 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center text-sm">
-              📈
+            <span className="h-8 w-8 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
+              <TrendingUp className="w-4.5 h-4.5 text-slate-700" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -280,8 +299,8 @@ export function OpsTraffic() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               زوار فريدون
             </span>
-            <span className="h-8 w-8 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
-              👥
+            <span className="h-8 w-8 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Users className="w-4.5 h-4.5 text-blue-600" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -303,8 +322,8 @@ export function OpsTraffic() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               أكثر سوق مهتم
             </span>
-            <span className="h-8 w-8 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
-              🏆
+            <span className="h-8 w-8 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Award className="w-4.5 h-4.5 text-amber-600" />
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -328,7 +347,7 @@ export function OpsTraffic() {
         {/* Top Export Countries */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs text-start">
           <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
-            <span>🌍</span>
+            <Globe className="w-4 h-4 text-emerald-600" />
             <span>الدول والأسواق الأكثر تصفحاً</span>
           </h3>
           <p className="text-[11px] text-slate-400 mb-4 font-medium">
@@ -373,7 +392,7 @@ export function OpsTraffic() {
         {/* Top Visited Pages & Produce */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs text-start">
           <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
-            <span>📦</span>
+            <Package className="w-4 h-4 text-teal-600" />
             <span>أكثر المحاصيل والصفحات تصفحاً</span>
           </h3>
           <p className="text-[11px] text-slate-400 mb-4 font-medium">
@@ -418,7 +437,7 @@ export function OpsTraffic() {
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs text-start flex flex-col justify-between">
           <div>
             <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
-              <span>📱</span>
+              <Smartphone className="w-4 h-4 text-teal-600" />
               <span>توزيع أجهزة الزوار</span>
             </h3>
             <p className="text-[11px] text-slate-400 mb-4 font-medium">
@@ -426,18 +445,18 @@ export function OpsTraffic() {
             </p>
 
             <div className="grid grid-cols-2 gap-3 text-center mb-5">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
-                <span className="text-2xl">💻</span>
-                <p className="text-xs font-bold text-slate-800 mt-1">كمبيوتر مكتبي</p>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col items-center">
+                <Monitor className="w-6 h-6 text-emerald-600 mb-1" />
+                <p className="text-xs font-bold text-slate-800">كمبيوتر مكتبي</p>
                 <p className="text-base font-extrabold text-emerald-600 mt-0.5">
                   {stats.desktopPercent}%
                 </p>
                 <p className="text-[10px] text-slate-400">{stats.desktopCount} زيارة</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
-                <span className="text-2xl">📱</span>
-                <p className="text-xs font-bold text-slate-800 mt-1">هاتف ذكي</p>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col items-center">
+                <Smartphone className="w-6 h-6 text-teal-600 mb-1" />
+                <p className="text-xs font-bold text-slate-800">هاتف ذكي</p>
                 <p className="text-base font-extrabold text-teal-600 mt-0.5">
                   {stats.mobilePercent}%
                 </p>
@@ -446,8 +465,9 @@ export function OpsTraffic() {
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-[11px] text-emerald-900 leading-relaxed font-medium">
-            💡 <strong>ملاحظة للمصدرين:</strong> غالبية المستوردين الأوروبيين يتصفحون الكتالوج من أجهزة الكمبيوتر المكتبية، بينما يعتمد عملاء الخليج بنسبة أعلى على الهواتف والواتساب.
+          <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-[11px] text-emerald-900 leading-relaxed font-medium flex items-start gap-2">
+            <Lightbulb className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+            <p><strong>ملاحظة للمصدرين:</strong> غالبية المستوردين الأوروبيين يتصفحون الكتالوج من أجهزة الكمبيوتر المكتبية، بينما يعتمد عملاء الخليج بنسبة أعلى على الهواتف والواتساب.</p>
           </div>
         </div>
       </div>
@@ -492,7 +512,7 @@ export function OpsTraffic() {
 
         {filteredVisits.length === 0 ? (
           <div className="py-16 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2.5 px-4">
-            <span className="text-3xl animate-pulse">📡</span>
+            <Radio className="w-9 h-9 text-slate-300 animate-pulse" />
             <p className="font-bold text-slate-700 text-sm">
               {searchQuery || selectedCountryFilter !== "all"
                 ? "لا توجد زيارات مطابقة للبحث حالياً."
@@ -617,7 +637,7 @@ export function OpsTraffic() {
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-300 text-xl border border-indigo-500/30">
-                🎥
+                <Video className="w-5 h-5 text-indigo-300" />
               </span>
               <div>
                 <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -647,7 +667,7 @@ export function OpsTraffic() {
               className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
             >
               <span>لوحة تحكم كلاريتي</span>
-              <span>↗</span>
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
@@ -673,9 +693,10 @@ export function OpsTraffic() {
                 <button
                   type="button"
                   onClick={() => setIsEditingClarity(true)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1.5"
                 >
-                  ✏️ تغيير المعرف
+                  <Pencil className="w-3.5 h-3.5" />
+                  <span>تغيير المعرف</span>
                 </button>
               </div>
             </div>
@@ -694,9 +715,10 @@ export function OpsTraffic() {
                   <button
                     type="button"
                     onClick={handleSaveClarity}
-                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-md"
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-md flex items-center gap-1.5"
                   >
-                    حفظ وتفعيل الكود ⚡
+                    <span>حفظ وتفعيل الكود</span>
+                    <Zap className="w-3.5 h-3.5" />
                   </button>
                   {isEditingClarity && (
                     <button

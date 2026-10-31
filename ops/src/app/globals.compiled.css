@@ -386,6 +386,9 @@
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
   }
+  .my-auto {
+    margin-block: auto;
+  }
   .me-0\.5 {
     margin-inline-end: calc(var(--spacing) * 0.5);
   }
@@ -473,8 +476,14 @@
   .h-3 {
     height: calc(var(--spacing) * 3);
   }
+  .h-3\.5 {
+    height: calc(var(--spacing) * 3.5);
+  }
   .h-4 {
     height: calc(var(--spacing) * 4);
+  }
+  .h-4\.5 {
+    height: calc(var(--spacing) * 4.5);
   }
   .h-5 {
     height: calc(var(--spacing) * 5);
@@ -533,8 +542,17 @@
   .w-3 {
     width: calc(var(--spacing) * 3);
   }
+  .w-3\.5 {
+    width: calc(var(--spacing) * 3.5);
+  }
   .w-4 {
     width: calc(var(--spacing) * 4);
+  }
+  .w-4\.5 {
+    width: calc(var(--spacing) * 4.5);
+  }
+  .w-5 {
+    width: calc(var(--spacing) * 5);
   }
   .w-6 {
     width: calc(var(--spacing) * 6);
@@ -1437,6 +1455,9 @@
   .\[background-size\:24px_24px\] {
     background-size: 24px 24px;
   }
+  .stroke-\[2\.5\] {
+    stroke-width: 2.5;
+  }
   .object-contain {
     object-fit: contain;
   }
@@ -2009,6 +2030,9 @@
       --tw-scale-y: 110%;
       --tw-scale-z: 110%;
       scale: var(--tw-scale-x) var(--tw-scale-y);
+    }
+    .group-hover\:text-emerald-400:is(:where(.group):hover *) {
+      color: var(--color-emerald-400);
     }
     .group-hover\:text-emerald-600:is(:where(.group):hover *) {
       color: var(--color-emerald-600);

@@ -7,6 +7,18 @@ import {
   type Inquiry,
 } from "@/context/ops-store-context";
 import { isFacilityVisit } from "@/components/ops/ops-visits-center";
+import {
+  Bell,
+  CheckCheck,
+  FileText,
+  MessageCircle,
+  Mail,
+  Eye,
+  Copy,
+  Check,
+  Trash2,
+  X,
+} from "lucide-react";
 
 export function OpsNotificationsCenter({
   searchQuery,
@@ -478,7 +490,7 @@ export function OpsNotificationsCenter({
         <div>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 font-bold">
-              🔔
+              <Bell className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900">
@@ -498,7 +510,7 @@ export function OpsNotificationsCenter({
               onClick={markAllInquiriesRead}
               className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
             >
-              <span>✓✓</span>
+              <CheckCheck className="w-4 h-4 text-emerald-600" />
               <span>تحديد الكل كمقروء</span>
             </button>
           )}
@@ -509,7 +521,7 @@ export function OpsNotificationsCenter({
             className="inline-flex items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:shadow-emerald-600/20 active:scale-95 transition-all"
             title="تصدير تقرير رسمي بصيغة PDF للطلبات الحالية"
           >
-            <span>📄</span>
+            <FileText className="w-4 h-4" />
             <span>تصدير تقرير PDF</span>
           </button>
         </div>
@@ -705,7 +717,7 @@ export function OpsNotificationsCenter({
                         className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white transition-all shadow-xs"
                         title="فتح محادثة واتساب مع المستورد"
                       >
-                        <span>💬</span>
+                        <MessageCircle className="w-3.5 h-3.5" />
                         <span>واتساب</span>
                       </a>
 
@@ -715,7 +727,7 @@ export function OpsNotificationsCenter({
                         className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors"
                         title="إرسال إيميل رسمي"
                       >
-                        <span>✉️</span>
+                        <Mail className="w-3.5 h-3.5" />
                         <span>إيميل</span>
                       </a>
 
@@ -726,9 +738,9 @@ export function OpsNotificationsCenter({
                           markInquiryRead(item.id);
                           setSelectedInquiry(item);
                         }}
-                        className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors"
                       >
-                        <span>👁️</span>
+                        <Eye className="w-3.5 h-3.5" />
                         <span>التفاصيل</span>
                       </button>
 
@@ -739,7 +751,7 @@ export function OpsNotificationsCenter({
                         className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
                         title="نسخ ملخص الطلب"
                       >
-                        {copiedId === item.id ? "✓" : "📋"}
+                        {copiedId === item.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
 
                       {/* Delete */}
@@ -757,7 +769,7 @@ export function OpsNotificationsCenter({
                         className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
                         title="حذف الطلب"
                       >
-                        🗑
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -776,7 +788,7 @@ export function OpsNotificationsCenter({
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-xl font-bold text-emerald-600">
-                  📋
+                  <FileText className="w-5 h-5 text-emerald-600" />
                 </span>
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">
@@ -794,7 +806,7 @@ export function OpsNotificationsCenter({
                 onClick={() => setSelectedInquiry(null)}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -916,15 +928,17 @@ export function OpsNotificationsCenter({
                     href={getWhatsAppLink(selectedInquiry)}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 sm:flex-initial text-center rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors"
+                    className="flex-1 sm:flex-initial text-center rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors inline-flex items-center justify-center gap-1.5"
                   >
-                    محادثة واتساب 💬
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>محادثة واتساب</span>
                   </a>
                   <a
                     href={getEmailLink(selectedInquiry)}
-                    className="flex-1 sm:flex-initial text-center rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition-colors"
+                    className="flex-1 sm:flex-initial text-center rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition-colors inline-flex items-center justify-center gap-1.5"
                   >
-                    إرسال إيميل ✉️
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>إرسال إيميل</span>
                   </a>
                 </div>
               </div>

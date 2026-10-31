@@ -518,6 +518,9 @@
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
   }
+  .my-auto {
+    margin-block: auto;
+  }
   .ms-1\.5 {
     margin-inline-start: calc(var(--spacing) * 1.5);
   }
@@ -652,6 +655,9 @@
   }
   .h-4 {
     height: calc(var(--spacing) * 4);
+  }
+  .h-4\.5 {
+    height: calc(var(--spacing) * 4.5);
   }
   .h-5 {
     height: calc(var(--spacing) * 5);
@@ -2105,6 +2111,9 @@
   .fill-current {
     fill: currentcolor;
   }
+  .stroke-\[2\.5\] {
+    stroke-width: 2.5;
+  }
   .object-contain {
     object-fit: contain;
   }
@@ -2927,6 +2936,9 @@
       .group-hover\:bg-emerald-500\/20:is(:where(.group):hover *) {
         background-color: color-mix(in oklab, var(--color-emerald-500) 20%, transparent);
       }
+    }
+    .group-hover\:text-emerald-400:is(:where(.group):hover *) {
+      color: var(--color-emerald-400);
     }
     .group-hover\:text-emerald-500:is(:where(.group):hover *) {
       color: var(--color-emerald-500);

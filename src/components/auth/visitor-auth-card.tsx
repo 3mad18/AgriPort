@@ -14,44 +14,25 @@ import {
   validatePhoneNumberByCountry,
   evaluatePasswordStrength,
 } from "@/lib/auth-validation";
+import {
+  Eye,
+  EyeOff,
+  ChevronDown,
+  Mail,
+  User,
+  ShieldCheck,
+  Package,
+  Check,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 
 // SVG Icons
-const EyeIcon = ({ visible }: { visible: boolean }) => (
-  <svg
-    className="h-4 w-4"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    {visible ? (
-      <>
-        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-        <line x1="1" y1="1" x2="23" y2="23" />
-      </>
-    ) : (
-      <>
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
-      </>
-    )}
-  </svg>
-);
+const EyeIcon = ({ visible }: { visible: boolean }) =>
+  visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />;
 
 const ChevronDownIcon = () => (
-  <svg
-    className="h-4 w-4 shrink-0 transition-transform duration-200"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
+  <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
 );
 
 export function VisitorAuthCard() {
@@ -573,7 +554,7 @@ export function VisitorAuthCard() {
       {/* Product Quote Notice if redirected from a product */}
       {cropName && activeTab !== "forgot" && (
         <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200/90 text-emerald-950 text-xs sm:text-sm flex items-start gap-3 shadow-xs animate-fade-in text-start">
-          <span className="text-2xl shrink-0 mt-0.5">📦</span>
+          <Package className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-slate-900">
               {language === "ar"
@@ -623,7 +604,7 @@ export function VisitorAuthCard() {
       {/* Error / Success Notifications */}
       {errorMsg && (
         <div className="mb-5 p-3.5 bg-red-50 border border-red-200/80 rounded-2xl text-red-700 text-xs sm:text-sm flex items-start gap-2.5 animate-fade-in text-start">
-          <span className="text-base shrink-0 mt-0.5">⚠️</span>
+          <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="font-semibold">{errorMsg}</p>
             {errorMsg === tr.emailNotFoundError && activeTab === "login" && (
@@ -645,7 +626,7 @@ export function VisitorAuthCard() {
 
       {successMsg && (
         <div className="mb-5 p-3.5 bg-emerald-50 border border-emerald-200/80 rounded-2xl text-emerald-800 text-xs sm:text-sm flex items-center gap-2.5 animate-fade-in text-start">
-          <span className="text-base shrink-0">✅</span>
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <p className="font-semibold">{successMsg}</p>
         </div>
       )}
@@ -667,8 +648,8 @@ export function VisitorAuthCard() {
                 placeholder={tr.emailPlaceholder}
                 className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 rounded-2xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-all outline-hidden"
               />
-              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 text-sm pointer-events-none`}>
-                ✉️
+              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 pointer-events-none`}>
+                <Mail className="w-4 h-4" />
               </span>
             </div>
           </div>
@@ -756,7 +737,7 @@ export function VisitorAuthCard() {
               </label>
               {regTouched.name && nameValidation.isValid && (
                 <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                  <span>✓</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{language === "ar" ? "اسم صالح" : "Valid"}</span>
                 </span>
               )}
@@ -777,13 +758,13 @@ export function VisitorAuthCard() {
                     : "border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 }`}
               />
-              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 text-sm pointer-events-none`}>
-                👤
+              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 pointer-events-none`}>
+                <User className="w-4 h-4" />
               </span>
             </div>
             {regTouched.name && !nameValidation.isValid && (
               <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
-                <span>⚠️</span>
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                 <span>{nameValidation.error}</span>
               </p>
             )}
@@ -797,7 +778,7 @@ export function VisitorAuthCard() {
               </label>
               {regTouched.email && emailValidation.isValid && (
                 <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                  <span>✓</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{language === "ar" ? "بريد صالح" : "Valid"}</span>
                 </span>
               )}
@@ -818,13 +799,13 @@ export function VisitorAuthCard() {
                     : "border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 }`}
               />
-              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 text-sm pointer-events-none`}>
-                ✉️
+              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 pointer-events-none`}>
+                <Mail className="w-4 h-4" />
               </span>
             </div>
             {regTouched.email && !emailValidation.isValid && (
               <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
-                <span>⚠️</span>
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                 <span>{emailValidation.error}</span>
               </p>
             )}
@@ -907,7 +888,7 @@ export function VisitorAuthCard() {
                       passStrength.hasMinLength ? "text-emerald-700 font-bold" : "text-slate-400"
                     }`}
                   >
-                    <span>{passStrength.hasMinLength ? "✓" : "○"}</span>
+                    {passStrength.hasMinLength ? <Check className="w-3 h-3 text-emerald-600" /> : <span className="text-slate-300">○</span>}
                     <span>{language === "ar" ? "8 خانات فأكثر" : "8+ characters"}</span>
                   </span>
                   <span
@@ -917,7 +898,7 @@ export function VisitorAuthCard() {
                         : "text-slate-400"
                     }`}
                   >
-                    <span>{passStrength.hasLetter && passStrength.hasNumber ? "✓" : "○"}</span>
+                    {passStrength.hasLetter && passStrength.hasNumber ? <Check className="w-3 h-3 text-emerald-600" /> : <span className="text-slate-300">○</span>}
                     <span>{language === "ar" ? "أحرف وأرقام معاً" : "Letters & numbers"}</span>
                   </span>
                 </div>
@@ -926,7 +907,7 @@ export function VisitorAuthCard() {
 
             {regTouched.password && !passValidation.isValid && (
               <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
-                <span>⚠️</span>
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                 <span>{passValidation.error}</span>
               </p>
             )}
@@ -940,7 +921,7 @@ export function VisitorAuthCard() {
               </label>
               {regTouched.phone && phoneValidation.isValid && (
                 <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                  <span>✓</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{language === "ar" ? "رقم صحيح" : "Valid"}</span>
                 </span>
               )}
@@ -1037,7 +1018,7 @@ export function VisitorAuthCard() {
             {/* Validation error if touched and invalid */}
             {regTouched.phone && !phoneValidation.isValid && (
               <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
-                <span>⚠️</span>
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                 <span>{phoneValidation.error}</span>
               </p>
             )}
@@ -1098,7 +1079,7 @@ export function VisitorAuthCard() {
                         : "bg-slate-100 text-slate-400"
                     }`}
                   >
-                    {isPassed ? "✓" : step.num}
+                    {isPassed ? <Check className="w-3.5 h-3.5" /> : step.num}
                   </div>
                   <span
                     className={`text-[11px] font-semibold hidden sm:inline ${
@@ -1123,7 +1104,7 @@ export function VisitorAuthCard() {
           {forgotStep === "verify" && (
             <div className="mb-5 p-4 rounded-2xl bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 text-xs sm:text-sm animate-fade-in shadow-xs text-start">
               <div className="flex items-start gap-2.5">
-                <span className="text-xl shrink-0 mt-0.5">📨</span>
+                <Mail className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="font-bold text-emerald-950">
                     {language === "ar"
@@ -1167,13 +1148,13 @@ export function VisitorAuthCard() {
                         : "border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                     }`}
                   />
-                  <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 text-sm pointer-events-none`}>
-                    ✉️
+                  <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 pointer-events-none`}>
+                    <Mail className="w-4 h-4" />
                   </span>
                 </div>
                 {forgotTouched.email && !forgotEmailValidation.isValid && (
                   <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
-                    <span>⚠️</span>
+                    <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                     <span>{forgotEmailValidation.error}</span>
                   </p>
                 )}
@@ -1370,7 +1351,7 @@ export function VisitorAuthCard() {
                           newPassStrength.hasMinLength ? "text-emerald-700 font-bold" : "text-slate-400"
                         }`}
                       >
-                        <span>{newPassStrength.hasMinLength ? "✓" : "○"}</span>
+                        {newPassStrength.hasMinLength ? <Check className="w-3 h-3 text-emerald-600" /> : <span className="text-slate-300">○</span>}
                         <span>{language === "ar" ? "8 خانات فأكثر" : "8+ characters"}</span>
                       </span>
                       <span
@@ -1380,7 +1361,7 @@ export function VisitorAuthCard() {
                             : "text-slate-400"
                         }`}
                       >
-                        <span>{newPassStrength.hasLetter && newPassStrength.hasNumber ? "✓" : "○"}</span>
+                        {newPassStrength.hasLetter && newPassStrength.hasNumber ? <Check className="w-3 h-3 text-emerald-600" /> : <span className="text-slate-300">○</span>}
                         <span>{language === "ar" ? "أحرف وأرقام معاً" : "Letters & numbers"}</span>
                       </span>
                     </div>
@@ -1464,8 +1445,8 @@ export function VisitorAuthCard() {
           {/* STEP 4: Success View */}
           {forgotStep === "success" && (
             <div className="text-center py-4 space-y-4 animate-fade-in">
-              <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-emerald-100 text-emerald-600 text-3xl font-extrabold shadow-inner mx-auto mb-2">
-                ✓
+              <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-emerald-100 text-emerald-600 shadow-inner mx-auto mb-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-600" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
                 {tr.passwordResetSuccess}
@@ -1490,7 +1471,7 @@ export function VisitorAuthCard() {
 
       {/* Security footnote */}
       <div className="mt-8 pt-5 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] text-slate-400">
-        <span>🛡️</span>
+        <ShieldCheck className="w-4 h-4 text-emerald-600" />
         <span>{tr.securityNote}</span>
       </div>
     </div>

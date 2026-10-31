@@ -5,6 +5,20 @@ import Link from "next/link";
 import { getVisitorSiteUrl } from "@/lib/urls";
 import { useOpsStore, type Inquiry } from "@/context/ops-store-context";
 import { isFacilityVisit } from "@/components/ops/ops-visits-center";
+import {
+  TrendingUp,
+  Bell,
+  Landmark,
+  Boxes,
+  Handshake,
+  Users,
+  Plus,
+  CalendarCheck,
+  Settings,
+  ExternalLink,
+  Activity,
+  ArrowLeft,
+} from "lucide-react";
 
 export function OpsOverview({
   onNavigateTab,
@@ -44,8 +58,8 @@ export function OpsOverview({
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               طلبات عروض الأسعار
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-lg">
-              📈
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100">
+              <TrendingUp className="h-5 w-5 text-slate-700" />
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
@@ -70,8 +84,8 @@ export function OpsOverview({
             <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
               تسعير غير مقروء
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white text-lg group-hover:scale-110 transition-transform">
-              🔔
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white group-hover:scale-110 transition-transform shadow-xs">
+              <Bell className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
@@ -86,7 +100,7 @@ export function OpsOverview({
           </div>
           <p className="mt-2 text-xs text-emerald-600/80 font-medium flex items-center gap-1">
             <span>انقر للمعاينة والرد</span>
-            <span>←</span>
+            <ArrowLeft className="h-3 w-3" />
           </p>
         </div>
 
@@ -99,8 +113,8 @@ export function OpsOverview({
             <span className="text-xs font-bold text-teal-800 uppercase tracking-wider">
               الزيارات الميدانية
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-600 text-white text-lg group-hover:scale-110 transition-transform">
-              🏛️
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-600 text-white group-hover:scale-110 transition-transform shadow-xs">
+              <Landmark className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
@@ -119,7 +133,7 @@ export function OpsOverview({
           </div>
           <p className="mt-2 text-xs text-teal-700/80 font-medium flex items-center gap-1">
             <span>تفقد المحطات والمزارع</span>
-            <span>←</span>
+            <ArrowLeft className="h-3 w-3" />
           </p>
         </div>
 
@@ -132,8 +146,8 @@ export function OpsOverview({
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               المحاصيل بالكتالوج
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 text-lg">
-              🍊
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+              <Boxes className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
@@ -155,8 +169,8 @@ export function OpsOverview({
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               عقود تم الاتفاق عليها
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 text-lg">
-              🤝
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+              <Handshake className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
@@ -181,8 +195,8 @@ export function OpsOverview({
             <span className="text-xs font-bold text-indigo-800 uppercase tracking-wider">
               العملاء المسجلون
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white text-lg group-hover:scale-110 transition-transform">
-              👥
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white group-hover:scale-110 transition-transform shadow-xs">
+              <Users className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
@@ -195,7 +209,7 @@ export function OpsOverview({
           </div>
           <p className="mt-2 text-xs text-indigo-600/80 font-medium flex items-center gap-1">
             <span>إدارة وتواصل العملاء</span>
-            <span>←</span>
+            <ArrowLeft className="h-3 w-3" />
           </p>
         </div>
       </div>
@@ -374,7 +388,7 @@ export function OpsOverview({
                 }}
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 font-semibold text-white transition-colors cursor-pointer"
               >
-                <span>➕</span>
+                <Plus className="h-4 w-4" />
                 <span>إضافة محصول</span>
               </button>
 
@@ -383,7 +397,7 @@ export function OpsOverview({
                 onClick={() => onNavigateTab("visits")}
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-teal-800/80 hover:bg-teal-700 border border-teal-600/50 p-3 font-semibold text-white transition-colors cursor-pointer"
               >
-                <span>🏛️</span>
+                <CalendarCheck className="h-4 w-4" />
                 <span>جدول الزيارات</span>
               </button>
 
@@ -392,7 +406,7 @@ export function OpsOverview({
                 onClick={() => onNavigateTab("settings")}
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 font-semibold text-white transition-colors"
               >
-                <span>⚙️</span>
+                <Settings className="h-4 w-4" />
                 <span>تعديل التواصل</span>
               </button>
 
@@ -402,34 +416,34 @@ export function OpsOverview({
                 rel="noreferrer"
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 font-semibold text-white transition-colors"
               >
-                <span>🌐</span>
+                <ExternalLink className="h-4 w-4" />
                 <span>معاينة الكتالوج</span>
               </a>
 
               <button
                 type="button"
                 onClick={() => onNavigateTab("users")}
-                className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 p-3 font-semibold text-white transition-colors cursor-pointer"
+                className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 p-3 font-semibold text-white transition-colors cursor-pointer shadow-xs"
               >
-                <span>👥</span>
+                <Users className="h-4 w-4" />
                 <span>قاعدة بيانات العملاء المسجلين ({registeredUsers.length})</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => onNavigateTab("traffic")}
-                className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 p-3 font-semibold text-white transition-colors cursor-pointer"
+                className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-teal-600 hover:bg-teal-500 p-3 font-semibold text-white transition-colors cursor-pointer shadow-xs"
               >
-                <span>🌐</span>
+                <Activity className="h-4 w-4" />
                 <span>رصد حركة وزوار الموقع المباشر (Traffic)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => onNavigateTab("notifications")}
-                className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 p-3 font-semibold text-white transition-colors"
+                className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 p-3 font-semibold text-white transition-colors shadow-xs"
               >
-                <span>🔔</span>
+                <Bell className="h-4 w-4" />
                 <span>مركز طلبات عروض الأسعار</span>
               </button>
             </div>
