@@ -12,6 +12,7 @@ import {
   validatePassword,
   validatePhoneNumberByCountry,
 } from "@/lib/auth-validation";
+import { identifyUser, trackEvent, upgradeSession, setTag } from "@/lib/clarity";
 
 export type VisitorUser = {
   id: string;
@@ -49,10 +50,6 @@ type VisitorAuthContextType = {
     countryCode: string;
     countryIso: string;
   }) => { success: boolean; error?: string };
-  loginWithSocial: (
-    provider: "google" | "apple",
-    mockProfile?: { name?: string; email?: string }
-  ) => { success: boolean; error?: string };
   requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string; emailSent?: boolean }>;
   verifyResetCode: (email: string, code: string) => { success: boolean; error?: string };
   resetPasswordWithCode: (email: string, code: string, newPassword: string) => { success: boolean; error?: string };
@@ -65,6 +62,24 @@ const VisitorAuthContext = createContext<VisitorAuthContextType | undefined>(und
 export const VISITOR_SESSION_KEY = "agriport_visitor_session";
 export const VISITOR_USERS_KEY = "agriport_visitor_registered_accounts";
 export const VISITOR_AUTH_EVENT = "agriport_visitor_auth_change";
+
+let cachedVisitorUser: VisitorUser | null = null;
+let cachedVisitorUserRaw: string | null = null;
+
+export function saveVisitorSession(user: VisitorUser | null) {
+  if (typeof window === "undefined") return;
+  if (!user) {
+    localStorage.removeItem(VISITOR_SESSION_KEY);
+    cachedVisitorUser = null;
+    cachedVisitorUserRaw = null;
+  } else {
+    const raw = JSON.stringify(user);
+    localStorage.setItem(VISITOR_SESSION_KEY, raw);
+    cachedVisitorUser = user;
+    cachedVisitorUserRaw = raw;
+  }
+  window.dispatchEvent(new Event(VISITOR_AUTH_EVENT));
+}
 
 function getRegisteredAccounts(): RegisteredAccount[] {
   if (typeof window === "undefined") return [];
@@ -102,10 +117,7 @@ function subscribeVisitorAuth(callback: () => void) {
   };
 }
 
-let cachedVisitorUser: VisitorUser | null = null;
-let cachedVisitorUserRaw: string | null = null;
-
-function getVisitorAuthSnapshot(): VisitorUser | null {
+export function getVisitorAuthSnapshot(): VisitorUser | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(VISITOR_SESSION_KEY);
   if (raw === cachedVisitorUserRaw) return cachedVisitorUser;
@@ -169,11 +181,13 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
       createdAt: account.createdAt,
     };
 
-    const raw = JSON.stringify(sessionUser);
-    localStorage.setItem(VISITOR_SESSION_KEY, raw);
-    cachedVisitorUser = sessionUser;
-    cachedVisitorUserRaw = raw;
-    window.dispatchEvent(new Event(VISITOR_AUTH_EVENT));
+    saveVisitorSession(sessionUser);
+
+    try {
+      identifyUser(sessionUser.id, undefined, undefined, sessionUser.name);
+      setTag("user_role", "registered_client");
+      trackEvent("user_login");
+    } catch {}
 
     return { success: true };
   };
@@ -236,6 +250,23 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
     accounts.push(newAccount);
     saveRegisteredAccounts(accounts);
 
+    // Sync newly registered account to API & cloud store
+    try {
+      fetch("/api/registered-users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: newAccount.id,
+          name: newAccount.name,
+          email: newAccount.email,
+          phone: newAccount.phone,
+          countryCode: newAccount.countryCode,
+          countryIso: newAccount.countryIso,
+          passwordHash: newAccount.passwordHash,
+        }),
+      }).catch((e) => console.warn("Could not sync registered user to API:", e));
+    } catch {}
+
     // Automatically authenticate the newly registered user
     const sessionUser: VisitorUser = {
       id: newAccount.id,
@@ -248,46 +279,14 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
       createdAt: newAccount.createdAt,
     };
 
-    const raw = JSON.stringify(sessionUser);
-    localStorage.setItem(VISITOR_SESSION_KEY, raw);
-    cachedVisitorUser = sessionUser;
-    cachedVisitorUserRaw = raw;
-    window.dispatchEvent(new Event(VISITOR_AUTH_EVENT));
+    saveVisitorSession(sessionUser);
 
-    return { success: true };
-  };
-
-  const loginWithSocial = (
-    provider: "google" | "apple",
-    mockProfile?: { name?: string; email?: string }
-  ) => {
-    const defaultName =
-      mockProfile?.name ||
-      (provider === "google" ? "مستخدم Google المعتمد" : "عميل Apple ID");
-    const defaultEmail =
-      mockProfile?.email ||
-      (provider === "google" ? "client.google@gmail.com" : "client.apple@icloud.com");
-
-    const sessionUser: VisitorUser = {
-      id: `usr_${provider}_` + Date.now().toString(36),
-      name: defaultName,
-      email: defaultEmail,
-      phone: "100 000 0000",
-      countryCode: "+20",
-      countryIso: "EG",
-      provider,
-      avatar:
-        provider === "google"
-          ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
-          : undefined,
-      createdAt: new Date().toISOString(),
-    };
-
-    const raw = JSON.stringify(sessionUser);
-    localStorage.setItem(VISITOR_SESSION_KEY, raw);
-    cachedVisitorUser = sessionUser;
-    cachedVisitorUserRaw = raw;
-    window.dispatchEvent(new Event(VISITOR_AUTH_EVENT));
+    try {
+      identifyUser(sessionUser.id, undefined, undefined, sessionUser.name);
+      setTag("user_role", "registered_client");
+      trackEvent("user_registered");
+      upgradeSession("user_registration");
+    } catch {}
 
     return { success: true };
   };
@@ -403,10 +402,7 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem(VISITOR_SESSION_KEY);
-      cachedVisitorUser = null;
-      cachedVisitorUserRaw = null;
-      window.dispatchEvent(new Event(VISITOR_AUTH_EVENT));
+      saveVisitorSession(null);
     }
   };
 
@@ -420,7 +416,6 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         loginWithEmail,
         registerUser,
-        loginWithSocial,
         requestPasswordReset,
         verifyResetCode,
         resetPasswordWithCode,

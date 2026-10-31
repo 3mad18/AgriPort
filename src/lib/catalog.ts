@@ -120,6 +120,8 @@ function syncLocalInquiry(item: any) {
   } catch (e) {}
 }
 
+import { trackEvent, upgradeSession, setTag } from "@/lib/clarity";
+
 export async function submitQuoteInquiry(inquiryData: {
   name: string;
   company: string;
@@ -141,6 +143,17 @@ export async function submitQuoteInquiry(inquiryData: {
     hasSupabaseUrl: Boolean(supabaseUrl),
     hasSupabaseKey: Boolean(supabaseKey),
   });
+
+  // Track Smart Event & Upgrade Session Recording in Microsoft Clarity
+  try {
+    trackEvent("quote_inquiry_submitted");
+    upgradeSession("quote_inquiry_lead");
+    setTag("lead_product", inquiryData.product || "General Quotation");
+    setTag("lead_country", inquiryData.country || "International");
+    if (inquiryData.company) {
+      setTag("lead_company", inquiryData.company);
+    }
+  } catch {}
 
   const payload = {
     id: "inq-" + Date.now(),

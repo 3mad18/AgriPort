@@ -21,6 +21,7 @@ import {
   PRODUCTS_EVENT,
 } from "@/lib/supabase-config";
 
+
 export type Product = {
   id: string;
   name: string;
@@ -63,10 +64,22 @@ export type SiteSettings = {
   showExportBanner: boolean;
 };
 
+export type RegisteredUserRecord = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  countryCode: string;
+  countryIso: string;
+  createdAt: string;
+  passwordHash?: string;
+};
+
 type OpsStoreContextType = {
   products: Product[];
   inquiries: Inquiry[];
   settings: SiteSettings;
+  registeredUsers: RegisteredUserRecord[];
   unreadInquiriesCount: number;
   addProduct: (product: Omit<Product, "id">) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
@@ -77,6 +90,15 @@ type OpsStoreContextType = {
   markAllInquiriesRead: () => void;
   deleteInquiry: (id: string) => void;
   updateSettings: (settings: Partial<SiteSettings>) => Promise<{ success: boolean; error?: string }>;
+  deleteRegisteredUser: (id: string) => Promise<{ success: boolean }>;
+  addRegisteredUser: (data: {
+    name: string;
+    email: string;
+    phone: string;
+    countryCode: string;
+    countryIso: string;
+    password?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   showToast: (message: string, type?: "success" | "error" | "info") => void;
 };
 
@@ -272,15 +294,18 @@ const DEFAULT_SETTINGS: SiteSettings = {
 
 // PRODUCTS_KEY imported
 const INQUIRIES_KEY = "agriport_ops_inquiries";
+const USERS_STORAGE_KEY = "agriport_visitor_registered_accounts";
 // SETTINGS_KEY imported
 // STORE_EVENT imported
 
 function subscribeStore(callback: () => void) {
   window.addEventListener("storage", callback);
   window.addEventListener(STORE_EVENT, callback);
+  window.addEventListener("agriport_visitor_auth_change", callback);
   return () => {
     window.removeEventListener("storage", callback);
     window.removeEventListener(STORE_EVENT, callback);
+    window.removeEventListener("agriport_visitor_auth_change", callback);
   };
 }
 
@@ -335,6 +360,29 @@ function getSettingsSnapshot(): SiteSettings {
   }
 }
 
+const DEFAULT_REGISTERED_USERS: RegisteredUserRecord[] = [];
+
+let cachedUsers: RegisteredUserRecord[] | null = null;
+let cachedUsersRaw: string | null = null;
+
+function getUsersSnapshot(): RegisteredUserRecord[] {
+  if (typeof window === "undefined") return DEFAULT_REGISTERED_USERS;
+  const raw = localStorage.getItem(USERS_STORAGE_KEY);
+  if (raw === cachedUsersRaw && cachedUsers) return cachedUsers;
+  if (!raw) return DEFAULT_REGISTERED_USERS;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      cachedUsers = parsed;
+      cachedUsersRaw = raw;
+      return cachedUsers;
+    }
+    return DEFAULT_REGISTERED_USERS;
+  } catch {
+    return DEFAULT_REGISTERED_USERS;
+  }
+}
+
 const OpsStoreContext = createContext<OpsStoreContextType | undefined>(undefined);
 
 export function OpsStoreProvider({ children }: { children: ReactNode }) {
@@ -348,6 +396,12 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     subscribeStore,
     getInquiriesSnapshot,
     () => DEFAULT_INQUIRIES,
+  );
+
+  const registeredUsers = useSyncExternalStore(
+    subscribeStore,
+    getUsersSnapshot,
+    () => DEFAULT_REGISTERED_USERS,
   );
 
   const settings = useSyncExternalStore(
@@ -496,6 +550,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               featured: item.featured ?? false,
             }));
             localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mapped));
+            localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(mapped));
+            window.dispatchEvent(new Event(PRODUCTS_EVENT));
             cachedProducts = mapped;
             cachedProductsRaw = JSON.stringify(mapped);
             notifyChange();
@@ -532,6 +588,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               showExportBanner: row.show_export_banner ?? true,
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(mapped));
+            localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(mapped));
+            window.dispatchEvent(new Event(SETTINGS_EVENT));
             cachedSettings = mapped;
             cachedSettingsRaw = JSON.stringify(mapped);
             notifyChange();
@@ -542,16 +600,43 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    async function syncRegisteredUsersFromCloud() {
+      try {
+        const res = await fetch("/api/registered-users", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.users) && data.users.length > 0 && isMounted) {
+            const local = getUsersSnapshot();
+            const localMap = new Map(local.map((u) => [u.email.toLowerCase(), u]));
+            data.users.forEach((cloudUser: any) => {
+              if (!localMap.has(cloudUser.email.toLowerCase())) {
+                localMap.set(cloudUser.email.toLowerCase(), cloudUser);
+              }
+            });
+            const merged = Array.from(localMap.values());
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(merged));
+            cachedUsers = merged;
+            cachedUsersRaw = JSON.stringify(merged);
+            notifyChange();
+          }
+        }
+      } catch (err) {
+        // Silently skip if network offline
+      }
+    }
+
     // Initial fetch
     syncInquiriesFromCloud();
     syncProductsFromCloud();
     syncSettingsFromCloud();
+    syncRegisteredUsersFromCloud();
 
     // Poll every 15s
     const timer = setInterval(() => {
       syncInquiriesFromCloud();
       syncProductsFromCloud();
       syncSettingsFromCloud();
+      syncRegisteredUsersFromCloud();
     }, 15000);
 
     // Sync on tab focus / visibility
@@ -559,6 +644,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       syncInquiriesFromCloud();
       syncProductsFromCloud();
       syncSettingsFromCloud();
+      syncRegisteredUsersFromCloud();
     };
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleFocus);
@@ -580,6 +666,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       };
       const updated = [newProduct, ...current];
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
+      localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new Event(PRODUCTS_EVENT));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       notifyChange();
@@ -827,6 +915,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       const current = getSettingsSnapshot();
       const updated = { ...current, ...partial };
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
+      localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new Event(SETTINGS_EVENT));
       cachedSettings = updated;
       cachedSettingsRaw = JSON.stringify(updated);
       notifyChange();
@@ -895,6 +985,88 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const deleteRegisteredUser = useCallback(
+    async (id: string) => {
+      if (typeof window === "undefined") return { success: false };
+      const current = getUsersSnapshot().filter((u) => u.id !== id);
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(current));
+      cachedUsers = current;
+      cachedUsersRaw = JSON.stringify(current);
+      notifyChange();
+      window.dispatchEvent(new Event("agriport_visitor_auth_change"));
+      triggerOpsToast("تم حذف حساب العميل بنجاح", "success", "إدارة المستخدمين");
+
+      try {
+        await fetch(`/api/registered-users?id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+      } catch (e) {
+        console.warn("Could not delete user from API:", e);
+      }
+
+      return { success: true };
+    },
+    [notifyChange],
+  );
+
+  const addRegisteredUser = useCallback(
+    async (data: {
+      name: string;
+      email: string;
+      phone: string;
+      countryCode: string;
+      countryIso: string;
+      password?: string;
+    }) => {
+      if (typeof window === "undefined") {
+        return { success: false, error: "بيئة المتصفح مطلوبة" };
+      }
+
+      const cleanEmail = data.email.trim().toLowerCase();
+      const current = getUsersSnapshot();
+      if (current.some((u) => u.email.toLowerCase() === cleanEmail)) {
+        triggerOpsToast("البريد الإلكتروني مسجل مسبقاً", "error", "تنبيه");
+        return { success: false, error: "البريد الإلكتروني مسجل مسبقاً" };
+      }
+
+      const newUser: RegisteredUserRecord = {
+        id: "usr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: data.name.trim(),
+        email: cleanEmail,
+        phone: data.phone.trim(),
+        countryCode: data.countryCode || "+20",
+        countryIso: data.countryIso || "EG",
+        passwordHash: data.password || "12345678",
+        createdAt: new Date().toISOString(),
+      };
+
+      const updated = [newUser, ...current];
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updated));
+      cachedUsers = updated;
+      cachedUsersRaw = JSON.stringify(updated);
+      notifyChange();
+      window.dispatchEvent(new Event("agriport_visitor_auth_change"));
+      triggerOpsToast(
+        `تم إضافة حساب العميل ${newUser.name} بنجاح`,
+        "success",
+        "إدارة المستخدمين"
+      );
+
+      try {
+        await fetch("/api/registered-users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        });
+      } catch (e) {
+        console.warn("Could not insert user to API:", e);
+      }
+
+      return { success: true };
+    },
+    [notifyChange],
+  );
+
   const unreadInquiriesCount = inquiries.filter(
     (item) => item.read === false
   ).length;
@@ -905,6 +1077,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         products,
         inquiries,
         settings,
+        registeredUsers,
         unreadInquiriesCount,
         addProduct,
         updateProduct,
@@ -915,6 +1088,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         markAllInquiriesRead,
         deleteInquiry,
         updateSettings,
+        deleteRegisteredUser,
+        addRegisteredUser,
         showToast: triggerOpsToast,
       }}
     >

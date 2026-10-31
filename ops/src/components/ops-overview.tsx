@@ -10,10 +10,10 @@ export function OpsOverview({
   onNavigateTab,
   onOpenAddProduct,
 }: {
-  onNavigateTab: (tab: "overview" | "notifications" | "visits" | "products" | "settings") => void;
+  onNavigateTab: (tab: "overview" | "notifications" | "visits" | "products" | "users" | "traffic" | "settings") => void;
   onOpenAddProduct?: () => void;
 }) {
-  const { inquiries, products } = useOpsStore();
+  const { inquiries, products, registeredUsers } = useOpsStore();
 
   const visitInquiries = inquiries.filter(isFacilityVisit);
   const priceQuoteInquiries = inquiries.filter((i) => !isFacilityVisit(i));
@@ -34,7 +34,7 @@ export function OpsOverview({
   return (
     <div className="space-y-8">
       {/* KPI Stats Grid */}
-      <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {/* Card 1: Total Price Quotes */}
         <div
           onClick={() => onNavigateTab("notifications")}
@@ -169,6 +169,33 @@ export function OpsOverview({
           </div>
           <p className="mt-2 text-xs text-slate-400 font-medium">
             {inProgressCount} طلبات قيد التفاوض والمتابعة
+          </p>
+        </div>
+
+        {/* Card 6: Registered Clients */}
+        <div
+          onClick={() => onNavigateTab("users")}
+          className="rounded-3xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/50 to-white p-5 sm:p-6 shadow-xs text-start cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-indigo-800 uppercase tracking-wider">
+              العملاء المسجلون
+            </span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white text-lg group-hover:scale-110 transition-transform">
+              👥
+            </span>
+          </div>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-indigo-900 tracking-tight">
+              {registeredUsers.length}
+            </span>
+            <span className="text-xs font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">
+              عميل
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-indigo-600/80 font-medium flex items-center gap-1">
+            <span>إدارة وتواصل العملاء</span>
+            <span>←</span>
           </p>
         </div>
       </div>
@@ -378,6 +405,24 @@ export function OpsOverview({
                 <span>🌐</span>
                 <span>معاينة الكتالوج</span>
               </a>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab("users")}
+                className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 p-3 font-semibold text-white transition-colors cursor-pointer"
+              >
+                <span>👥</span>
+                <span>قاعدة بيانات العملاء المسجلين ({registeredUsers.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab("traffic")}
+                className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 p-3 font-semibold text-white transition-colors cursor-pointer"
+              >
+                <span>🌐</span>
+                <span>رصد حركة وزوار الموقع المباشر (Traffic)</span>
+              </button>
 
               <button
                 type="button"

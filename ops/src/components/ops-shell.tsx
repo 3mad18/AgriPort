@@ -11,10 +11,12 @@ import { OpsOverview } from "@/components/ops-overview";
 import { OpsNotificationsCenter } from "@/components/ops-notifications-center";
 import { OpsVisitsCenter, isFacilityVisit } from "@/components/ops-visits-center";
 import { OpsProducts } from "@/components/ops-products";
+import { OpsUsers } from "@/components/ops-users";
+import { OpsTraffic } from "@/components/ops-traffic";
 import { OpsSettings } from "@/components/ops-settings";
 import { OpsToast } from "@/components/ops-toast";
 
-export type OpsTab = "overview" | "notifications" | "visits" | "products" | "settings";
+export type OpsTab = "overview" | "notifications" | "visits" | "products" | "users" | "traffic" | "settings";
 
 const OPS_TAB_STORAGE_KEY = "agriport_ops_persisted_tab";
 
@@ -31,22 +33,22 @@ function subscribeOpsTab(callback: () => void) {
 function getInitialOpsTab(): OpsTab {
   if (typeof window === "undefined") return "overview";
   try {
-    // 1. Check URL hash (e.g. #settings, #products, #notifications, #visits, #overview)
+    // 1. Check URL hash (e.g. #settings, #products, #notifications, #visits, #users, #traffic, #overview)
     const hash = window.location.hash.replace(/^#/, "").toLowerCase() as OpsTab;
-    if (["overview", "notifications", "visits", "products", "settings"].includes(hash)) {
+    if (["overview", "notifications", "visits", "products", "users", "traffic", "settings"].includes(hash)) {
       return hash;
     }
 
     // 2. Check query param (e.g. ?tab=settings)
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get("tab")?.toLowerCase() as OpsTab;
-    if (["overview", "notifications", "visits", "products", "settings"].includes(tabParam)) {
+    if (["overview", "notifications", "visits", "products", "users", "traffic", "settings"].includes(tabParam)) {
       return tabParam;
     }
 
     // 3. Check localStorage
     const saved = localStorage.getItem(OPS_TAB_STORAGE_KEY) as OpsTab;
-    if (["overview", "notifications", "visits", "products", "settings"].includes(saved)) {
+    if (["overview", "notifications", "visits", "products", "users", "traffic", "settings"].includes(saved)) {
       return saved;
     }
   } catch (e) {}
@@ -60,6 +62,7 @@ export function OpsShell() {
   const {
     inquiries,
     unreadInquiriesCount,
+    registeredUsers,
     markInquiryRead,
     markAllInquiriesRead,
   } = useOpsStore();
@@ -96,7 +99,7 @@ export function OpsShell() {
   // Authentication Guard
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/secure-login");
+      router.replace("/ops/login");
     }
   }, [isLoading, isAuthenticated, router]);
 
@@ -173,6 +176,17 @@ export function OpsShell() {
       id: "products" as OpsTab,
       label: "إدارة كتالوج المحاصيل",
       icon: "📦",
+    },
+    {
+      id: "users" as OpsTab,
+      label: "العملاء المسجلون",
+      icon: "👥",
+      badge: registeredUsers.length > 0 ? `${registeredUsers.length}` : undefined,
+    },
+    {
+      id: "traffic" as OpsTab,
+      label: "حركة وزوار الموقع (مباشر)",
+      icon: "🌐",
     },
     {
       id: "settings" as OpsTab,
@@ -329,7 +343,10 @@ export function OpsShell() {
               <h1 className="text-sm sm:text-lg font-bold text-slate-900 leading-tight truncate">
                 {activeTab === "overview" && "نظرة عامة وإحصائيات التصدير"}
                 {activeTab === "notifications" && "مركز تلقي الطلبات والإشعارات"}
+                {activeTab === "visits" && "حجوزات الزيارات الميدانية ومحطات التعبئة"}
                 {activeTab === "products" && "إدارة كتالوج المحاصيل"}
+                {activeTab === "users" && "قاعدة بيانات العملاء والمستخدمين المسجلين"}
+                {activeTab === "traffic" && "حركة وزوار الموقع في الوقت الفعلي (Live Analytics)"}
                 {activeTab === "settings" && "إعدادات الموقع والتصدير"}
               </h1>
             </div>
@@ -509,6 +526,10 @@ export function OpsShell() {
               onResetOpenAddModal={() => setOpenAddProductModal(false)}
             />
           )}
+
+          {activeTab === "users" && <OpsUsers />}
+
+          {activeTab === "traffic" && <OpsTraffic />}
 
           {activeTab === "settings" && <OpsSettings />}
         </main>

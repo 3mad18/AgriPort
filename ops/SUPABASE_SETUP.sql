@@ -246,3 +246,99 @@ BEGIN
 EXCEPTION WHEN duplicate_object THEN
     NULL;
 END $$;
+
+
+-- 5. Table: REGISTERED_USERS (بيانات العملاء والمستخدمين المسجلين بالموقع)
+CREATE TABLE IF NOT EXISTS public.registered_users (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    phone TEXT DEFAULT '',
+    country_code TEXT DEFAULT '+20',
+    country_iso TEXT DEFAULT 'EG',
+    password_hash TEXT DEFAULT ''
+);
+
+ALTER TABLE public.registered_users ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public insert registered_users" ON public.registered_users;
+CREATE POLICY "Allow public insert registered_users"
+ON public.registered_users FOR INSERT
+TO anon, authenticated, service_role
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow ops read registered_users" ON public.registered_users;
+CREATE POLICY "Allow ops read registered_users"
+ON public.registered_users FOR SELECT
+TO anon, authenticated, service_role
+USING (true);
+
+DROP POLICY IF EXISTS "Allow ops update registered_users" ON public.registered_users;
+CREATE POLICY "Allow ops update registered_users"
+ON public.registered_users FOR UPDATE
+TO anon, authenticated, service_role
+USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow ops delete registered_users" ON public.registered_users;
+CREATE POLICY "Allow ops delete registered_users"
+ON public.registered_users FOR DELETE
+TO anon, authenticated, service_role
+USING (true);
+
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.registered_users;
+EXCEPTION WHEN duplicate_object THEN
+    NULL;
+END $$;
+
+
+-- 6. Table: SITE_VISITS (سجل رصد حركة وزوار الموقع في الوقت الفعلي بدون تسجيل)
+CREATE TABLE IF NOT EXISTS public.site_visits (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    visitor_id TEXT NOT NULL,
+    path TEXT NOT NULL,
+    page_title TEXT DEFAULT '',
+    country TEXT DEFAULT '',
+    country_code TEXT DEFAULT '',
+    flag TEXT DEFAULT '',
+    city TEXT DEFAULT '',
+    device TEXT DEFAULT '',
+    os TEXT DEFAULT '',
+    browser TEXT DEFAULT '',
+    referrer TEXT DEFAULT '',
+    referrer_icon TEXT DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_visits_created_at ON public.site_visits(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_site_visits_country ON public.site_visits(country);
+CREATE INDEX IF NOT EXISTS idx_site_visits_path ON public.site_visits(path);
+
+ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public insert site_visits" ON public.site_visits;
+CREATE POLICY "Allow public insert site_visits"
+ON public.site_visits FOR INSERT
+TO anon, authenticated, service_role
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow ops read site_visits" ON public.site_visits;
+CREATE POLICY "Allow ops read site_visits"
+ON public.site_visits FOR SELECT
+TO anon, authenticated, service_role
+USING (true);
+
+DROP POLICY IF EXISTS "Allow ops delete site_visits" ON public.site_visits;
+CREATE POLICY "Allow ops delete site_visits"
+ON public.site_visits FOR DELETE
+TO anon, authenticated, service_role
+USING (true);
+
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.site_visits;
+EXCEPTION WHEN duplicate_object THEN
+    NULL;
+END $$;

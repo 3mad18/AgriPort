@@ -16,33 +16,6 @@ import {
 } from "@/lib/auth-validation";
 
 // SVG Icons
-const GoogleIcon = () => (
-  <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
-    <path
-      fill="#4285F4"
-      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
-    />
-    <path
-      fill="#34A853"
-      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"
-    />
-    <path
-      fill="#FBBC05"
-      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.99 0 12s.45 3.85 1.24 5.42l4.04-3.15z"
-    />
-    <path
-      fill="#EA4335"
-      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-    />
-  </svg>
-);
-
-const AppleIcon = () => (
-  <svg className="h-5 w-5 shrink-0 fill-current" viewBox="0 0 170 170">
-    <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.69-7.85-12-14.42-6-9.16-10.74-19.46-14.23-30.89-3.49-11.43-5.23-22.18-5.23-32.26 0-14.68 3.73-27.02 11.19-37.03 7.46-10.01 17.07-15.17 28.84-15.48 4.8 0 10.36 1.34 16.69 4.02 6.33 2.68 10.42 4.09 12.28 4.23 1.57-.14 5.92-1.63 13.06-4.48 7.14-2.85 13.2-4.08 18.17-3.69 13.94.98 24.89 6.22 32.84 15.72-12.28 7.44-18.3 17.57-18.06 30.39.24 9.94 4.08 18.38 11.52 25.32 7.44 6.94 16.48 10.84 27.12 11.69-2.22 6.64-4.87 13.19-7.94 19.64zM119.22 33.15c0-7.25 2.65-14.1 7.94-20.55 5.29-6.45 11.83-10.65 19.64-12.6 1.25 7.13-.88 13.9-6.39 20.31-5.51 6.41-12.24 10.72-20.19 12.92-.35-.03-1-.08-1-.08z" />
-  </svg>
-);
-
 const EyeIcon = ({ visible }: { visible: boolean }) => (
   <svg
     className="h-4 w-4"
@@ -98,7 +71,6 @@ export function VisitorAuthCard() {
     isAuthenticated,
     loginWithEmail,
     registerUser,
-    loginWithSocial,
     requestPasswordReset,
     verifyResetCode,
     resetPasswordWithCode,
@@ -175,7 +147,6 @@ export function VisitorAuthCard() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(null);
 
   const countryDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -236,6 +207,14 @@ export function VisitorAuthCard() {
     }, 1000);
     return () => clearInterval(interval);
   }, [activeTab, forgotStep, resendCountdown]);
+
+  // Capture URL error messages (e.g. returned from OAuth callback)
+  useEffect(() => {
+    const errorParam = searchParams?.get("error");
+    if (errorParam) {
+      setErrorMsg(decodeURIComponent(errorParam));
+    }
+  }, [searchParams]);
 
   // Reset form inputs upon component mount
   useEffect(() => {
@@ -377,32 +356,6 @@ export function VisitorAuthCard() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  // Handle Social Login (Google / Apple)
-  const handleSocialLogin = (provider: "google" | "apple") => {
-    setErrorMsg(null);
-    setSocialLoading(provider);
-
-    setTimeout(() => {
-      const res = loginWithSocial(provider);
-      setSocialLoading(null);
-      if (res.success) {
-        setSuccessMsg(
-          provider === "google"
-            ? "تم تسجيل الدخول بنجاح عبر حساب Google!"
-            : "تم تسجيل الدخول بنجاح عبر Apple ID!"
-        );
-        resetForm();
-        setTimeout(() => {
-          if (typeof window !== "undefined") {
-            window.location.href = targetDestination;
-          } else {
-            router.push(targetDestination);
-          }
-        }, 500);
-      }
-    }, 600);
   };
 
   // Forgot Password: Step 1 (Request OTP code)
@@ -636,51 +589,9 @@ export function VisitorAuthCard() {
         </div>
       )}
 
-      {/* SOCIAL SIGN IN BUTTONS & TAB SWITCHER (Only when not in forgot password mode) */}
+      {/* TAB SWITCHER: Login / Register (Only when not in forgot password mode) */}
       {activeTab !== "forgot" && (
         <>
-          <div className="space-y-3 mb-6">
-            {/* Google Button */}
-            <button
-              type="button"
-              onClick={() => handleSocialLogin("google")}
-              disabled={socialLoading !== null || isSubmitting}
-              className="w-full flex items-center justify-center gap-3.5 px-4 py-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm transition-all shadow-xs hover:border-slate-300 hover:shadow-md active:scale-[0.99] disabled:opacity-50"
-            >
-              {socialLoading === "google" ? (
-                <div className="h-5 w-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <GoogleIcon />
-              )}
-              <span>{tr.socialGoogle}</span>
-            </button>
-
-            {/* Apple Button */}
-            <button
-              type="button"
-              onClick={() => handleSocialLogin("apple")}
-              disabled={socialLoading !== null || isSubmitting}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.99] disabled:opacity-50"
-            >
-              {socialLoading === "apple" ? (
-                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <AppleIcon />
-              )}
-              <span>{tr.socialApple}</span>
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
-            </div>
-            <span className="relative bg-white px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">
-              {tr.orContinueWithEmail}
-            </span>
-          </div>
-
           {/* Tab Switcher: Login / Register */}
           <div className="grid grid-cols-2 p-1 bg-slate-100/90 rounded-2xl mb-6">
             <button
