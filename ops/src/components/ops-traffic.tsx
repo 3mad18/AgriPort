@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { triggerOpsToast } from "@/components/ops-toast";
@@ -91,31 +91,114 @@ export function OpsTraffic() {
         localStorage.setItem("agriport_clarity_project_id", trimmed);
         setClarityId(trimmed);
         setIsEditingClarity(false);
-        triggerOpsToast("ØªÙ… ØªÙØ¹ÙŠÙ„ ÙƒÙˆØ¯ Microsoft Clarity Ø¨Ù†Ø¬Ø§Ø­ ÙÙŠ Ø§Ù„Ù…ÙˆÙ‚Ø¹! ðŸŽ‰", "success", "Ø±Ø¨Ø· ÙƒÙ„Ø§Ø±ÙŠØªÙŠ");
+        triggerOpsToast("تم تفعيل كود Microsoft Clarity بنجاح في الموقع! 🎉", "success", "ربط كلاريتي");
       } else {
         localStorage.removeItem("agriport_clarity_project_id");
         setClarityId("");
         setIsEditingClarity(false);
-        triggerOpsToast("ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø±Ø¨Ø· ÙƒÙˆØ¯ ÙƒÙ„Ø§Ø±ÙŠØªÙŠ", "info", "ØªÙ†Ø¨ÙŠÙ‡");
+        triggerOpsToast("تم إلغاء ربط كود كلاريتي", "info", "تنبيه");
       }
     }
   };
 
+  const computeStatsFromVisits = (allVisits: SiteVisit[]): TrafficStats => {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const visitsToday = allVisits.filter(
+      (v) => new Date(v.created_at).getTime() >= todayStart.getTime()
+    );
+    const uniqueVisitorsToday = new Set(visitsToday.map((v) => v.visitor_id)).size;
+    const activeNow = allVisits.filter(
+      (v) => Date.now() - new Date(v.created_at).getTime() < 10 * 60 * 1000
+    ).length;
+
+    const countryMap = new Map<string, { name: string; flag: string; count: number }>();
+    allVisits.forEach((v) => {
+      const key = v.country || "غير محدد";
+      const curr = countryMap.get(key) || { name: key, flag: v.flag || "🌐", count: 0 };
+      curr.count += 1;
+      countryMap.set(key, curr);
+    });
+    const topCountries = Array.from(countryMap.values()).sort((a, b) => b.count - a.count);
+
+    const pagesMap = new Map<string, { path: string; title: string; count: number }>();
+    allVisits.forEach((v) => {
+      const key = v.path || "/";
+      const curr = pagesMap.get(key) || { path: key, title: v.page_title || key, count: 0 };
+      curr.count += 1;
+      pagesMap.set(key, curr);
+    });
+    const topPages = Array.from(pagesMap.values()).sort((a, b) => b.count - a.count);
+
+    const mobileCount = allVisits.filter(
+      (v) => v.device?.includes("محمول") || v.device?.includes("Mobile") || v.device?.includes("📱")
+    ).length;
+    const desktopCount = allVisits.length - mobileCount;
+
+    return {
+      totalVisits: allVisits.length,
+      visitsToday: visitsToday.length,
+      uniqueVisitorsToday,
+      activeNow,
+      mobileCount,
+      desktopCount,
+      mobilePercent: allVisits.length ? Math.round((mobileCount / allVisits.length) * 100) : 0,
+      desktopPercent: allVisits.length ? Math.round((desktopCount / allVisits.length) * 100) : 0,
+      topCountries,
+      topPages,
+    };
+  };
+
   const fetchTraffic = useCallback(async (isSilent = false) => {
     if (!isSilent) setIsLoading(true);
+
+    // 1. Read local storage cache first
+    let localVisits: SiteVisit[] = [];
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("agriport_live_visits");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) localVisits = parsed;
+        }
+      } catch {}
+    }
+
     try {
       const res = await fetch("/api/analytics/visitors", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
-          if (data.stats) setStats(data.stats);
-          if (Array.isArray(data.visits)) setVisits(data.visits);
+          const serverVisits = Array.isArray(data.visits) ? data.visits : [];
+          const mergedMap = new Map<string, SiteVisit>();
+          [...serverVisits, ...localVisits].forEach((v) => {
+            if (v && v.id && !mergedMap.has(v.id)) {
+              mergedMap.set(v.id, v);
+            }
+          });
+          const combinedVisits = Array.from(mergedMap.values()).sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+
+          setVisits(combinedVisits);
+          if (combinedVisits.length > 0) {
+            setStats(computeStatsFromVisits(combinedVisits));
+          } else if (data.stats) {
+            setStats(data.stats);
+          }
+          return;
         }
       }
     } catch {
       // offline fallback
     } finally {
       if (!isSilent) setIsLoading(false);
+    }
+
+    if (localVisits.length > 0) {
+      setVisits(localVisits);
+      setStats(computeStatsFromVisits(localVisits));
     }
   }, []);
 
@@ -125,7 +208,18 @@ export function OpsTraffic() {
     const interval = setInterval(() => {
       fetchTraffic(true);
     }, 10000);
-    return () => clearInterval(interval);
+
+    const handleLocalTrafficUpdate = () => {
+      fetchTraffic(true);
+    };
+    window.addEventListener("agriport_traffic_updated", handleLocalTrafficUpdate);
+    window.addEventListener("storage", handleLocalTrafficUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("agriport_traffic_updated", handleLocalTrafficUpdate);
+      window.removeEventListener("storage", handleLocalTrafficUpdate);
+    };
   }, [fetchTraffic]);
 
   // Filtered visits
@@ -151,21 +245,21 @@ export function OpsTraffic() {
   // Export Traffic to CSV
   const handleExportCSV = () => {
     if (visits.length === 0) {
-      triggerOpsToast("Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ø²ÙŠØ§Ø±Ø§Øª Ø­Ø§Ù„ÙŠØ© Ù„Ù„ØªØµØ¯ÙŠØ±", "error", "ØªÙ†Ø¨ÙŠÙ‡");
+      triggerOpsToast("لا توجد بيانات زيارات حالية للتصدير", "error", "تنبيه");
       return;
     }
 
     const headers = [
-      "Ù…ÙØ¹Ø±Ù Ø§Ù„Ø²Ø§Ø¦Ø± Ø§Ù„Ù…Ø¬Ù‡ÙˆÙ„",
-      "Ø§Ù„Ø¯ÙˆÙ„Ø©",
-      "Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©",
-      "Ø§Ù„ØµÙØ­Ø© Ø§Ù„ØªÙŠ Ø²Ø§Ø±Ù‡Ø§",
-      "Ù…Ø³Ø§Ø± Ø§Ù„Ø±Ø§Ø¨Ø·",
-      "Ù†ÙˆØ¹ Ø§Ù„Ø¬Ù‡Ø§Ø²",
-      "Ù†Ø¸Ø§Ù… Ø§Ù„ØªØ´ØºÙŠÙ„",
-      "Ø§Ù„Ù…ØªØµÙØ­",
-      "Ù…ØµØ¯Ø± Ø§Ù„Ø²ÙŠØ§Ø±Ø©",
-      "ØªØ§Ø±ÙŠØ® ÙˆÙˆÙ‚Øª Ø§Ù„Ø²ÙŠØ§Ø±Ø©",
+      "مُعرف الزائر المجهول",
+      "الدولة",
+      "المدينة",
+      "الصفحة التي زارها",
+      "مسار الرابط",
+      "نوع الجهاز",
+      "نظام التشغيل",
+      "المتصفح",
+      "مصدر الزيارة",
+      "تاريخ ووقت الزيارة",
     ];
 
     const rows = visits.map((v) => [
@@ -195,7 +289,7 @@ export function OpsTraffic() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    triggerOpsToast("ØªÙ… ØªØµØ¯ÙŠØ± Ø³Ø¬Ù„ Ø­Ø±ÙƒØ© Ø§Ù„Ø²ÙˆØ§Ø± Ø¨Ù†Ø¬Ø§Ø­ ðŸ“Š", "success", "ØªØµØ¯ÙŠØ± Ø§Ù„ØªØ±Ø§ÙÙŠÙƒ");
+    triggerOpsToast("تم تصدير سجل حركة الزوار بنجاح 📊", "success", "تصدير الترافيك");
   };
 
   return (
@@ -209,16 +303,16 @@ export function OpsTraffic() {
             </span>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-slate-900">
-                Ø­Ø±ÙƒØ© ÙˆØ²ÙˆØ§Ø± Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙÙŠ Ø§Ù„ÙˆÙ‚Øª Ø§Ù„ÙØ¹Ù„ÙŠ
+                حركة وزوار الموقع في الوقت الفعلي
               </h2>
               <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>Ø¨Ø« Ø­ÙŠ ÙˆÙ…Ø¨Ø§Ø´Ø±</span>
+                <span>بث حي ومباشر</span>
               </span>
             </div>
           </div>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Ø±ØµØ¯ Ù…Ø¨Ø§Ø´Ø± Ù„Ù„Ø²ÙˆØ§Ø± Ø§Ù„Ø°ÙŠÙ† ÙŠØªØµÙØ­ÙˆÙ† Ù…ÙˆÙ‚Ø¹ Ø§Ù„ØªØµØ¯ÙŠØ± Ø¨Ø¯ÙˆÙ† ØªØ³Ø¬ÙŠÙ„ (Ø§Ù„Ø¯ÙˆÙ„ØŒ Ø§Ù„Ù…Ø­Ø§ØµÙŠÙ„ Ø§Ù„ØªÙŠ ØªØµÙØ­ÙˆÙ‡Ø§ØŒ Ø§Ù„Ø£Ø¬Ù‡Ø²Ø© ÙˆÙ…ØµØ§Ø¯Ø± Ø§Ù„ÙˆØµÙˆÙ„)
+            رصد مباشر للزوار الذين يتصفحون موقع التصدير بدون تسجيل (الدول، المحاصيل التي تصفحوها، الأجهزة ومصادر الوصول)
           </p>
         </div>
 
@@ -228,10 +322,10 @@ export function OpsTraffic() {
             onClick={() => fetchTraffic(false)}
             disabled={isLoading}
             className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors"
-            title="ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙÙˆØ±Ø§Ù‹"
+            title="تحديث البيانات فوراً"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-            <span>ØªØ­Ø¯ÙŠØ« Ø­ÙŠ</span>
+            <span>تحديث حي</span>
           </button>
 
           <button
@@ -240,7 +334,7 @@ export function OpsTraffic() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-md shadow-teal-700/20 hover:shadow-lg transition-all active:scale-[0.98]"
           >
             <FileSpreadsheet className="w-4 h-4" />
-            <span>ØªØµØ¯ÙŠØ± Ø§Ù„Ø³Ø¬Ù„ (Excel)</span>
+            <span>تصدير السجل (Excel)</span>
           </button>
         </div>
       </div>
@@ -251,7 +345,7 @@ export function OpsTraffic() {
         <div className="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-5 rounded-3xl shadow-md relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-100">
-              Ù†Ø´Ø·ÙˆÙ† Ø§Ù„Ø¢Ù† Ø¨Ø§Ù„Ù…ÙˆÙ‚Ø¹
+              نشطون الآن بالموقع
             </span>
             <span className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-sm">
               <Radio className="w-4 h-4 text-white animate-pulse" />
@@ -262,11 +356,11 @@ export function OpsTraffic() {
               {stats.activeNow}
             </span>
             <span className="text-[11px] font-bold bg-white/20 px-2 py-0.5 rounded-full">
-              ÙÙŠ Ù‡Ø°Ù‡ Ø§Ù„Ù„Ø­Ø¸Ø©
+              في هذه اللحظة
             </span>
           </div>
           <p className="mt-1.5 text-[11px] text-emerald-100/90 font-medium">
-            ÙŠØªÙ†Ù‚Ù„ÙˆÙ† Ø¨ÙŠÙ† ØµÙØ­Ø§Øª ÙˆÙ…Ø­Ø§ØµÙŠÙ„ Ø§Ù„Ù…ÙˆÙ‚Ø¹
+            يتنقلون بين صفحات ومحاصيل الموقع
           </p>
         </div>
 
@@ -274,7 +368,7 @@ export function OpsTraffic() {
         <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Ø²ÙŠØ§Ø±Ø§Øª Ø§Ù„ÙŠÙˆÙ…
+              زيارات اليوم
             </span>
             <span className="h-8 w-8 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
               <TrendingUp className="w-4.5 h-4.5 text-slate-700" />
@@ -285,11 +379,11 @@ export function OpsTraffic() {
               {stats.visitsToday}
             </span>
             <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
-              ØµÙØ­Ø© Ù…Ø¹Ø±ÙˆØ¶Ø©
+              صفحة معروضة
             </span>
           </div>
           <p className="mt-1.5 text-[11px] text-slate-400 font-medium">
-            Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ØªØµÙØ­ Ø§Ù„ÙŠÙˆÙ…ÙŠ
+            إجمالي التصفح اليومي
           </p>
         </div>
 
@@ -297,7 +391,7 @@ export function OpsTraffic() {
         <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Ø²ÙˆØ§Ø± ÙØ±ÙŠØ¯ÙˆÙ†
+              زوار فريدون
             </span>
             <span className="h-8 w-8 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <Users className="w-4.5 h-4.5 text-blue-600" />
@@ -308,11 +402,11 @@ export function OpsTraffic() {
               {stats.uniqueVisitorsToday}
             </span>
             <span className="text-[11px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">
-              Ù…Ø´ØªØ±ÙŠÙ† Ù…Ø­ØªÙ…Ù„ÙŠÙ†
+              مشترين محتملين
             </span>
           </div>
           <p className="mt-1.5 text-[11px] text-slate-400 font-medium">
-            Ø£Ø¬Ù‡Ø²Ø© ÙØ±ÙŠØ¯Ø© Ø¯Ø®Ù„Øª Ø§Ù„Ù…Ù†ØµØ© Ø§Ù„ÙŠÙˆÙ…
+            أجهزة فريدة دخلت المنصة اليوم
           </p>
         </div>
 
@@ -320,7 +414,7 @@ export function OpsTraffic() {
         <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Ø£ÙƒØ«Ø± Ø³ÙˆÙ‚ Ù…Ù‡ØªÙ…
+              أكثر سوق مهتم
             </span>
             <span className="h-8 w-8 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <Award className="w-4.5 h-4.5 text-amber-600" />
@@ -328,16 +422,16 @@ export function OpsTraffic() {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
-              <span>{stats.topCountries[0]?.flag || "ðŸŒ"}</span>
+              <span>{stats.topCountries[0]?.flag || "🌐"}</span>
               <span className="truncate">
-                {stats.topCountries[0]?.name || (stats.totalVisits === 0 ? "Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª..." : "ØºÙŠØ± Ù…Ø­Ø¯Ø¯")}
+                {stats.topCountries[0]?.name || (stats.totalVisits === 0 ? "بانتظار البيانات..." : "غير محدد")}
               </span>
             </span>
           </div>
           <p className="mt-1.5 text-[11px] text-slate-400 font-medium">
             {stats.topCountries[0]?.count
-              ? `Ø³Ø¬Ù„ ${stats.topCountries[0].count} Ø²ÙŠØ§Ø±Ø§Øª Ù…Ù† Ù‡Ø°Ø§ Ø§Ù„Ø³ÙˆÙ‚`
-              : "Ø£Ø¹Ù„Ù‰ Ù…Ø¹Ø¯Ù„ ØªØµÙØ­ Ù„Ù„ÙƒØªØ§Ù„ÙˆØ¬ Ø§Ù„Ù…ØµØ±ÙŠ"}
+              ? `سجل ${stats.topCountries[0].count} زيارات من هذا السوق`
+              : "أعلى معدل تصفح للكتالوج المصري"}
           </p>
         </div>
       </div>
@@ -348,16 +442,16 @@ export function OpsTraffic() {
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs text-start">
           <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
             <Globe className="w-4 h-4 text-emerald-600" />
-            <span>Ø§Ù„Ø¯ÙˆÙ„ ÙˆØ§Ù„Ø£Ø³ÙˆØ§Ù‚ Ø§Ù„Ø£ÙƒØ«Ø± ØªØµÙØ­Ø§Ù‹</span>
+            <span>الدول والأسواق الأكثر تصفحاً</span>
           </h3>
           <p className="text-[11px] text-slate-400 mb-4 font-medium">
-            ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ø²ÙˆØ§Ø± Ø§Ù„Ø£Ø¬Ø§Ù†Ø¨ ÙˆØ§Ù„Ù…Ø­Ù„ÙŠÙŠÙ† Ø­Ø³Ø¨ Ø§Ù„Ø¨Ù„Ø¯
+            توزيع الزوار الأجانب والمحليين حسب البلد
           </p>
 
           <div className="space-y-3">
             {stats.topCountries.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
-                Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø£ÙˆÙ„ Ø²Ø§Ø¦Ø± Ø­Ù‚ÙŠÙ‚ÙŠ Ù„Ù„Ù…ÙˆÙ‚Ø¹...
+                بانتظار استقبال أول زائر للموقع...
               </div>
             ) : (
               stats.topCountries.slice(0, 5).map((country) => {
@@ -373,7 +467,7 @@ export function OpsTraffic() {
                         <span>{country.name}</span>
                       </span>
                       <span className="text-slate-500 text-[11px] font-mono">
-                        {country.count} Ø²ÙŠØ§Ø±Ø© ({percent}%)
+                        {country.count} زيارة ({percent}%)
                       </span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
@@ -393,16 +487,16 @@ export function OpsTraffic() {
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs text-start">
           <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
             <Package className="w-4 h-4 text-teal-600" />
-            <span>Ø£ÙƒØ«Ø± Ø§Ù„Ù…Ø­Ø§ØµÙŠÙ„ ÙˆØ§Ù„ØµÙØ­Ø§Øª ØªØµÙØ­Ø§Ù‹</span>
+            <span>أكثر المحاصيل والصفحات تصفحاً</span>
           </h3>
           <p className="text-[11px] text-slate-400 mb-4 font-medium">
-            Ù…Ø§ ÙŠØ¨Ø­Ø« Ø¹Ù†Ù‡ Ø§Ù„Ù…Ø³ØªÙˆØ±Ø¯ÙˆÙ† Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…ÙˆÙ‚Ø¹
+            ما يبحث عنه المستوردون داخل الموقع
           </p>
 
           <div className="space-y-3">
             {stats.topPages.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
-                Ø³ØªØ¸Ù‡Ø± Ù‡Ù†Ø§ Ø£ÙƒØ«Ø± Ø§Ù„Ù…Ø­Ø§ØµÙŠÙ„ ÙˆØ§Ù„ØµÙØ­Ø§Øª ØªØµÙØ­Ø§Ù‹ ÙÙˆØ± Ø²ÙŠØ§Ø±Ø© Ø§Ù„Ù…Ø´ØªØ±ÙŠÙ†.
+                ستظهر هنا أكثر المحاصيل والصفحات تصفحاً فور زيارة المشترين.
               </div>
             ) : (
               stats.topPages.slice(0, 5).map((page) => {
@@ -417,7 +511,7 @@ export function OpsTraffic() {
                         {page.title}
                       </span>
                       <span className="text-slate-500 text-[11px] font-mono">
-                        {page.count} Ù…Ø´Ø§Ù‡Ø¯Ø©
+                        {page.count} مشاهدة
                       </span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
@@ -438,36 +532,36 @@ export function OpsTraffic() {
           <div>
             <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
               <Smartphone className="w-4 h-4 text-teal-600" />
-              <span>ØªÙˆØ²ÙŠØ¹ Ø£Ø¬Ù‡Ø²Ø© Ø§Ù„Ø²ÙˆØ§Ø±</span>
+              <span>توزيع أجهزة الزوار</span>
             </h3>
             <p className="text-[11px] text-slate-400 mb-4 font-medium">
-              Ù†ÙˆØ¹ Ø§Ù„Ø¬Ù‡Ø§Ø² Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… ÙÙŠ ØªØµÙØ­ Ø§Ù„Ù…ÙˆÙ‚Ø¹
+              نوع الجهاز المستخدم في تصفح الموقع
             </p>
 
             <div className="grid grid-cols-2 gap-3 text-center mb-5">
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col items-center">
                 <Monitor className="w-6 h-6 text-emerald-600 mb-1" />
-                <p className="text-xs font-bold text-slate-800">ÙƒÙ…Ø¨ÙŠÙˆØªØ± Ù…ÙƒØªØ¨ÙŠ</p>
+                <p className="text-xs font-bold text-slate-800">كمبيوتر مكتبي</p>
                 <p className="text-base font-extrabold text-emerald-600 mt-0.5">
                   {stats.desktopPercent}%
                 </p>
-                <p className="text-[10px] text-slate-400">{stats.desktopCount} Ø²ÙŠØ§Ø±Ø©</p>
+                <p className="text-[10px] text-slate-400">{stats.desktopCount} زيارة</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col items-center">
                 <Smartphone className="w-6 h-6 text-teal-600 mb-1" />
-                <p className="text-xs font-bold text-slate-800">Ù‡Ø§ØªÙ Ø°ÙƒÙŠ</p>
+                <p className="text-xs font-bold text-slate-800">هاتف ذكي</p>
                 <p className="text-base font-extrabold text-teal-600 mt-0.5">
                   {stats.mobilePercent}%
                 </p>
-                <p className="text-[10px] text-slate-400">{stats.mobileCount} Ø²ÙŠØ§Ø±Ø©</p>
+                <p className="text-[10px] text-slate-400">{stats.mobileCount} زيارة</p>
               </div>
             </div>
           </div>
 
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-[11px] text-emerald-900 leading-relaxed font-medium flex items-start gap-2">
             <Lightbulb className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
-            <p><strong>Ù…Ù„Ø§Ø­Ø¸Ø© Ù„Ù„Ù…ØµØ¯Ø±ÙŠÙ†:</strong> ØºØ§Ù„Ø¨ÙŠØ© Ø§Ù„Ù…Ø³ØªÙˆØ±Ø¯ÙŠÙ† Ø§Ù„Ø£ÙˆØ±ÙˆØ¨ÙŠÙŠÙ† ÙŠØªØµÙØ­ÙˆÙ† Ø§Ù„ÙƒØªØ§Ù„ÙˆØ¬ Ù…Ù† Ø£Ø¬Ù‡Ø²Ø© Ø§Ù„ÙƒÙ…Ø¨ÙŠÙˆØªØ± Ø§Ù„Ù…ÙƒØªØ¨ÙŠØ©ØŒ Ø¨ÙŠÙ†Ù…Ø§ ÙŠØ¹ØªÙ…Ø¯ Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ø®Ù„ÙŠØ¬ Ø¨Ù†Ø³Ø¨Ø© Ø£Ø¹Ù„Ù‰ Ø¹Ù„Ù‰ Ø§Ù„Ù‡ÙˆØ§ØªÙ ÙˆØ§Ù„ÙˆØ§ØªØ³Ø§Ø¨.</p>
+            <p><strong>ملاحظة للمصدرين:</strong> غالبية المستوردين الأوروبيين يتصفحون الكتالوج من أجهزة الكمبيوتر المكتبية، بينما يعتمد عملاء الخليج بنسبة أعلى على الهواتف والواتساب.</p>
           </div>
         </div>
       </div>
@@ -478,10 +572,10 @@ export function OpsTraffic() {
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full bg-emerald-500 animate-ping"></span>
             <h3 className="text-sm font-bold text-slate-900">
-              Ø³Ø¬Ù„ Ø§Ù„Ø²ÙŠØ§Ø±Ø§Øª Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø© Ù„Ù„Ù…ÙˆÙ‚Ø¹ (Live Stream)
+              سجل الزيارات المباشرة للموقع (Live Stream)
             </h3>
             <span className="text-xs text-slate-400 font-mono">
-              ({filteredVisits.length} Ø²ÙŠØ§Ø±Ø© Ù…Ø³Ø¬Ù„Ø©)
+              ({filteredVisits.length} زيارة مسجلة)
             </span>
           </div>
 
@@ -491,7 +585,7 @@ export function OpsTraffic() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Ø¨Ø­Ø« Ø¨Ø§Ù„Ø¯ÙˆÙ„Ø© Ø£Ùˆ Ø§Ù„ØµÙØ­Ø© Ø£Ùˆ Ø§Ù„Ø¬Ù‡Ø§Ø²..."
+              placeholder="بحث بالدولة أو الصفحة أو الجهاز..."
               className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-500 w-48 sm:w-60"
             />
 
@@ -500,7 +594,7 @@ export function OpsTraffic() {
               onChange={(e) => setSelectedCountryFilter(e.target.value)}
               className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
             >
-              <option value="all">ÙƒÙ„ Ø§Ù„Ø¯ÙˆÙ„</option>
+              <option value="all">كل الدول</option>
               {stats.topCountries.map((c) => (
                 <option key={c.name} value={c.name}>
                   {c.flag} {c.name}
@@ -515,13 +609,13 @@ export function OpsTraffic() {
             <Radio className="w-9 h-9 text-slate-300 animate-pulse" />
             <p className="font-bold text-slate-700 text-sm">
               {searchQuery || selectedCountryFilter !== "all"
-                ? "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø²ÙŠØ§Ø±Ø§Øª Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ù„Ø¨Ø­Ø« Ø­Ø§Ù„ÙŠØ§Ù‹."
-                : "Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø­Ø±ÙƒØ© ÙˆØ²ÙˆØ§Ø± Ø­Ù‚ÙŠÙ‚ÙŠÙŠÙ† Ø¹Ù„Ù‰ Ø§Ù„Ù…ÙˆÙ‚Ø¹"}
+                ? "لا توجد زيارات مطابقة للبحث حالياً."
+                : "بانتظار حركة وزوار على الموقع"}
             </p>
             <p className="text-[11px] text-slate-400 max-w-md leading-relaxed">
               {searchQuery || selectedCountryFilter !== "all"
-                ? "Ø¬Ø±Ø¨ Ø¥Ø²Ø§Ù„Ø© Ù…Ø¹Ø§ÙŠÙŠØ± Ø§Ù„Ø¨Ø­Ø« Ø£Ùˆ Ø§Ø®ØªÙŠØ§Ø± Ø¯ÙˆÙ„Ø© Ø£Ø®Ø±Ù‰."
-                : "ØªØµÙØ­ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¢Ù† Ù…Ù† Ø£ÙŠ Ù‡Ø§ØªÙ Ø£Ùˆ ÙƒÙ…Ø¨ÙŠÙˆØªØ±ØŒ ÙˆØ³ÙŠØªÙ… Ø±ØµØ¯ Ø­Ø±ÙƒØªÙƒ ÙˆØ¯ÙˆÙ„ØªÙƒ ÙˆÙ†ÙˆØ¹ Ø¬Ù‡Ø§Ø²Ùƒ ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ø¬Ø¯ÙˆÙ„ Ù…Ø¨Ø§Ø´Ø±Ø© Ø¨Ø§Ù„Ø«ÙˆØ§Ù†ÙŠ!"}
+                ? "جرب إزالة معايير البحث أو اختيار دولة أخرى."
+                : "تصفح الموقع الآن من أي هاتف أو كمبيوتر، وسيتم رصد حركتك ودولتك ونوع جهازك في هذا الجدول مباشرة بالثواني!"}
             </p>
           </div>
         ) : (
@@ -529,12 +623,12 @@ export function OpsTraffic() {
             <table className="w-full text-start text-xs">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/70 text-slate-500 font-bold">
-                  <th className="py-3 px-6 text-start">Ø§Ù„Ø¯ÙˆÙ„Ø© ÙˆØ§Ù„Ù…Ø¯ÙŠÙ†Ø©</th>
-                  <th className="py-3 px-6 text-start">Ø§Ù„ØµÙØ­Ø© / Ø§Ù„Ù…Ø­ØµÙˆÙ„</th>
-                  <th className="py-3 px-6 text-start">Ø§Ù„Ø¬Ù‡Ø§Ø² ÙˆØ§Ù„Ù…ØªØµÙØ­</th>
-                  <th className="py-3 px-6 text-start">Ù…ØµØ¯Ø± Ø§Ù„Ø²ÙŠØ§Ø±Ø©</th>
-                  <th className="py-3 px-6 text-start">ØªÙˆÙ‚ÙŠØª Ø§Ù„Ø²ÙŠØ§Ø±Ø©</th>
-                  <th className="py-3 px-6 text-end">Ù…Ø¹Ø±Ù Ø§Ù„Ø²Ø§Ø¦Ø±</th>
+                  <th className="py-3 px-6 text-start">الدولة والمدينة</th>
+                  <th className="py-3 px-6 text-start">الصفحة / المحصول</th>
+                  <th className="py-3 px-6 text-start">الجهاز والمتصفح</th>
+                  <th className="py-3 px-6 text-start">مصدر الزيارة</th>
+                  <th className="py-3 px-6 text-start">توقيت الزيارة</th>
+                  <th className="py-3 px-6 text-end">معرف الزائر</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -550,7 +644,7 @@ export function OpsTraffic() {
                       {/* Country & Flag */}
                       <td className="py-3.5 px-6">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{visit.flag || "ðŸŒ"}</span>
+                          <span className="text-lg">{visit.flag || "🌐"}</span>
                           <div>
                             <p className="font-bold text-slate-900">
                               {visit.country}
@@ -561,7 +655,7 @@ export function OpsTraffic() {
                           </div>
                           {isRecent && (
                             <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold animate-pulse">
-                              Ø§Ù„Ø¢Ù†
+                              الآن
                             </span>
                           )}
                         </div>
@@ -584,7 +678,7 @@ export function OpsTraffic() {
                         <div className="text-slate-700">
                           <p className="font-medium">{visit.device}</p>
                           <p className="text-[10px] text-slate-400 font-mono">
-                            {visit.os} â€¢ {visit.browser}
+                            {visit.os} • {visit.browser}
                           </p>
                         </div>
                       </td>
@@ -592,7 +686,7 @@ export function OpsTraffic() {
                       {/* Referrer */}
                       <td className="py-3.5 px-6">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium">
-                          <span>{visit.referrer_icon || "ðŸŒ"}</span>
+                          <span>{visit.referrer_icon || "🌐"}</span>
                           <span>{visit.referrer}</span>
                         </span>
                       </td>
@@ -641,19 +735,19 @@ export function OpsTraffic() {
               </span>
               <div>
                 <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                  <span>Ø±Ø¨Ø· Ø®Ø¯Ù…Ø© Microsoft Clarity (ØªØ³Ø¬ÙŠÙ„ Ø¬Ù„Ø³Ø§Øª Ø§Ù„Ø²ÙˆØ§Ø± ÙˆØ§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©)</span>
+                  <span>ربط خدمة Microsoft Clarity (تسجيل جلسات الزوار والخريطة الحرارية)</span>
                   {clarityId ? (
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[11px] font-bold">
-                      â— Ù…ÙØ¹Ù‘Ù„ ÙˆÙ†Ø´Ø·
+                      ● مفعّل ونشط
                     </span>
                   ) : (
                     <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[11px] font-bold">
-                      â—‹ ØºÙŠØ± Ù…ØªØµÙ„
+                      ○ غير متصل
                     </span>
                   )}
                 </h4>
                 <p className="text-xs text-slate-300 mt-0.5">
-                  Ø£Ø¯Ø§Ø© Ø±Ø³Ù…ÙŠØ© Ù…Ø¬Ø§Ù†ÙŠØ© 100% Ù…Ù† Ù…ÙŠÙƒØ±ÙˆØ³ÙˆÙØª Ù„Ù…Ø´Ø§Ù‡Ø¯Ø© ÙÙŠØ¯ÙŠÙˆ Ø­Ù‚ÙŠÙ‚ÙŠ Ù„Ø´Ø§Ø´Ø© Ø§Ù„Ø²Ø§Ø¦Ø± ÙˆØ­Ø±ÙƒØ§Øª Ø§Ù„Ù…Ø§ÙˆØ³ ÙˆØ§Ù„Ù†Ù‚Ø±Ø§Øª (Heatmaps) Ø¯ÙˆÙ† Ø£ÙŠ Ø±Ø³ÙˆÙ….
+                  أداة رسمية مجانية 100% من ميكروسوفت لمشاهدة فيديو حقيقي لشاشة الزائر وحركات الماوس والنقرات (Heatmaps) دون أي رسوم.
                 </p>
               </div>
             </div>
@@ -666,7 +760,7 @@ export function OpsTraffic() {
               rel="noreferrer"
               className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
             >
-              <span>Ù„ÙˆØ­Ø© ØªØ­ÙƒÙ… ÙƒÙ„Ø§Ø±ÙŠØªÙŠ</span>
+              <span>لوحة تحكم كلاريتي</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -679,13 +773,13 @@ export function OpsTraffic() {
               <div className="space-y-1">
                 <div className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span>ÙƒÙˆØ¯ Ø§Ù„ØªØªØ¨Ø¹ ÙŠØ¹Ù…Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹ Ø¹Ù„Ù‰ ÙƒÙ„ ØµÙØ­Ø§Øª Ù…ÙˆÙ‚Ø¹ AgriPort</span>
+                  <span>كود التتبع يعمل حالياً على كل صفحات موقع AgriPort</span>
                 </div>
                 <div className="text-sm font-mono text-slate-200">
                   Project ID: <span className="bg-indigo-950/80 px-2.5 py-1 rounded-lg border border-indigo-800 font-bold text-indigo-300">{clarityId}</span>
                 </div>
                 <p className="text-[11px] text-slate-400">
-                  ØªØ³ØªØ·ÙŠØ¹ Ø§Ù„Ø¢Ù† ÙØªØ­ Ø­Ø³Ø§Ø¨Ùƒ ÙÙŠ ÙƒÙ„Ø§Ø±ÙŠØªÙŠ Ù„Ù…Ø´Ø§Ù‡Ø¯Ø© ØªØ³Ø¬ÙŠÙ„Ø§Øª ÙƒÙ„ Ø²Ø§Ø¦Ø±ØŒ ÙˆÙ…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ø²ÙˆØ§Ø± Ø¨Ù†ÙØ³ Ø§Ù„Ù€ Visitor ID Ø§Ù„Ù…Ø³Ø¬Ù„ Ù‡Ù†Ø§.
+                  تستطيع الآن فتح حسابك في كلاريتي لمشاهدة تسجيلات كل زائر، ومطابقة الزوار بنفس الـ Visitor ID المسجل هنا.
                 </p>
               </div>
 
@@ -696,7 +790,7 @@ export function OpsTraffic() {
                   className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1.5"
                 >
                   <Pencil className="w-3.5 h-3.5" />
-                  <span>ØªØºÙŠÙŠØ± Ø§Ù„Ù…Ø¹Ø±Ù</span>
+                  <span>تغيير المعرف</span>
                 </button>
               </div>
             </div>
@@ -707,7 +801,7 @@ export function OpsTraffic() {
                   type="text"
                   value={clarityInput}
                   onChange={(e) => setClarityInput(e.target.value)}
-                  placeholder="Ø£Ù„ØµÙ‚ Ù‡Ù†Ø§ Ø§Ù„Ù€ Project ID Ø§Ù„Ø®Ø§Øµ Ø¨Ùƒ (Ù…Ø«Ø§Ù„: k9xyz123abc)"
+                  placeholder="ألصق هنا الـ Project ID الخاص بك (مثال: k9xyz123abc)"
                   className="flex-1 rounded-xl bg-slate-950 border border-indigo-800/60 px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 font-mono"
                   dir="ltr"
                 />
@@ -717,7 +811,7 @@ export function OpsTraffic() {
                     onClick={handleSaveClarity}
                     className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-md flex items-center gap-1.5"
                   >
-                    <span>Ø­ÙØ¸ ÙˆØªÙØ¹ÙŠÙ„ Ø§Ù„ÙƒÙˆØ¯</span>
+                    <span>حفظ وتفعيل الكود</span>
                     <Zap className="w-3.5 h-3.5" />
                   </button>
                   {isEditingClarity && (
@@ -729,7 +823,7 @@ export function OpsTraffic() {
                       }}
                       className="px-3.5 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold"
                     >
-                      Ø¥Ù„ØºØ§Ø¡
+                      إلغاء
                     </button>
                   )}
                 </div>
@@ -738,30 +832,30 @@ export function OpsTraffic() {
               {/* 4 Steps Guide */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-2">
                 <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-start space-y-1">
-                  <span className="text-xs font-extrabold text-indigo-400">1. Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø¬Ø§Ù†ÙŠ</span>
+                  <span className="text-xs font-extrabold text-indigo-400">1. التسجيل المجاني</span>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Ø§ÙØªØ­ <a href="https://clarity.microsoft.com/" target="_blank" rel="noreferrer" className="text-indigo-300 underline">clarity.microsoft.com</a> ÙˆØ³Ø¬Ù„ Ø¨Ø­Ø³Ø§Ø¨Ùƒ (Ù…Ø¬Ø§Ù†Ø§Ù‹ Ø¨Ø¯ÙˆÙ† ÙÙŠØ²Ø§).
+                    افتح <a href="https://clarity.microsoft.com/" target="_blank" rel="noreferrer" className="text-indigo-300 underline">clarity.microsoft.com</a> وسجل بحسابك (مجاناً بدون فيزا).
                   </p>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-start space-y-1">
-                  <span className="text-xs font-extrabold text-indigo-400">2. Ø¥Ø¶Ø§ÙØ© Ù…Ø´Ø±ÙˆØ¹</span>
+                  <span className="text-xs font-extrabold text-indigo-400">2. إضافة مشروع</span>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Ø§Ø¶ØºØ· <strong>New Project</strong> ÙˆØ§ÙƒØªØ¨ Ø§Ø³Ù… "AgriPort" ÙˆØ±Ø§Ø¨Ø· Ù…ÙˆÙ‚Ø¹Ùƒ.
+                    اضغط <strong>New Project</strong> واكتب اسم "AgriPort" ورابط موقعك.
                   </p>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-start space-y-1">
-                  <span className="text-xs font-extrabold text-indigo-400">3. Ù†Ø³Ø® Project ID</span>
+                  <span className="text-xs font-extrabold text-indigo-400">3. نسخ Project ID</span>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Ù…Ù† ØµÙØ­Ø© Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù†Ø³Ø® ÙƒÙˆØ¯ Ø§Ù„Ù€ <strong>Project ID</strong> Ø§Ù„Ù…ÙƒÙˆÙ† Ù…Ù† Ø­Ø±ÙˆÙ ÙˆØ£Ø±Ù‚Ø§Ù….
+                    من صفحة الإعدادات انسخ كود الـ <strong>Project ID</strong> المكون من حروف وأرقام.
                   </p>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-start space-y-1">
-                  <span className="text-xs font-extrabold text-indigo-400">4. Ù„ØµÙ‚ ÙˆØªÙØ¹ÙŠÙ„</span>
+                  <span className="text-xs font-extrabold text-indigo-400">4. لصق وتفعيل</span>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Ø£Ù„ØµÙ‚Ù‡ ÙÙŠ Ø§Ù„Ø­Ù‚Ù„ Ø£Ø¹Ù„Ø§Ù‡ ÙˆØ§Ø¶ØºØ· Ø­ÙØ¸Ø› ÙˆØ³ÙŠØ¨Ø¯Ø£ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø´Ø§Ø´Ø§Øª ÙÙˆØ±Ø§Ù‹!
+                    ألصقه في الحقل أعلاه واضغط حفظ؛ وسيبدأ تسجيل الشاشات فوراً!
                   </p>
                 </div>
               </div>
@@ -772,4 +866,3 @@ export function OpsTraffic() {
     </div>
   );
 }
-

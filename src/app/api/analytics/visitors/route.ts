@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { RECENT_VISITS_CACHE } from "@/lib/traffic-store";
+import { RECENT_VISITS_CACHE, getPersistedVisits } from "@/lib/traffic-store";
 
 function corsHeaders() {
   return {
@@ -65,9 +65,10 @@ export async function GET() {
     } catch {}
   }
 
-  // 2. Merge only REAL visits (in-memory live cache + persistent database)
+  // 2. Merge visits (in-memory live cache + disk persistence + database if available)
+  const persistedVisits = getPersistedVisits();
   const mergedMap = new Map<string, any>();
-  [...RECENT_VISITS_CACHE, ...fetchedVisits].forEach((v) => {
+  [...RECENT_VISITS_CACHE, ...persistedVisits, ...fetchedVisits].forEach((v) => {
     if (v && v.id && !mergedMap.has(v.id)) {
       mergedMap.set(v.id, v);
     }

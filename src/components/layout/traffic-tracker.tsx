@@ -98,18 +98,67 @@ export function TrafficTracker() {
       timestamp: new Date().toISOString(),
     };
 
+    // Store in localStorage for immediate client-side tracking & resilience
     try {
-      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-        navigator.sendBeacon("/api/analytics/track", blob);
-      } else {
-        fetch("/api/analytics/track", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          keepalive: true,
-        }).catch(() => {});
-      }
+      const isMobile =
+        screenWidth < 768 ||
+        (typeof navigator !== "undefined" && /mobile|android|iphone/i.test(navigator.userAgent));
+      const localVisit = {
+        id: "vst_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        created_at: new Date().toISOString(),
+        visitor_id: visitorId,
+        path: pathname,
+        page_title: title || pathname,
+        country: timeZone.includes("Cairo") ? "مصر" : "زائر المنصة",
+        country_code: timeZone.includes("Cairo") ? "EG" : "EG",
+        flag: timeZone.includes("Cairo") ? "🇪🇬" : "🌐",
+        device: isMobile ? "هاتف محمول 📱" : "كمبيوتر 💻",
+        os: typeof navigator !== "undefined" && /iphone|ipad/i.test(navigator.userAgent)
+          ? "iOS"
+          : typeof navigator !== "undefined" && /android/i.test(navigator.userAgent)
+          ? "Android"
+          : "Windows",
+        browser: typeof navigator !== "undefined" && /edg/i.test(navigator.userAgent)
+          ? "Edge"
+          : "Chrome",
+        referrer: referrer || "مباشر (Direct Visit)",
+        referrer_icon: referrer.includes("Google") ? "🔍" : "🌐",
+      };
+      const existingRaw = localStorage.getItem("agriport_live_visits");
+      const existing = existingRaw ? JSON.parse(existingRaw) : [];
+      const updated = [
+        localVisit,
+        ...existing.filter(
+          (v: any) => v.path !== pathname || Date.now() - new Date(v.created_at).getTime() > 30000
+        ),
+      ].slice(0, 100);
+      localStorage.setItem("agriport_live_visits", JSON.stringify(updated));
+      window.dispatchEvent(new Event("agriport_traffic_updated"));
+    } catch {}
+
+    try {
+      fetch("/api/analytics/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.visit) {
+            try {
+              const existingRaw = localStorage.getItem("agriport_live_visits");
+              const existing = existingRaw ? JSON.parse(existingRaw) : [];
+              const updated = [
+                data.visit,
+                ...existing.filter((v: any) => v.id !== data.visit.id),
+              ].slice(0, 100);
+              localStorage.setItem("agriport_live_visits", JSON.stringify(updated));
+              window.dispatchEvent(new Event("agriport_traffic_updated"));
+            } catch {}
+          }
+        })
+        .catch(() => {});
     } catch {
       // Non-blocking tracking
     }

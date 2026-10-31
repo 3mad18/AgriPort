@@ -101,21 +101,104 @@ export function OpsTraffic() {
     }
   };
 
+  const computeStatsFromVisits = (allVisits: SiteVisit[]): TrafficStats => {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const visitsToday = allVisits.filter(
+      (v) => new Date(v.created_at).getTime() >= todayStart.getTime()
+    );
+    const uniqueVisitorsToday = new Set(visitsToday.map((v) => v.visitor_id)).size;
+    const activeNow = allVisits.filter(
+      (v) => Date.now() - new Date(v.created_at).getTime() < 10 * 60 * 1000
+    ).length;
+
+    const countryMap = new Map<string, { name: string; flag: string; count: number }>();
+    allVisits.forEach((v) => {
+      const key = v.country || "غير محدد";
+      const curr = countryMap.get(key) || { name: key, flag: v.flag || "🌐", count: 0 };
+      curr.count += 1;
+      countryMap.set(key, curr);
+    });
+    const topCountries = Array.from(countryMap.values()).sort((a, b) => b.count - a.count);
+
+    const pagesMap = new Map<string, { path: string; title: string; count: number }>();
+    allVisits.forEach((v) => {
+      const key = v.path || "/";
+      const curr = pagesMap.get(key) || { path: key, title: v.page_title || key, count: 0 };
+      curr.count += 1;
+      pagesMap.set(key, curr);
+    });
+    const topPages = Array.from(pagesMap.values()).sort((a, b) => b.count - a.count);
+
+    const mobileCount = allVisits.filter(
+      (v) => v.device?.includes("محمول") || v.device?.includes("Mobile") || v.device?.includes("📱")
+    ).length;
+    const desktopCount = allVisits.length - mobileCount;
+
+    return {
+      totalVisits: allVisits.length,
+      visitsToday: visitsToday.length,
+      uniqueVisitorsToday,
+      activeNow,
+      mobileCount,
+      desktopCount,
+      mobilePercent: allVisits.length ? Math.round((mobileCount / allVisits.length) * 100) : 0,
+      desktopPercent: allVisits.length ? Math.round((desktopCount / allVisits.length) * 100) : 0,
+      topCountries,
+      topPages,
+    };
+  };
+
   const fetchTraffic = useCallback(async (isSilent = false) => {
     if (!isSilent) setIsLoading(true);
+
+    // 1. Read local storage cache first
+    let localVisits: SiteVisit[] = [];
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("agriport_live_visits");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) localVisits = parsed;
+        }
+      } catch {}
+    }
+
     try {
       const res = await fetch("/api/analytics/visitors", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
-          if (data.stats) setStats(data.stats);
-          if (Array.isArray(data.visits)) setVisits(data.visits);
+          const serverVisits = Array.isArray(data.visits) ? data.visits : [];
+          const mergedMap = new Map<string, SiteVisit>();
+          [...serverVisits, ...localVisits].forEach((v) => {
+            if (v && v.id && !mergedMap.has(v.id)) {
+              mergedMap.set(v.id, v);
+            }
+          });
+          const combinedVisits = Array.from(mergedMap.values()).sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+
+          setVisits(combinedVisits);
+          if (combinedVisits.length > 0) {
+            setStats(computeStatsFromVisits(combinedVisits));
+          } else if (data.stats) {
+            setStats(data.stats);
+          }
+          return;
         }
       }
     } catch {
       // offline fallback
     } finally {
       if (!isSilent) setIsLoading(false);
+    }
+
+    if (localVisits.length > 0) {
+      setVisits(localVisits);
+      setStats(computeStatsFromVisits(localVisits));
     }
   }, []);
 
@@ -125,7 +208,18 @@ export function OpsTraffic() {
     const interval = setInterval(() => {
       fetchTraffic(true);
     }, 10000);
-    return () => clearInterval(interval);
+
+    const handleLocalTrafficUpdate = () => {
+      fetchTraffic(true);
+    };
+    window.addEventListener("agriport_traffic_updated", handleLocalTrafficUpdate);
+    window.addEventListener("storage", handleLocalTrafficUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("agriport_traffic_updated", handleLocalTrafficUpdate);
+      window.removeEventListener("storage", handleLocalTrafficUpdate);
+    };
   }, [fetchTraffic]);
 
   // Filtered visits
@@ -357,7 +451,7 @@ export function OpsTraffic() {
           <div className="space-y-3">
             {stats.topCountries.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
-                بانتظار استقبال أول زائر حقيقي للموقع...
+                بانتظار استقبال أول زائر للموقع...
               </div>
             ) : (
               stats.topCountries.slice(0, 5).map((country) => {
@@ -516,7 +610,7 @@ export function OpsTraffic() {
             <p className="font-bold text-slate-700 text-sm">
               {searchQuery || selectedCountryFilter !== "all"
                 ? "لا توجد زيارات مطابقة للبحث حالياً."
-                : "بانتظار حركة وزوار حقيقيين على الموقع"}
+                : "بانتظار حركة وزوار على الموقع"}
             </p>
             <p className="text-[11px] text-slate-400 max-w-md leading-relaxed">
               {searchQuery || selectedCountryFilter !== "all"

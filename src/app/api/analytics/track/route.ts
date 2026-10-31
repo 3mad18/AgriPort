@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { RECENT_VISITS_CACHE } from "@/lib/traffic-store";
+import { RECENT_VISITS_CACHE, savePersistedVisits } from "@/lib/traffic-store";
 
 function corsHeaders() {
   return {
@@ -179,6 +179,7 @@ export async function POST(request: Request) {
     if (RECENT_VISITS_CACHE.length > 200) {
       RECENT_VISITS_CACHE.pop();
     }
+    savePersistedVisits(RECENT_VISITS_CACHE);
 
     // Persist to Supabase table if available
     const { url, key } = getSupabaseConfig();
