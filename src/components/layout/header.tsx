@@ -342,7 +342,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="text-xs font-semibold text-slate-700 hover:text-emerald-700 transition-all flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/80 shadow-2xs"
+                className="text-xs font-bold text-slate-800 hover:text-emerald-700 transition-all flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100/90 hover:bg-emerald-50 border border-slate-300/80 hover:border-emerald-300 shadow-xs"
               >
                 <UserIcon />
                 <span>{loginLabel}</span>
@@ -350,8 +350,27 @@ export function Header() {
             )}
           </div>
 
-          {/* Mobile Right Controls: Language Pill + Menu Toggle */}
-          <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile Right Controls: Sign In + Language Pill + Menu Toggle */}
+          <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+            {/* Direct Mobile Sign In / Account Button */}
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 px-2.5 py-1 text-xs font-bold shadow-xs active:scale-95 transition-all"
+              aria-label={loginLabel}
+              title={loginLabel}
+            >
+              {isAuthenticated && user ? (
+                <div className="h-5 w-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+              ) : (
+                <UserIcon />
+              )}
+              <span className="text-[11px] font-bold">
+                {isAuthenticated && user ? user.name.split(" ")[0] : loginLabel}
+              </span>
+            </Link>
+
             {/* Mobile Language Button & Popover */}
             <div className="relative" ref={mobileLangRef}>
               <button
