@@ -731,6 +731,9 @@
   .h-\[340px\] {
     height: 340px;
   }
+  .h-\[360px\] {
+    height: 360px;
+  }
   .h-full {
     height: 100%;
   }
@@ -1105,6 +1108,9 @@
   :where(.divide-slate-100 > :not(:last-child)) {
     border-color: var(--color-slate-100);
   }
+  .self-start {
+    align-self: flex-start;
+  }
   .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1155,6 +1161,10 @@
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
+  }
+  .border-0 {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
   }
   .border-2 {
     border-style: var(--tw-border-style);
@@ -3598,6 +3608,9 @@
     .sm\:block {
       display: block;
     }
+    .sm\:flex {
+      display: flex;
+    }
     .sm\:inline {
       display: inline;
     }
@@ -3688,6 +3701,9 @@
     .sm\:items-center {
       align-items: center;
     }
+    .sm\:items-end {
+      align-items: flex-end;
+    }
     .sm\:gap-1\.5 {
       gap: calc(var(--spacing) * 1.5);
     }
@@ -3727,6 +3743,9 @@
       --tw-space-y-reverse: 0;
       margin-block-start: calc(calc(var(--spacing) * 16) * var(--tw-space-y-reverse));
       margin-block-end: calc(calc(var(--spacing) * 16) * calc(1 - var(--tw-space-y-reverse)));
+    }
+    .sm\:self-auto {
+      align-self: auto;
     }
     .sm\:rounded-3xl {
       border-radius: var(--radius-3xl);
