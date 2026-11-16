@@ -115,8 +115,8 @@ function ContactFormInner() {
     if (!isCleared && (resolvedProductName || emailParam)) {
       setFormData((prev) => ({
         ...prev,
-        product: prev.product ? prev.product : resolvedProductName,
-        email: prev.email ? prev.email : emailParam,
+        product: resolvedProductName || prev.product,
+        email: emailParam || prev.email,
       }));
     }
   }, [isCleared, resolvedProductName, emailParam]);

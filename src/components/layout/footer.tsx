@@ -17,10 +17,15 @@ export function Footer() {
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      router.push(`/contact?email=${encodeURIComponent(email)}`);
+    const cleanEmail = email.trim();
+    const targetUrl = cleanEmail
+      ? `/contact?email=${encodeURIComponent(cleanEmail)}`
+      : `/contact`;
+
+    if (typeof window !== "undefined") {
+      window.location.href = targetUrl;
     } else {
-      router.push("/contact");
+      router.push(targetUrl);
     }
   };
 
