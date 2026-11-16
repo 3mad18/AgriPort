@@ -12,7 +12,6 @@ import {
   BadgeCheck,
   Copy,
   Check,
-  ArrowUpRight,
   MapPin,
   Sparkles,
 } from "lucide-react";
@@ -277,57 +276,7 @@ export default function AboutPage() {
           <div className="absolute bottom-0 start-0 h-64 w-64 rounded-full bg-emerald-600/10 blur-2xl pointer-events-none" />
         </div>
 
-        {/* 4. The 8 Specialized Export Crops Basket */}
-        {about.crops && (
-          <div className="space-y-6 text-start">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3.5 py-1 text-xs font-bold text-slate-700 mb-2">
-                <span>🌱</span>
-                <span>{about.cropsBadge || "Export Portfolio"}</span>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-                {about.cropsTitle}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                {about.cropsSubtitle}
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              {about.crops.map((crop, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl sm:rounded-3xl border border-slate-100 bg-white p-5 shadow-xs hover:border-slate-200 hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5">
-                        {crop.tag}
-                      </span>
-                    </div>
-                    <h4 className="text-base font-bold text-slate-900 leading-tight">
-                      {crop.name}
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed">
-                      {crop.desc}
-                    </p>
-                  </div>
-                  <div className="pt-4 mt-3 border-t border-slate-100">
-                    <Link
-                      href="/products"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700"
-                    >
-                      <span>{language === "ar" ? "تفاصيل المحصول ومواصفاته" : "View Crop Specifications"}</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 5. Core Export Pillars */}
+        {/* 4. Core Export Pillars */}
         {about.pillars && (
           <div className="space-y-6 text-start">
             <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
