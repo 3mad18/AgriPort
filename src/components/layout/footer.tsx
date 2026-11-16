@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/language-context";
 import { useSiteSettings } from "@/lib/use-site-settings";
 import { MapPin, Mail, Phone, User, ShieldCheck } from "lucide-react";
@@ -12,7 +12,6 @@ const CURRENT_YEAR = 2026;
 export function Footer() {
   const { t, language } = useLanguage();
   const { settings: siteSettings } = useSiteSettings();
-  const pathname = usePathname();
   const router = useRouter();
   const [email, setEmail] = useState("");
 
@@ -142,16 +141,28 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-slate-800 text-sm text-slate-500 font-medium">
-          <div className="flex items-center gap-2.5">
-            <img
-              src="/brand/agri-flow-symbol-dark.png"
-              alt="AgriPort"
-              className="h-6 w-auto object-contain"
-            />
-            <span className="flex items-center text-base tracking-tight" dir="ltr">
-              <span className="font-medium text-emerald-400">Agri</span>
-              <span className="font-bold text-white">Port</span>
-            </span>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/brand/agri-flow-symbol-dark.png"
+                alt="AgriPort"
+                className="h-6 w-auto object-contain"
+              />
+              <span className="flex items-center text-base tracking-tight" dir="ltr">
+                <span className="font-medium text-emerald-400">Agri</span>
+                <span className="font-bold text-white">Port</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+              <span className="inline-flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60" title="Commercial Registration / السجل التجاري">
+                <span className="text-slate-500 font-sans">{language === "ar" ? "س.ت:" : "CR:"}</span>
+                <span className="text-emerald-400 font-bold">{siteSettings.commercialRegister || "108420"}</span>
+              </span>
+              <span className="inline-flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60" title="Tax ID / البطاقة الضريبية">
+                <span className="text-slate-500 font-sans">{language === "ar" ? "ب.ض:" : "Tax:"}</span>
+                <span className="text-emerald-400 font-bold">{siteSettings.taxCard || "629-418-735"}</span>
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm">

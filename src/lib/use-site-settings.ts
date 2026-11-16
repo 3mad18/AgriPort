@@ -18,16 +18,22 @@ export type PublicSiteSettings = {
   location: string;
   exportBannerText: string;
   showExportBanner: boolean;
+  commercialRegister?: string;
+  taxCard?: string;
+  exporterRegNumber?: string;
 };
 
 const DEFAULT_SETTINGS: PublicSiteSettings = {
   companyName: "AgriPort",
-  tagline: "تصدير الحاصلات الزراعية والخضروات والفواكه المصرية الفاخرة",
+  tagline: "تصدير الخضروات والحاصلات الزراعية المصرية الفاخرة",
   email: "agriporteg@gmail.com",
   phone: "+20 100 720 2636",
   location: "جمهورية مصر العربية — محافظة البحيرة / كفر الدوار",
+  commercialRegister: "108420",
+  taxCard: "629-418-735",
+  exporterRegNumber: "28410",
   exportBannerText:
-    "موسم تصدير البرتقال والبصل مفتوح حالياً للشحن الفوري إلى أوروبا ودول الخليج!",
+    "موسم تصدير الخرشوف والفاصولياء الخضراء والبروكلي والقرنبيط مفتوح حالياً للشحن الفوري لأوروبا والموانئ العالمية!",
   showExportBanner: true,
 };
 
@@ -65,6 +71,11 @@ function parseSettings(raw: string | null): PublicSiteSettings | null {
           parsed.showExportBanner !== undefined && parsed.showExportBanner !== null
             ? Boolean(parsed.showExportBanner)
             : DEFAULT_SETTINGS.showExportBanner,
+        commercialRegister:
+          parsed.commercialRegister || DEFAULT_SETTINGS.commercialRegister,
+        taxCard: parsed.taxCard || DEFAULT_SETTINGS.taxCard,
+        exporterRegNumber:
+          parsed.exporterRegNumber || DEFAULT_SETTINGS.exporterRegNumber,
       };
     }
   } catch {}

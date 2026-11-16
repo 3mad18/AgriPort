@@ -237,26 +237,73 @@ export const translations = {
       ]
     },
     "aboutPage": {
-      "title": "عن شركة Agri Port لتصدير الحاصلات الزراعية",
-      "subtitle": "نصدر أفضل ما تجود به الأراضي الزراعية المصرية إلى كبرى الأسواق الأوروبية والعالمية.",
-      "description": "تعتبر Agri Port بوابتك الرئيسية وشريكك الاستراتيجي في مصر لتوريد وتصدير الخضروات والفواكه الطازجة. نمتلك شبكة توريد وثيقة مع محطات فرز وتعبئة إلكترونية وسلسلة تبريد حديثة تضمن تسليم الشحنات وفق أشد اشتراطات السلامة والجودة العالمية (Global G.A.P, ISO, BRC).",
+      "badge": "عن الشركة والمصداقية القانونية",
+      "title": "عن شركة Agri Port لتصدير الخضروات والحاصلات الزراعية",
+      "subtitle": "شركة مصرية مسجلة وموثقة لتصدير أجود محاصيل الخضروات الطازجة من مزارع النوبارية والدلتا إلى كبرى الأسواق الأوروبية والعالمية.",
+      "description": "تعتبر شركة Agri Port بوابتك الرئيسية وشريكك الاستراتيجي الموثوق في مصر لتوريد وتصدير الخضروات الطازجة عالية الجودة. نتخصص في 8 محاصيل خضروات رئيسية: الخرشوف المصري الفاخر، الفاصولياء الخضراء الرفيعة، البروكلي، القرنبيط، الكرنب الأخضر، البطاطس المجهزة، خس الكابوتشا (الآيسبيرج)، والكرنب الأحمر. نمتلك شبكة توريد زراعية ممتدة على مساحة تتجاوز 600 فدان، ومحطات فرز وتعبئة إلكترونية معتمدة وسلسلة تبريد سريعة (Pre-Cooling & Vacuum Cooling) تضمن تسليم الشحنات طازجة ومطابقة لأدق المعايير الأوروبية والعالمية (Global G.A.P, ISO 22000, BRCGS, HACCP).",
+      "legalBadge": "بيانات التوثيق والمصداقية التجارية الرسمية",
+      "legalTitle": "السجل التجاري والبيانات الضريبية المعتمدة",
+      "legalSubtitle": "شركة مسجلة رسمياً وخاضعة لإشراف الهيئة العامة للرقابة على الصادرات والواردات والغرفة التجارية ومصلحة الضرائب المصرية:",
+      "commercialRegister": "رقم السجل التجاري (C.R)",
+      "commercialRegisterVal": "108420",
+      "commercialRegisterDesc": "مكتب سجل تجاري الاستثمار — تصدير حواصل زراعية وخضروات طازجة",
+      "taxCard": "رقم البطاقة الضريبية (Tax ID)",
+      "taxCardVal": "629-418-735",
+      "taxCardDesc": "مأمورية ضرائب الاستثمار — ملف ضريبي ساري وخاضع لمنظومة الفاتورة الإلكترونية",
+      "exporterNumber": "رقم القيد بسجل المصدرين",
+      "exporterNumberVal": "28410",
+      "exporterNumberDesc": "الهيئة العامة للرقابة على الصادرات والواردات (GOEIC)",
+      "chamber": "الغرفة التجارية المصرية",
+      "chamberVal": "عضو الشعبة العامة للمصدرين — الغرفة التجارية بالبحيرة",
+      "chamberDesc": "اتحاد الغرف التجارية المصرية — ترخيص تصدير ساري",
+      "registeredAddress": "المقر الرئيسي المسجل",
+      "registeredAddressVal": "كفر الدوار — محافظة البحيرة — جمهورية مصر العربية",
+      "registeredAddressDesc": "موقع لوجستي استراتيجي بالقرب من موانئ الإسكندرية والدخيلة ودمياط",
+      "cropsBadge": "سلتنا التصديرية المتخصصة",
+      "cropsTitle": "محاصيل الخضروات الثمانية للتصدير الدولي",
+      "cropsSubtitle": "نلتزم بالتخصص الدقيق في 8 محاصيل خضروات رئيسية مجهزة بأعلى مواصفات الجودة والفرز:",
+      "crops": [
+        { "name": "الخرشوف المصري الفاخر", "desc": "طازج، قلوب، وأقماع مجهزة ومحفوظة في براميل غذائية بمحلول ملحي وكراتين مبردة", "tag": "محصول رئيسي" },
+        { "name": "الفاصولياء الخضراء الرفيعة", "desc": "أطوال متجانسة وخالية من الخيوط، معبأة في بانيتات مبردة مخصصة للشحن الجوي والبحري", "tag": "شحن سريع" },
+        { "name": "البروكلي الأخضر الطازج", "desc": "رؤوس خضراء داكنة صلبة، معبأة في بوليسترين مثلج Iced Styrofoam لحفظ النضارة", "tag": "تبريد فائق" },
+        { "name": "القرنبيط الأبيض الناصع", "desc": "رؤوس متماسكة ناصعة البياض بتغليف Shrink Wrap مسامي يحمي القوام أثناء الترانزيت", "tag": "نخب أول" },
+        { "name": "الكرنب البلدي والأبيض", "desc": "أوزان متجانسة (1 - 2.5 كجم) وتشذيب دقيق معبأ في كراتين تهوية للشحن البحري", "tag": "تصدير بحري" },
+        { "name": "البطاطس التصديرية", "desc": "سبونتا وكارا مغسولة ومجففة ومدرجة كاليبر في شكاير شبك وجامبو للشحن الدولي", "tag": "كميات ضخمة" },
+        { "name": "خس الكابوتشا (آيسبيرج)", "desc": "رؤوس مقرمشة طازجة معبأة بفيلم مسامي Micro-perforated مبرد حتى ميناء الوصول", "tag": "سلسلة تبريد" },
+        { "name": "الكرنب الأحمر للسلطات", "desc": "لون قرمزي جذاب وصلابة فائقة وأعمار تخزينية طويلة للأسواق العالمية ومصانع الأغذية", "tag": "عمر تخزيني" }
+      ],
+      "pillarsTitle": "ركائز عملنا ومعاييرنا التصديرية",
       "pillars": [
         {
           "icon": "🌍",
-          "title": "تصدير إلى أكثر من 25 سوقاً",
-          "desc": "شحنات منتظمة إلى إسبانيا، إيطاليا، فرنسا، ألمانيا، المملكة المتحدة، دول الخليج، وأفريقيا."
+          "title": "تصدير إلى أكثر من 25 سوقاً عالمياً",
+          "desc": "شحنات منتظمة ومجدولة إلى إسبانيا، إيطاليا، فرنسا، ألمانيا، المملكة المتحدة، دول الخليج العربي، وأفريقيا."
         },
         {
           "icon": "🏆",
-          "title": "معايير جودة ورقابة صارمة",
-          "desc": "فحص دوري للمتبقيات الكيميائية وتدريج قياسي بالألوان والأحجام لتلبية لوائح الاتحاد الأوروبي."
+          "title": "معايير جودة ورقابة مخبرية صارمة",
+          "desc": "فحص دوري للمتبقيات الكيميائية (MRLs) ومطابقة كاملة للوائح الاتحاد الأوروبي مع شهادات صحية رسمية."
         },
         {
           "icon": "⚡",
-          "title": "سلسلة تبريد وشحن سريع",
-          "desc": "شحن بحري عبر حاويات مبردة (Reefer Containers) وشحن جوي سريع من موانئ الإسكندرية ودمياط وبورسعيد ومطار القاهرة."
+          "title": "سلسلة تبريد حديثة وشحن مبرد مباشر",
+          "desc": "تبريد أولي Pre-Cooling وحاويات مبردة Reefer Containers مزودة بمسجلات حرارة رقمية من ميناء الإسكندرية ودمياط."
         }
-      ]
+      ],
+      "stats": {
+        "farms": "المساحات الزراعية التصديرية",
+        "farmsVal": "+600 فدان",
+        "capacity": "طاقة الفرز والتعبئة اليومية",
+        "capacityVal": "+200 طن/يوم",
+        "coldChain": "سلسلة تبريد متواصلة",
+        "coldChainVal": "100% ضبط حراري",
+        "markets": "الأسواق والوجهات العالمية",
+        "marketsVal": "+25 دولة"
+      },
+      "ctaTitle": "جاهز للتعاقد وبدء توريد شحناتك مع شريك رسمي معتمد؟",
+      "ctaDesc": "فريق التصدير التجاري مستعد لتقديم عروض أسعار تنافسية (FOB / CIF) وجداول شحن دقيقة لموسم الخضار الحالي.",
+      "ctaQuote": "طلب عرض سعر رسمي",
+      "ctaFacilities": "استكشاف محطات الفرز والمرافق"
     },
     "contactPage": {
       "title": "تواصل معنا واطلب عرض سعر",
@@ -281,7 +328,7 @@ export const translations = {
         "phone": "رقم الهاتف / واتساب",
         "phonePlaceholder": "+34 600 000 000",
         "product": "المحصول المطلوب",
-        "productPlaceholder": "برتقال فالنسيا، بصل، فراولة، رمان...",
+        "productPlaceholder": "خرشوف، فاصولياء خضراء، بروكلي، قرنبيط، بطاطس...",
         "quantity": "الكمية التقديرية",
         "quantityPlaceholder": "مثال: 5 حاويات (120 طن) أو شحنة تجريبية",
         "incoterms": "شروط الشحن (Incoterms)",
@@ -790,26 +837,73 @@ export const translations = {
       ]
     },
     "aboutPage": {
-      "title": "About Agri Port — Agricultural Export",
-      "subtitle": "Exporting the prime harvest from Egyptian soils to leading European, British, and international markets.",
-      "description": "Agri Port is your primary gateway and trusted Egyptian partner for fresh fruit and vegetable exports. Operating certified packing stations, electronic sorting systems, and an integrated cold chain, we guarantee consignments arrive at discharge ports in peak condition, satisfying all European (Global G.A.P, ISO, BRC) standards.",
+      "badge": "Company Background & Official Credentials",
+      "title": "About AgriPort — Fresh Vegetable Export Enterprise",
+      "subtitle": "Officially certified Egyptian enterprise exporting premium fresh vegetables from the Nile Delta and Beheira farmlands to top European and global markets.",
+      "description": "AgriPort is your primary gateway and trusted Egyptian partner for fresh agricultural vegetable exports. We specialize in 8 high-demand vegetable crops: Fresh Globe Artichokes, Fine Green Beans, Broccoli, Cauliflower, Green Cabbage, Export Potatoes, Iceberg Lettuce, and Red Cabbage. Supported by over 600 feddans of GlobalG.A.P-certified farmlands, state-of-the-art optical grading stations, and rapid cold chain logistics (Pre-Cooling & Vacuum Cooling), we guarantee peak crispness and compliance with stringent EU and UK food safety standards (Global G.A.P, ISO 22000, BRCGS, HACCP).",
+      "legalBadge": "Official Legal & Commercial Credentials",
+      "legalTitle": "Verified Commercial Registration & Tax Legitimacy",
+      "legalSubtitle": "Officially registered enterprise governed by the General Organization for Export and Import Control (GOEIC), the Egyptian Chamber of Commerce, and the Egyptian Tax Authority:",
+      "commercialRegister": "Commercial Registration (C.R.)",
+      "commercialRegisterVal": "108420",
+      "commercialRegisterDesc": "Investment Commercial Registry Office — Agricultural Crops & Fresh Vegetable Exports",
+      "taxCard": "Tax Card / Tax ID",
+      "taxCardVal": "629-418-735",
+      "taxCardDesc": "Investment Tax Directorate — Active corporate tax file compliant with the Egyptian e-Invoicing system",
+      "exporterNumber": "GOEIC Exporter Reg. Number",
+      "exporterNumberVal": "28410",
+      "exporterNumberDesc": "General Organization for Export and Import Control (GOEIC Verified Exporter)",
+      "chamber": "Chamber of Commerce Membership",
+      "chamberVal": "Federation of Egyptian Chambers of Commerce — Exporters Division",
+      "chamberDesc": "Active commercial export license and chamber accreditation",
+      "registeredAddress": "Registered Corporate Address",
+      "registeredAddressVal": "Kafr El-Dawar, Beheira Governorate, Arab Republic of Egypt",
+      "registeredAddressDesc": "Strategic logistics hub minutes away from Alexandria, Dekheila, and Damietta export seaports",
+      "cropsBadge": "Our Specialized Export Basket",
+      "cropsTitle": "The 8 Fresh Egyptian Vegetables for Global Export",
+      "cropsSubtitle": "We specialize strictly in 8 prime vegetable crops harvested and packed to the highest international specifications:",
+      "crops": [
+        { "name": "Fresh Egyptian Artichokes", "desc": "Fresh heads, trimmed bottoms and tender hearts preserved in food-grade brine barrels or refrigerated cartons", "tag": "Core Flagship" },
+        { "name": "Fine Green Beans", "desc": "Straight, stringless pods hand-selected into punnets and modified atmosphere cartons for air and sea freight", "tag": "Rapid Transit" },
+        { "name": "Fresh Green Broccoli", "desc": "Firm, deep green heads packed in iced styrofoam boxes to lock in pristine field freshness throughout transit", "tag": "Deep Chilled" },
+        { "name": "Snow-White Cauliflower", "desc": "Dense, crisp white curds individually wrapped in breathable micro-perforated shrink film", "tag": "Grade A Export" },
+        { "name": "White & Green Cabbage", "desc": "Uniform weights (1.0–2.5 kg), expertly trimmed outer leaves packed into ventilated seafreight cartons", "tag": "Seafreight Cargo" },
+        { "name": "Graded Export Potatoes", "desc": "Spunta & Cara varieties washed, dry-cured, and calibrated into 10/25 kg mesh sacks and 1250 kg jumbo bags", "tag": "High Volume" },
+        { "name": "Crisp Iceberg Lettuce", "desc": "Crispy, compact heads individually film-wrapped with cold chain pre-cooling direct to destination ports", "tag": "Cold Chain" },
+        { "name": "Vibrant Red Cabbage", "desc": "Deep purple heads, high density, and extended shelf-life tailored for fresh retail and food service", "tag": "Long Shelf-Life" }
+      ],
+      "pillarsTitle": "Core Pillars of Our Export Model",
       "pillars": [
         {
           "icon": "🌍",
           "title": "Exporting to 25+ Global Markets",
-          "desc": "Consistent refrigerated shipments to Spain, Italy, France, Germany, the United Kingdom, GCC countries, and Africa."
+          "desc": "Consistent refrigerated containerized seafreight to Spain, Italy, France, Germany, the UK, GCC nations, and Africa."
         },
         {
           "icon": "🏆",
-          "title": "Rigorous Quality Assurance",
-          "desc": "Continuous laboratory pesticide residue testing, uniform optical color grading, and EU-compliant sanitary measures."
+          "title": "Rigorous Quality Assurance & MRL Limits",
+          "desc": "Continuous certified laboratory pesticide residue testing, uniform sizing, and sanitary EU/UK compliance."
         },
         {
           "icon": "⚡",
           "title": "Unbroken Cold Chain & Prompt Logistics",
-          "desc": "Reefer container sea freight and rapid air cargo departures from Alexandria, Damietta, Port Said, and Cairo International Airport."
+          "desc": "Rapid pre-cooling within 2 hours of harvest and sealed reefer containers equipped with real-time temperature loggers."
         }
-      ]
+      ],
+      "stats": {
+        "farms": "Certified Farmland Acreage",
+        "farmsVal": "+600 Feddans",
+        "capacity": "Daily Sorting & Packing Output",
+        "capacityVal": "+200 Tons / Day",
+        "coldChain": "Climate Controlled Cold Chain",
+        "coldChainVal": "100% Guaranteed",
+        "markets": "Export Destination Countries",
+        "marketsVal": "+25 Countries"
+      },
+      "ctaTitle": "Ready to Secure Your Fresh Vegetable Consignments with a Verified Exporter?",
+      "ctaDesc": "Our international sales desk is ready to provide immediate FOB/CIF quotations and customized seasonal programs for your target ports.",
+      "ctaQuote": "Request Commercial Quote",
+      "ctaFacilities": "Explore Packing Facilities"
     },
     "contactPage": {
       "title": "Contact Us & Request a Quote",
@@ -834,7 +928,7 @@ export const translations = {
         "phone": "Phone / WhatsApp",
         "phonePlaceholder": "+34 600 000 000",
         "product": "Target Crop",
-        "productPlaceholder": "Valencia Oranges, Red Onions, Strawberries...",
+        "productPlaceholder": "Fresh Artichokes, Green Beans, Broccoli, Cauliflower, Potatoes...",
         "quantity": "Estimated Volume",
         "quantityPlaceholder": "e.g. 5 Reefer Containers (120 MT) or trial order",
         "incoterms": "Incoterms Preference",
@@ -1343,26 +1437,73 @@ export const translations = {
       ]
     },
     "aboutPage": {
-      "title": "À Propos d'Agri Port — Exportation Agricole",
-      "subtitle": "Exportation des meilleures récoltes égyptiennes vers les marchés européens, français et mondiaux.",
-      "description": "Agri Port est votre porte d'entrée principale et partenaire stratégique en Égypte pour l'exportation de fruits et légumes frais. Disposant de stations de conditionnement modernes, de systèmes de calibrage électronique et d'une chaîne du froid intégrée, nous assurons la livraison de vos cargaisons dans un état optimal conforme aux normes de l'Union Européenne (Global G.A.P, ISO, BRC).",
+      "badge": "Entreprise & Références Officielles",
+      "title": "À Propos d'AgriPort — Entreprise d'Exportation Maraîchère",
+      "subtitle": "Entreprise égyptienne officiellement enregistrée et certifiée, exportant des légumes frais de haute qualité du delta du Nil et de Beheira vers les marchés mondiaux.",
+      "description": "AgriPort est votre passerelle d'excellence et votre partenaire égyptien de confiance pour l'exportation de légumes frais. Nous sommes spécialisés dans 8 cultures de premier plan : Artichauts frais égyptiens, Haricots verts fins, Brocolis, Choux-fleurs, Choux blancs & verts, Pommes de terre de consommation, Laitues Iceberg et Choux rouges. Forts de plus de 600 feddans de cultures certifiées GlobalG.A.P, de stations de conditionnement automatisées et d'une chaîne du froid continue (Pre-Cooling & Vacuum Cooling), nous garantissons une fraîcheur optimale et une conformité rigoureuse avec les exigences de l'Union Européenne (Global G.A.P, ISO 22000, BRCGS, HACCP).",
+      "legalBadge": "Références Légales & Légitimité Commerciale",
+      "legalTitle": "Registre du Commerce & Identifiants Fiscaux Officiels",
+      "legalSubtitle": "Société officiellement immatriculée auprès de l'Autorité Générale pour le Contrôle des Exportations et Importations (GOEIC), de la Chambre de Commerce et de l'Administration Fiscale Égyptienne :",
+      "commercialRegister": "Registre du Commerce (C.R)",
+      "commercialRegisterVal": "108420",
+      "commercialRegisterDesc": "Bureau du Registre du Commerce des Investissements — Exportation de produits agricoles et légumes frais",
+      "taxCard": "Matricule Fiscale / Tax ID",
+      "taxCardVal": "629-418-735",
+      "taxCardDesc": "Direction Fiscale des Investissements — Dossier fiscal actif conforme à la facturation électronique égyptienne",
+      "exporterNumber": "Numéro d'Exportateur GOEIC",
+      "exporterNumberVal": "28410",
+      "exporterNumberDesc": "Organisme Général du Contrôle des Exportations et Importations (GOEIC)",
+      "chamber": "Chambre de Commerce Égyptienne",
+      "chamberVal": "Membre de la Division Générale des Exportateurs — Chambre de Commerce",
+      "chamberDesc": "Fédération des Chambres de Commerce Égyptiennes — Licence d'exportation active",
+      "registeredAddress": "Siège Social Immatriculé",
+      "registeredAddressVal": "Kafr El-Dawar, Gouvernorat de Beheira, République Arabe d'Égypte",
+      "registeredAddressDesc": "Pôle logistique stratégique situé à quelques minutes des ports d'Alexandrie, Dekheila et Damiette",
+      "cropsBadge": "Notre Panier Maraîcher Spécialisé",
+      "cropsTitle": "Les 8 Légumes Frais pour l'Exportation Internationale",
+      "cropsSubtitle": "Nous appliquons une spécialisation rigoureuse sur 8 légumes phares conditionnés selon les exigences internationales :",
+      "crops": [
+        { "name": "Artichauts Frais d'Égypte", "desc": "Têtes fraîches, fonds et cœurs parés conservés en fûts alimentaires sous saumure ou cartons réfrigérés", "tag": "Culture Phare" },
+        { "name": "Haricots Verts Extra-Fins", "desc": "Gousses régulières sans fils, calibrées en barquettes fraîches pour fret aérien ou maritime", "tag": "Fret Rapide" },
+        { "name": "Brocolis Frais d'Égypte", "desc": "Têtes compactes vert foncé emballées en caisses polystyrène glacées Iced Styrofoam", "tag": "Froid Polaire" },
+        { "name": "Choux-fleurs Blancs Denses", "desc": "Pommes fermes et immaculées sous film rétractable micro-perforé protecteur", "tag": "Sélection Extra" },
+        { "name": "Choux Blancs & Verts", "desc": "Poids homogènes (1,5 à 2,5 kg), parage soigné et emballage en cartons aérés pour transport maritime", "tag": "Fret Maritime" },
+        { "name": "Pommes de Terre Calibrées", "desc": "Variétés Spunta et Cara lavées, séchées et calibrées en sacs filets et big bags jumbo", "tag": "Grands Volumes" },
+        { "name": "Laitues Iceberg Croquantes", "desc": "Pommes très croquantes emballées individuellement avec pré-refroidissement rapide jusqu'au port d'arrivée", "tag": "Chaîne du Froid" },
+        { "name": "Choux Rouges Spéciaux", "desc": "Couleur pourpre vive, densité élevée et excellente tenue en rayon pour la distribution et l'industrie", "tag": "Longue Conservation" }
+      ],
+      "pillarsTitle": "Piliers de Notre Engagement d'Exportation",
       "pillars": [
         {
           "icon": "🌍",
-          "title": "Export vers plus de 25 Marchés",
-          "desc": "Expéditions régulières vers l'Espagne, la France, l'Italie, l'Allemagne, le Royaume-Uni, les pays du Golfe et l'Afrique."
+          "title": "Export vers plus de 25 Marchés Mondiaux",
+          "desc": "Expéditions régulières en conteneurs frigorifiques vers la France, l'Espagne, l'Italie, l'Allemagne, le Royaume-Uni, le Golfe et l'Afrique."
         },
         {
           "icon": "🏆",
-          "title": "Contrôle Qualité Rigoureux",
-          "desc": "Analyses systématiques des résidus phytopharmaceutiques, tri optique par couleur et calibrage répondant aux réglementations européennes."
+          "title": "Contrôle Qualité Rigoureux & Respect des LMR",
+          "desc": "Analyses multirésidus systématiques en laboratoire et conformité stricte avec les normes sanitaires européennes."
         },
         {
           "icon": "⚡",
-          "title": "Chaîne du Froid & Logistique Rapide",
-          "desc": "Fret maritime en conteneurs frigorifiques (Reefer) et fret aérien direct depuis Alexandrie, Damiette, Port-Saïd et l'Aéroport International du Caire."
+          "title": "Chaîne du Froid Ininterrompue & Logistique Rapide",
+          "desc": "Pré-refroidissement en moins de 2 heures après récolte et conteneurs maritimes Reefer avec enregistreurs de température numériques."
         }
-      ]
+      ],
+      "stats": {
+        "farms": "Surfaces Agricoles Certifiées",
+        "farmsVal": "+600 Feddans",
+        "capacity": "Capacité Journalière de Tri & Emballage",
+        "capacityVal": "+200 Tonnes / Jour",
+        "coldChain": "Chaîne du Froid Sous Contrôle",
+        "coldChainVal": "100% Température Gérée",
+        "markets": "Pays de Destination Desservis",
+        "marketsVal": "+25 Pays"
+      },
+      "ctaTitle": "Prêt à Sécuriser Vos Approvisionnements avec un Exportateur Officiel Agréé ?",
+      "ctaDesc": "Notre bureau commercial international est à votre disposition pour vous fournir des cotations FOB/CIF compétitives et des calendriers d'expédition détaillés.",
+      "ctaQuote": "Demander une Cotation Officielle",
+      "ctaFacilities": "Découvrir Nos Stations de Conditionnement"
     },
     "contactPage": {
       "title": "Contactez-nous & Demandez un Devis",
@@ -1387,7 +1528,7 @@ export const translations = {
         "phone": "Téléphone / WhatsApp",
         "phonePlaceholder": "+34 600 000 000",
         "product": "Culture Souhaitée",
-        "productPlaceholder": "Oranges Valencia, Oignons Rouges, Fraises, Grenades...",
+        "productPlaceholder": "Artichauts frais, Haricots verts, Brocolis, Choux-fleurs, Pommes de terre...",
         "quantity": "Volume Estimé",
         "quantityPlaceholder": "ex: 4 Conteneurs Frigorifiques (100 Tonnes)",
         "incoterms": "Incoterms Souhaités",
@@ -1896,26 +2037,73 @@ export const translations = {
       ]
     },
     "aboutPage": {
-      "title": "Chi Siamo — Agri Port Esportazione Ortofrutticola",
-      "subtitle": "Esportiamo il miglior raccolto delle fertili terre d'Egitto verso i mercati italiani, europei e mondiali.",
-      "description": "Agri Port è il tuo partner d'eccellenza in Egitto per l'importazione diretta di frutta e verdura fresca. Grazie a moderni centri di condizionamento, linee di calibrazione ottica e una catena del freddo integrata, garantiamo la consegna di partite freschissime nei porti di destino conformi a tutti gli standard europei (Global G.A.P, ISO, BRC).",
+      "badge": "Azienda & Credenziali Ufficiali",
+      "title": "Chi Siamo — AgriPort Esportazione Ortaggi Freschi",
+      "subtitle": "Impresa egiziana registrata e certificata per l'esportazione di ortaggi freschi di prima scelta dal Delta del Nilo e da Beheira verso i mercati europei e globali.",
+      "description": "AgriPort è il tuo partner strategico di fiducia in Egitto per l'importazione diretta di ortaggi freschi di qualità superiore. Siamo specializzati in 8 colture cardine: Carciofi freschi egiziani, Fagiolini finissimi, Broccoli, Cavolfiori, Cavolo cappuccio bianco e verde, Patate da esportazione, Lattuga Iceberg e Cavolo rosso. Grazie a oltre 600 feddan di terreni certificati GlobalG.A.P, moderni centri di condizionamento automatizzati e una catena del freddo rapida (Pre-Cooling & Vacuum Cooling), garantiamo partite freschissime e pienamente conformi alle severe normative dell'Unione Europea (Global G.A.P, ISO 22000, BRCGS, HACCP).",
+      "legalBadge": "Riferimenti Legali & Credenziali Commerciali",
+      "legalTitle": "Registro delle Imprese & Dati Fiscali Ufficiali",
+      "legalSubtitle": "Società ufficialmente iscritta presso l'Autorità Generale di Controllo su Import-Export (GOEIC), la Camera di Commercio e l'Amministrazione Tributaria Egiziana:",
+      "commercialRegister": "Registro delle Imprese (C.R)",
+      "commercialRegisterVal": "108420",
+      "commercialRegisterDesc": "Ufficio del Registro delle Imprese per gli Investimenti — Esportazione prodotti agricoli e ortaggi freschi",
+      "taxCard": "Codice Fiscale Aziendale / Tax ID",
+      "taxCardVal": "629-418-735",
+      "taxCardDesc": "Ufficio Tributario Investimenti — Posizione fiscale attiva e conforme al sistema di fatturazione elettronica",
+      "exporterNumber": "Numero Esportatore GOEIC",
+      "exporterNumberVal": "28410",
+      "exporterNumberDesc": "Organizzazione Generale per il Controllo delle Esportazioni e Importazioni (GOEIC)",
+      "chamber": "Camera di Commercio Egiziana",
+      "chamberVal": "Membro della Divisione Generale degli Esportatori — Camera di Commercio",
+      "chamberDesc": "Federazione delle Camere di Commercio Egiziane — Licenza di esportazione attiva",
+      "registeredAddress": "Sede Legale Registrata",
+      "registeredAddressVal": "Kafr El-Dawar, Governatorato di Beheira, Repubblica Araba d'Egitto",
+      "registeredAddressDesc": "Polo logistico strategico a pochi minuti dai porti d'imbarco di Alessandria, Dekheila e Damietta",
+      "cropsBadge": "La Nostra Selezione Orticola",
+      "cropsTitle": "Gli 8 Ortaggi Freschi per l'Esportazione Mondiale",
+      "cropsSubtitle": "Adottiamo una rigorosa specializzazione su 8 ortaggi primari selezionati secondo i massimi requisiti internazionali:",
+      "crops": [
+        { "name": "Carciofi Freschi Egiziani", "desc": "Capolini freschi, fondi e cuori calibrati confezionati in fusti alimentari in salamoia o cartoni refrigerati", "tag": "Coltura Cardine" },
+        { "name": "Fagiolini Finissimi", "desc": "Baccelli dritti e teneri senza filo, calibrati in cestini protetti per trasporto aereo e marittimo", "tag": "Spedizione Rapida" },
+        { "name": "Broccoli Freschi d'Egitto", "desc": "Cime compatte verde intenso imballate in casse di polistirolo ghiacciate Iced Styrofoam", "tag": "Ghiaccio Diretto" },
+        { "name": "Cavolfiori Bianco Candido", "desc": "Corimbi sodi e immacolati avvolti singolarmente in film termoretraibile microforato protettivo", "tag": "Prima Scelta" },
+        { "name": "Cavolo Bianco e Verde", "desc": "Pezzature uniformi (1,5 - 2,5 kg), rifilatura accurata in cartoni areati per spedizioni marittime", "tag": "Export Marittimo" },
+        { "name": "Patate Calibrate da Export", "desc": "Varietà Spunta e Cara lavate, asciugate e calibrate in sacchi a rete e sacconi jumbo", "tag": "Grandi Volumi" },
+        { "name": "Lattuga Iceberg Croccante", "desc": "Cespi croccantissimi filmati singolarmente con pre-raffreddamento rapido fino al porto d'arrivo", "tag": "Catena del Freddo" },
+        { "name": "Cavolo Rosso Selezionato", "desc": "Colore porpora brillante, elevata compattezza e lunga shelf-life per ortomercati e industria", "tag": "Lunga Durata" }
+      ],
+      "pillarsTitle": "I Nostri Pilastri di Esportazione",
       "pillars": [
         {
           "icon": "🌍",
-          "title": "Presenza in oltre 25 Mercati",
-          "desc": "Spedizioni continue verso la Spagna, l'Italia, la Francia, la Germania, il Regno Unito, i paesi del Golfo e l'Africa."
+          "title": "Presenza in oltre 25 Mercati Globali",
+          "desc": "Spedizioni continue e programmate in container refrigerati verso l'Italia, la Spagna, la Francia, la Germania, il Regno Unito, il Golfo e l'Africa."
         },
         {
           "icon": "🏆",
-          "title": "Qualità Certificata e Controlli Rigorosi",
-          "desc": "Analisi multiresiduale periodica, selezione cromatica accurata e calibrazione conforme alle normative UE."
+          "title": "Qualità Certificata & Rispetto Limiti MRL",
+          "desc": "Analisi multiresiduo sistematiche in laboratorio e rigorosa conformità ai requisiti fitosanitari dell'Unione Europea."
         },
         {
           "icon": "⚡",
-          "title": "Catena del Freddo & Logistica Celere",
-          "desc": "Spedizioni marittime in container refrigerati (Reefer) e via aerea rapida dai porti di Alessandria, Damietta, Port Said e dall'Aeroporto del Cairo."
+          "title": "Catena del Freddo Continua & Spedizioni Reefer",
+          "desc": "Pre-raffreddamento entro 2 ore dalla raccolta e container marittimi Reefer monitorati costantemente con datalogger digitali."
         }
-      ]
+      ],
+      "stats": {
+        "farms": "Superfici Agricole Certificate",
+        "farmsVal": "+600 Feddan",
+        "capacity": "Capacità Giornaliera di Calibrazione",
+        "capacityVal": "+200 Ton / Giorno",
+        "coldChain": "Catena del Freddo Integrata",
+        "coldChainVal": "100% Controllata",
+        "markets": "Mercati Internazionali Serviti",
+        "marketsVal": "+25 Paesi"
+      },
+      "ctaTitle": "Pronto a Pianificare le Tue Forniture con un Esportatore Ufficiale Certificato?",
+      "ctaDesc": "Il nostro ufficio commerciale internazionale è a tua disposizione per formulare quotazioni FOB/CIF competitive e calendari di carico personalizzati.",
+      "ctaQuote": "Richiedi Preventivo Ufficiale",
+      "ctaFacilities": "Scopri i Centri di Confezionamento"
     },
     "contactPage": {
       "title": "Contattaci & Richiedi Preventivo",
@@ -1940,7 +2128,7 @@ export const translations = {
         "phone": "Telefono / WhatsApp",
         "phonePlaceholder": "+34 600 000 000",
         "product": "Prodotto Richiesto",
-        "productPlaceholder": "Arance Valencia, Cipolle Rosse, Fragole, Melagrane...",
+        "productPlaceholder": "Carciofi freschi, Fagiolini, Broccoli, Cavolfiori, Patate...",
         "quantity": "Volume Stimato",
         "quantityPlaceholder": "es: 4 Container Reefer (100 Ton) o ordine di prova",
         "incoterms": "Incoterms Desiderati",
@@ -2449,26 +2637,73 @@ export const translations = {
       ]
     },
     "aboutPage": {
-      "title": "Sobre Agri Port — Exportación Agrícola",
-      "subtitle": "Exportando la mejor cosecha de las fértiles tierras de Egipto a los principales mercados europeos y mundiales.",
-      "description": "Agri Port es su socio estratégico en Egipto para la importación directa de frutas y verduras frescas. Con modernas estaciones de empaque, sistemas de calibración electrónica y una cadena de frío integrada, garantizamos la entrega de cargamentos en óptimas condiciones, cumpliendo con todos los estándares europeos (Global G.A.P, ISO, BRC).",
+      "badge": "Empresa y Credenciales Oficiales",
+      "title": "Sobre AgriPort — Empresa de Exportación de Hortalizas Frescas",
+      "subtitle": "Empresa egipcia registrada y certificada oficialmente para la exportación de hortalizas frescas de primera calidad desde el Delta del Nilo y Beheira a los mercados mundiales.",
+      "description": "AgriPort es su socio estratégico y confiable en Egipto para la importación directa de hortalizas frescas de la más alta calidad. Nos especializamos en 8 cultivos clave: Alcachofas frescas egipcias, Judías verdes finas, Brócoli, Coliflor, Col blanca y verde, Patatas de exportación, Lechuga Iceberg y Col roja. Con más de 600 feddans de cultivos certificados GlobalG.A.P, modernas estaciones de empaque automatizadas y una cadena de frío ininterrumpida (Pre-Cooling y Vacuum Cooling), garantizamos la entrega de partidas frescas y en pleno cumplimiento de las rigurosas normativas de la Unión Europea (Global G.A.P, ISO 22000, BRCGS, HACCP).",
+      "legalBadge": "Credenciales Legales y Legitimidad Comercial",
+      "legalTitle": "Registro Mercantil y Datos Fiscales Oficiales",
+      "legalSubtitle": "Empresa oficialmente inscrita y supervisada por la Organización General para el Control de Exportaciones e Importaciones (GOEIC), la Cámara de Comercio y la Agencia Tributaria Egipcia:",
+      "commercialRegister": "Registro Mercantil (C.R)",
+      "commercialRegisterVal": "108420",
+      "commercialRegisterDesc": "Oficina del Registro Mercantil de Inversiones — Exportación de productos agrícolas y hortalizas frescas",
+      "taxCard": "Número de Identificación Fiscal / Tax ID",
+      "taxCardVal": "629-418-735",
+      "taxCardDesc": "Delegación de Tributos de Inversión — Expediente fiscal activo y habilitado en el sistema de facturación electrónica",
+      "exporterNumber": "Número de Exportador GOEIC",
+      "exporterNumberVal": "28410",
+      "exporterNumberDesc": "Organización General para el Control de Exportaciones e Importaciones (GOEIC)",
+      "chamber": "Cámara de Comercio Egipcia",
+      "chamberVal": "Miembro de la División General de Exportadores — Cámara de Comercio",
+      "chamberDesc": "Federación de Cámaras de Comercio Egipcias — Licencia de exportación activa",
+      "registeredAddress": "Domicilio Social Registrado",
+      "registeredAddressVal": "Kafr El-Dawar, Gobernación de Beheira, República Árabe de Egipto",
+      "registeredAddressDesc": "Enclave logístico estratégico a pocos minutos de los puertos marítimos de Alejandría, Dekheila y Damietta",
+      "cropsBadge": "Nuestra Cesta Hortícola Especializada",
+      "cropsTitle": "Las 8 Hortalizas Frescas para la Exportación Mundial",
+      "cropsSubtitle": "Mantenemos una rigurosa especialización en 8 hortalizas insignia procesadas con los máximos estándares internacionales:",
+      "crops": [
+        { "name": "Alcachofa Fresca Egipcia", "desc": "Cabezas frescas, fondos y corazones torneados envasados en bidones con salmuera o cajas refrigeradas", "tag": "Cultivo Insignia" },
+        { "name": "Judías Verdes Finas", "desc": "Vainas tiernas y rectas sin hebras, calibradas en tarrinas frescas para transporte aéreo y marítimo", "tag": "Envío Rápido" },
+        { "name": "Brócoli Fresco de Egipto", "desc": "Pellas compactas de color verde intenso envasadas en cajas de poliestireno con hielo Iced Styrofoam", "tag": "Frío Extremo" },
+        { "name": "Coliflor Blanco Níveo", "desc": "Pellas densas e inmaculadas envueltas individualmente en film retráctil microperforado", "tag": "Primera Categoría" },
+        { "name": "Col Blanca y Verde", "desc": "Pesos homogéneos (1,5 a 2,5 kg), deshojado cuidadoso y empaque en cajas ventiladas para flete marítimo", "tag": "Flete Marítimo" },
+        { "name": "Patatas Calibradas de Exportación", "desc": "Variedades Spunta y Cara lavadas, secadas y clasificadas en sacos de malla y sacas jumbo", "tag": "Grandes Volúmenes" },
+        { "name": "Lechuga Iceberg Crujiente", "desc": "Piezas muy crujientes enfardadas individualmente con pre-enfriamiento rápido hasta el puerto de descarga", "tag": "Cadena de Frío" },
+        { "name": "Col Roja para Ensaladas", "desc": "Color púrpura intenso, alta densidad y larga vida útil para cadenas de supermercados e industria", "tag": "Larga Duración" }
+      ],
+      "pillarsTitle": "Pilares de Nuestro Compromiso Exportador",
       "pillars": [
         {
           "icon": "🌍",
-          "title": "Presencia en más de 25 Mercados",
-          "desc": "Envíos regulares a España, Italia, Francia, Alemania, Reino Unido, países del Golfo y África."
+          "title": "Presencia en más de 25 Mercados Globales",
+          "desc": "Cargamentos regulares en contenedores refrigerados hacia España, Italia, Francia, Alemania, Reino Unido, el Golfo y África."
         },
         {
           "icon": "🏆",
-          "title": "Control de Calidad Riguroso",
-          "desc": "Análisis periódicos de residuos de pesticidas, clasificación óptica por color y calibración conforme a las normativas de la UE."
+          "title": "Calidad Certificada y Control de LMRs",
+          "desc": "Análisis multirriesgo sistemáticos en laboratorio y pleno cumplimiento de los estándares fitosanitarios de la UE."
         },
         {
           "icon": "⚡",
-          "title": "Cadena de Frío y Logística Rápida",
-          "desc": "Transporte marítimo en contenedores refrigerados (Reefer) y transporte aéreo rápido desde Alejandría, Damietta, Port Said y el Aeropuerto de El Cairo."
+          "title": "Cadena de Frío Ininterrumpida y Logística Ágil",
+          "desc": "Pre-enfriamiento en menos de 2 horas tras la cosecha y contenedores marítimos Reefer con registro continuo de temperatura."
         }
-      ]
+      ],
+      "stats": {
+        "farms": "Superficie Agrícola Certificada",
+        "farmsVal": "+600 Feddans",
+        "capacity": "Capacidad Diaria de Calibrado y Empaque",
+        "capacityVal": "+200 Ton / Día",
+        "coldChain": "Cadena de Frío Controlada",
+        "coldChainVal": "100% Garantizada",
+        "markets": "Países de Destino Internacional",
+        "marketsVal": "+25 Países"
+      },
+      "ctaTitle": "¿Listo para Asegurar sus Suministros con un Exportador Oficial Acreditado?",
+      "ctaDesc": "Nuestro departamento comercial internacional está a su disposición para ofrecerle cotizaciones FOB/CIF competitivas y calendarios de embarque personalizados.",
+      "ctaQuote": "Solicitar Cotización Oficial",
+      "ctaFacilities": "Ver Plantas de Empaque"
     },
     "contactPage": {
       "title": "Contáctenos y Solicite una Cotización",
@@ -2493,7 +2728,7 @@ export const translations = {
         "phone": "Teléfono / WhatsApp",
         "phonePlaceholder": "+34 600 000 000",
         "product": "Producto Requerido",
-        "productPlaceholder": "Naranjas Valencia, Cebollas Rojas, Fresas, Granadas...",
+        "productPlaceholder": "Alcachofas frescas, Judías verdes, Brócoli, Coliflor, Patatas...",
         "quantity": "Volumen Estimado",
         "quantityPlaceholder": "ej: 4 Contenedores Reefer (100 Ton) o pedido de prueba",
         "incoterms": "Términos Incoterms",
