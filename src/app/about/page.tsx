@@ -99,7 +99,7 @@ export default function AboutPage() {
         )}
 
         {/* 3. Official Legal & Commercial Credentials Card (السجل التجاري والبطاقة الضريبية) */}
-        <div className="rounded-3xl sm:rounded-[2.5rem] border-2 border-emerald-500/20 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-12 text-white shadow-xl relative overflow-hidden text-start">
+        <div id="credentials" className="rounded-3xl sm:rounded-[2.5rem] border-2 border-emerald-500/20 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-12 text-white shadow-xl relative overflow-hidden text-start scroll-mt-24">
           <div className="relative z-10 max-w-4xl space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 border border-emerald-400/30 px-3.5 py-1 text-xs font-bold text-emerald-300">
@@ -279,7 +279,7 @@ export default function AboutPage() {
 
         {/* 4. Strategic Geographic Location & Interactive Map */}
         {about.map && (
-          <div className="space-y-6 text-start">
+          <div id="map" className="space-y-6 text-start scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3.5 py-1 text-xs font-bold text-emerald-800 mb-2">
@@ -393,27 +393,123 @@ export default function AboutPage() {
           </div>
         )}
 
-        {/* 6. International Quality Certifications Strip */}
-        <div className="rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#F7F9FC] p-6 sm:p-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 sm:mb-6">
-            {t.trust.standards}
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-12 md:gap-16 opacity-60">
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 font-serif">
-              GLOBALG.A.P.
-            </span>
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
-              ISO<span className="font-light">22000</span>
-            </span>
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
-              BRCGS
-            </span>
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
-              FDA <span className="font-light text-xs align-top">Reg</span>
-            </span>
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
-              SEDEX <span className="font-light text-xs">SMETA</span>
-            </span>
+        {/* 6. International Quality Certifications */}
+        <div id="certifications" className="space-y-6 text-start scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3.5 py-1 text-xs font-bold text-emerald-800 mb-2">
+                <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
+                <span>{language === "ar" ? "اعتمادات وشهادات الجودة الدولية" : "International Quality Certifications"}</span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                {language === "ar" ? "شهادات الجودة والسلامة الغذائية المعتمَدة" : "Certified Food Safety & Quality Standards"}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1 max-w-2xl leading-relaxed">
+                {language === "ar"
+                  ? "تلتزم مزارعنا ومحطات التعبئة التابعة لـ AgriPort بأدق بروتوكولات الفحص الزراعي والممارسات الدولية لضمان أعلى مواصفات خلو متبقيات المبيدات ومأمونية الغذاء:"
+                  : "All AgriPort partner farms and packhouses operate under accredited international auditing schemes guaranteeing full food safety and traceability:"}
+              </p>
+            </div>
+
+            <Link
+              href="/contact?subject=Certificates"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-800 shadow-xs hover:border-emerald-500 hover:text-emerald-600 transition-all self-start sm:self-auto shrink-0"
+            >
+              <span>{language === "ar" ? "طلب نسخ الشهادات الرسمية" : "Request Certificate Copies"}</span>
+              <ExternalLink className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg font-extrabold font-serif text-slate-900 tracking-tight">GLOBALG.A.P.</span>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">IFA v6</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === "ar" ? "الممارسات الزراعية الجيدة العالمية" : "Integrated Farm Assurance"}
+              </h4>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {language === "ar"
+                  ? "إدارة متكاملة للمزارع، ترشيد استخدام المياه والأسمدة، ونظام تتبع رقمي كامل للدفعة (Lot Traceability) من الحقل حتى الصندوق."
+                  : "Certified farm management, rational water/nutrient usage, and complete harvest lot traceability from field to carton."}
+              </p>
+            </div>
+
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg font-extrabold text-slate-900 tracking-tight">ISO 22000:2018</span>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Food Safety</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === "ar" ? "نظام إدارة سلامة الغذاء" : "Food Safety Management System"}
+              </h4>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {language === "ar"
+                  ? "معايير صارمة في محطات التعبئة تشمل التعقيم، النظافة الشخصية، الرقابة على درجات الحرارة ومكافحة الملوثات البيولوجية."
+                  : "Stringent packhouse protocols governing hygiene, rapid cold chain controls, and biological contaminant prevention."}
+              </p>
+            </div>
+
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg font-extrabold text-slate-900 tracking-tight">BRCGS Food Safety</span>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">GFSI Benchmark</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === "ar" ? "المعيار العالمي لسلامة وتغليف الأغذية" : "Global Food Safety Standard"}
+              </h4>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {language === "ar"
+                  ? "المعيار المفضل لكبرى سلاسل السوبرماركت والموزعين في بريطانيا والاتحاد الأوروبي لمطابقة خامات التغليف والفرز."
+                  : "The gold benchmark for top European retail supermarket chains covering packaging materials and grading lines."}
+              </p>
+            </div>
+
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg font-extrabold text-slate-900 tracking-tight">FDA Registered</span>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">US Compliant</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === "ar" ? "تسجيل هيئة الغذاء والدواء الأمريكية" : "US FDA Food Facility Registration"}
+              </h4>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {language === "ar"
+                  ? "منشآت ومحطات مسجلة رسمياً لدى الـ FDA ومطابقة لقانون تحديث سلامة الأغذية الأمريكي (FSMA)."
+                  : "Official US FDA registration verifying compliance with Food Safety Modernization Act (FSMA) standards."}
+              </p>
+            </div>
+
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg font-extrabold text-slate-900 tracking-tight">HACCP Certified</span>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Risk Control</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === "ar" ? "تحليل المخاطر ونقاط التحكم الحرجة" : "Hazard Analysis & Critical Points"}
+              </h4>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {language === "ar"
+                  ? "تحديد ومراقبة كافة نقاط التحكم الحرجة في مسار الفرز والغسيل والتبريد لاستبعاد أي شوائب أو خلل حراري."
+                  : "Systematic monitoring of critical control points across sorting, washing, pre-cooling, and carton sealing."}
+              </p>
+            </div>
+
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg font-extrabold text-slate-900 tracking-tight">SEDEX / SMETA</span>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Ethical Trade</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">
+                {language === "ar" ? "تدقيق التجارة الأخلاقية والمسؤولية الاجتماعية" : "Ethical Trade & Social Audit"}
+              </h4>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {language === "ar"
+                  ? "التزام كامل بمعايير العمل اللائق، السلامة والصحة المهنية للعاملين، وحماية البيئة والتجارة المستدامة."
+                  : "Audit verifying worker health and safety, fair compensation, zero child labor, and responsible environmental stewardship."}
+              </p>
+            </div>
           </div>
         </div>
 
