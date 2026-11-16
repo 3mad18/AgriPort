@@ -602,9 +602,6 @@
   .mb-12 {
     margin-bottom: calc(var(--spacing) * 12);
   }
-  .mb-16 {
-    margin-bottom: calc(var(--spacing) * 16);
-  }
   .line-clamp-1 {
     overflow: hidden;
     display: -webkit-box;
@@ -1035,8 +1032,8 @@
   .gap-8 {
     gap: calc(var(--spacing) * 8);
   }
-  .gap-12 {
-    gap: calc(var(--spacing) * 12);
+  .gap-10 {
+    gap: calc(var(--spacing) * 10);
   }
   :where(.space-y-0\.5 > :not(:last-child)) {
     --tw-space-y-reverse: 0;
@@ -2374,6 +2371,9 @@
   .py-8 {
     padding-block: calc(var(--spacing) * 8);
   }
+  .py-10 {
+    padding-block: calc(var(--spacing) * 10);
+  }
   .py-12 {
     padding-block: calc(var(--spacing) * 12);
   }
@@ -2421,9 +2421,6 @@
   }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
-  }
-  .pt-8 {
-    padding-top: calc(var(--spacing) * 8);
   }
   .pt-16 {
     padding-top: calc(var(--spacing) * 16);
@@ -3621,9 +3618,6 @@
     .sm\:mb-16 {
       margin-bottom: calc(var(--spacing) * 16);
     }
-    .sm\:mb-24 {
-      margin-bottom: calc(var(--spacing) * 24);
-    }
     .sm\:line-clamp-none {
       overflow: visible;
       display: block;
@@ -3841,8 +3835,8 @@
     .sm\:py-32 {
       padding-block: calc(var(--spacing) * 32);
     }
-    .sm\:pt-24 {
-      padding-top: calc(var(--spacing) * 24);
+    .sm\:pt-20 {
+      padding-top: calc(var(--spacing) * 20);
     }
     .sm\:pt-32 {
       padding-top: calc(var(--spacing) * 32);
@@ -4038,6 +4032,9 @@
     }
     .lg\:items-center {
       align-items: center;
+    }
+    .lg\:items-end {
+      align-items: flex-end;
     }
     .lg\:p-8 {
       padding: calc(var(--spacing) * 8);

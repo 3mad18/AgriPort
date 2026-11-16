@@ -29,19 +29,27 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-slate-900 text-white pt-16 sm:pt-24 pb-12 border-t border-slate-800"
+      className="bg-slate-900 text-white pt-16 sm:pt-20 pb-12 border-t border-slate-800 text-start"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 mb-16 sm:mb-24 text-start">
-          {/* CTA Text & Contact input */}
-          <div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter mb-4 sm:mb-6 leading-tight text-white">
-              {footer.ctaTitle}
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg text-slate-400 font-medium mb-6 sm:mb-8 max-w-md leading-relaxed">
-              {footer.ctaDesc}
-            </p>
-            <form onSubmit={handleContactSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md">
+        {/* 1. Header Title */}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter mb-6 sm:mb-8 leading-tight text-white max-w-4xl">
+          {footer.ctaTitle}
+        </h2>
+
+        {/* 2. Subtitle & Contact Form (Beside each other - بجوار بعضهما) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-start pb-12 sm:pb-16 border-b border-slate-800">
+          {/* Paragraph Text */}
+          <p className="text-base sm:text-lg md:text-xl text-slate-400 font-medium leading-relaxed max-w-xl">
+            {footer.ctaDesc}
+          </p>
+
+          {/* Form + Location + Contacts (هذا الجزء كما هو بجوار النص) */}
+          <div className="flex flex-col items-start lg:items-end w-full">
+            <form
+              onSubmit={handleContactSubmit}
+              className="flex flex-col sm:flex-row gap-3 w-full max-w-md"
+            >
               <input
                 type="email"
                 value={email}
@@ -58,7 +66,7 @@ export function Footer() {
             </form>
 
             {/* Location & Direct Contact Tag */}
-            <div className="mt-6 flex flex-col gap-2.5 text-xs text-slate-400 font-medium">
+            <div className="mt-4 flex flex-col gap-2.5 text-xs text-slate-400 font-medium w-full max-w-md">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
@@ -86,11 +94,33 @@ export function Footer() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Quick Links (Simple 2 Columns) */}
-          <div className="grid grid-cols-2 gap-8 text-sm font-medium">
-            <div className="flex flex-col gap-4">
-              <h4 className="text-slate-500 uppercase tracking-widest text-xs font-bold mb-2">
+        {/* 3. Simple Clean Navigation Links Row */}
+        <div className="py-10 sm:py-12 flex flex-col md:flex-row justify-between items-start gap-8 border-b border-slate-800">
+          <div className="flex flex-col gap-2 max-w-sm">
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/brand/agri-flow-symbol-dark.png"
+                alt="AgriPort"
+                className="h-6 w-auto object-contain"
+              />
+              <span className="flex items-center text-base tracking-tight" dir="ltr">
+                <span className="font-medium text-emerald-400">Agri</span>
+                <span className="font-bold text-white">Port</span>
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 font-medium leading-relaxed">
+              {footer.subtext ||
+                (language === "ar"
+                  ? "بوابة تصدير الخضروات والحاصلات الزراعية من مصر إلى موانئ العالم"
+                  : "Export portal for premium fresh vegetables from Egypt to world ports")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-10 sm:gap-16 text-sm font-medium">
+            <div className="flex flex-col gap-3">
+              <h4 className="text-slate-500 uppercase tracking-widest text-xs font-bold mb-1">
                 {footer.colPlatform}
               </h4>
               <Link
@@ -107,8 +137,8 @@ export function Footer() {
               </Link>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <h4 className="text-slate-500 uppercase tracking-widest text-xs font-bold mb-2">
+            <div className="flex flex-col gap-3">
+              <h4 className="text-slate-500 uppercase tracking-widest text-xs font-bold mb-1">
                 {footer.colCompany}
               </h4>
               <Link
@@ -127,38 +157,37 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-slate-800 text-sm text-slate-500 font-medium">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="flex items-center gap-2.5">
-              <img
-                src="/brand/agri-flow-symbol-dark.png"
-                alt="AgriPort"
-                className="h-6 w-auto object-contain"
-              />
-              <span className="flex items-center text-base tracking-tight" dir="ltr">
-                <span className="font-medium text-emerald-400">Agri</span>
-                <span className="font-bold text-white">Port</span>
+        {/* 4. Bottom Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 text-xs text-slate-500 font-medium">
+          <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+            <span
+              className="inline-flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60"
+              title="Commercial Registration / السجل التجاري"
+            >
+              <span className="text-slate-500 font-sans">
+                {language === "ar" ? "س.ت:" : "CR:"}
               </span>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
-              <span className="inline-flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60" title="Commercial Registration / السجل التجاري">
-                <span className="text-slate-500 font-sans">{language === "ar" ? "س.ت:" : "CR:"}</span>
-                <span className="text-emerald-400 font-bold">{siteSettings.commercialRegister || "108420"}</span>
+              <span className="text-emerald-400 font-bold">
+                {siteSettings.commercialRegister || "108420"}
               </span>
-              <span className="inline-flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60" title="Tax ID / البطاقة الضريبية">
-                <span className="text-slate-500 font-sans">{language === "ar" ? "ب.ض:" : "Tax:"}</span>
-                <span className="text-emerald-400 font-bold">{siteSettings.taxCard || "629-418-735"}</span>
+            </span>
+            <span
+              className="inline-flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60"
+              title="Tax ID / البطاقة الضريبية"
+            >
+              <span className="text-slate-500 font-sans">
+                {language === "ar" ? "ب.ض:" : "Tax:"}
               </span>
-            </div>
+              <span className="text-emerald-400 font-bold">
+                {siteSettings.taxCard || "629-418-735"}
+              </span>
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm">
-            <p>
-              &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
-              {footer.rights}.
-            </p>
-          </div>
+          <p>
+            &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
+            {footer.rights}.
+          </p>
         </div>
       </div>
     </footer>
