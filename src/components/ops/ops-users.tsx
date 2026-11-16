@@ -496,9 +496,20 @@ export function OpsUsers() {
                             {user.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                              {user.name}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                                {user.name}
+                              </p>
+                              {user.isGuest || user.id.startsWith("gst_") ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                  🌱 ضيف
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                  ✓ دائم
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[10px] text-slate-400 font-mono mt-0.5">
                               ID: {user.id.slice(0, 10)}...
                             </p>

@@ -25,6 +25,9 @@ import {
   Check,
   CheckCircle2,
   AlertCircle,
+  LogIn,
+  UserPlus,
+  Sparkles,
 } from "lucide-react";
 
 // SVG Icons
@@ -52,20 +55,26 @@ export function VisitorAuthCard() {
     isAuthenticated,
     loginWithEmail,
     registerUser,
+    registerGuestUser,
     requestPasswordReset,
     verifyResetCode,
     resetPasswordWithCode,
     logout,
   } = useVisitorAuth();
 
-  // Active view: "login" | "register" | "forgot"
-  const initialTab =
-    searchParams?.get("tab") === "register" || (cropName && searchParams?.get("tab") !== "login")
+  // Active view: "login" | "guest" | "register" | "forgot"
+  const tabParam = searchParams?.get("tab");
+  const initialTab: "login" | "guest" | "register" | "forgot" =
+    tabParam === "guest"
+      ? "guest"
+      : tabParam === "register"
       ? "register"
-      : searchParams?.get("tab") === "login"
+      : tabParam === "login"
       ? "login"
+      : cropName
+      ? "guest"
       : "login";
-  const [activeTab, setActiveTab] = useState<"login" | "register" | "forgot">(initialTab);
+  const [activeTab, setActiveTab] = useState<"login" | "guest" | "register" | "forgot">(initialTab);
 
   // Sign In State
   const [loginEmail, setLoginEmail] = useState("");
@@ -73,15 +82,17 @@ export function VisitorAuthCard() {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  // Register State (STRICTLY ONLY: name, email, password, phone with country)
+  // Common Registration State (Guest & Full Account)
   const [regName, setRegName] = useState("");
-  const [regEmail, setRegEmail] = useState("");
-  const [regPassword, setRegPassword] = useState("");
-  const [showRegPassword, setShowRegPassword] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryPhone>(DEFAULT_COUNTRY);
   const [regPhone, setRegPhone] = useState("");
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState("");
+
+  // Full Account Registration State (Email + Password)
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [showRegPassword, setShowRegPassword] = useState(false);
 
   // Touch tracking for real-time validation feedback
   const [regTouched, setRegTouched] = useState({
@@ -124,8 +135,11 @@ export function VisitorAuthCard() {
   const newPassStrength = evaluatePasswordStrength(newPassword);
   const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
 
+  // Capture URL error messages (e.g. returned from OAuth callback)
+  const initialUrlError = searchParams?.get("error") ? decodeURIComponent(searchParams.get("error")!) : null;
+
   // Feedback states
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(initialUrlError);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -161,9 +175,9 @@ export function VisitorAuthCard() {
     setErrorMsg(null);
   };
 
-  const handleSwitchTab = (tab: "login" | "register") => {
+  const handleSwitchTab = (tab: "login" | "guest" | "register") => {
     setActiveTab(tab);
-    resetForm();
+    setErrorMsg(null);
     setSuccessMsg(null);
   };
 
@@ -188,19 +202,6 @@ export function VisitorAuthCard() {
     }, 1000);
     return () => clearInterval(interval);
   }, [activeTab, forgotStep, resendCountdown]);
-
-  // Capture URL error messages (e.g. returned from OAuth callback)
-  useEffect(() => {
-    const errorParam = searchParams?.get("error");
-    if (errorParam) {
-      setErrorMsg(decodeURIComponent(errorParam));
-    }
-  }, [searchParams]);
-
-  // Reset form inputs upon component mount
-  useEffect(() => {
-    resetForm();
-  }, []);
 
   // Close country dropdown on outside click
   useEffect(() => {
@@ -268,7 +269,72 @@ export function VisitorAuthCard() {
     }
   };
 
-  // Handle Register Submit with real validation
+  // Handle Guest Register (Strictly Name & Phone ONLY)
+  const handleRegisterGuest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    setRegTouched({
+      name: true,
+      email: false,
+      password: false,
+      phone: true,
+    });
+
+    // 1. Name Check
+    if (!nameValidation.isValid) {
+      setErrorMsg(nameValidation.error || tr.fillAllFieldsError);
+      return;
+    }
+
+    // 2. Phone Check
+    if (!regPhone.trim()) {
+      setErrorMsg(
+        language === "ar"
+          ? "يرجى إدخال رقم الهاتف / الواتساب للتواصل."
+          : "Please provide your phone number/WhatsApp."
+      );
+      return;
+    }
+
+    if (!phoneValidation.isValid) {
+      setErrorMsg(phoneValidation.error || tr.fillAllFieldsError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = registerGuestUser({
+        name: nameValidation.formattedValue || regName,
+        phone: phoneValidation.formattedValue || regPhone,
+        countryCode: selectedCountry.dialCode,
+        countryIso: selectedCountry.iso,
+      });
+
+      if (res.success) {
+        setSuccessMsg(tr.guestRegisteredSuccess);
+        resetForm();
+        setTimeout(() => {
+          if (typeof window !== "undefined") {
+            window.location.href = targetDestination;
+          } else {
+            router.push(targetDestination);
+          }
+        }, 600);
+      } else {
+        if (res.error === "email_already_exists") {
+          setErrorMsg(tr.emailAlreadyRegisteredError);
+        } else {
+          setErrorMsg(res.error || tr.fillAllFieldsError);
+        }
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Full Account Register (Name, Email, Password & Phone)
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -475,9 +541,19 @@ export function VisitorAuthCard() {
           )}
         </div>
 
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100/70 text-emerald-800 border border-emerald-200/50 mb-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-          {tr.visitorAccount}
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2 ${
+            user.isGuest
+              ? "bg-amber-100/80 text-amber-900 border border-amber-200/60"
+              : "bg-emerald-100/70 text-emerald-800 border border-emerald-200/50"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              user.isGuest ? "bg-amber-600 animate-pulse" : "bg-emerald-600 animate-pulse"
+            }`}
+          ></span>
+          {user.isGuest ? (language === "ar" ? "حساب ضيف سريع" : "Quick Guest Account") : tr.visitorAccount}
         </span>
 
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">{user.name}</h3>
@@ -490,6 +566,20 @@ export function VisitorAuthCard() {
               {user.countryCode} {user.phone}
             </span>
           </p>
+        )}
+
+        {user.isGuest && (
+          <div className="mt-3 p-3 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs text-start">
+            <p className="font-bold flex items-center gap-1.5">
+              <span>🌱</span>
+              <span>{tr.guestAccountNotice}</span>
+            </p>
+            <p className="text-[11px] text-amber-800/90 mt-1 leading-relaxed">
+              {language === "ar"
+                ? "يمكنك تصفح المحاصيل وطلب عروض الأسعار وحجز الشحنات مباشرة."
+                : "You can browse fresh produce, request quotes, and coordinate export shipments."}
+            </p>
+          </div>
         )}
 
         <div className="mt-8 flex flex-col gap-3">
@@ -542,12 +632,24 @@ export function VisitorAuthCard() {
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           {activeTab === "login"
             ? tr.tabSignIn
+            : activeTab === "guest"
+            ? (language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel)
             : activeTab === "register"
             ? tr.tabRegister
             : tr.forgotPasswordTitle}
         </h2>
         <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
-          {activeTab === "forgot" ? tr.forgotPasswordSubtitle : tr.pageSubtitle}
+          {activeTab === "forgot"
+            ? tr.forgotPasswordSubtitle
+            : activeTab === "guest"
+            ? (language === "ar"
+                ? "أدخل الاسم ورقم الهاتف فقط للمتابعة الفورية وطلب عروض الأسعار بدون كلمة مرور."
+                : tr.guestDescription)
+            : activeTab === "register"
+            ? (language === "ar"
+                ? "أنشئ حساباً دائماً ببياناتك الكاملة للوصول إلى كافة خدمات المنصة والعقود الدولية."
+                : tr.pageSubtitle)
+            : tr.pageSubtitle}
         </p>
       </div>
 
@@ -563,42 +665,82 @@ export function VisitorAuthCard() {
             </p>
             <p className="text-emerald-800 text-xs mt-1 leading-relaxed">
               {language === "ar"
-                ? "يُرجى إنشاء حسابك أو تسجيل الدخول أولاً لتتمكن من إتمام طلب التسعير وحجز الشحنة بكل سهولة."
-                : "Please create an account or sign in to complete your quote request easily."}
+                ? "يمكنك التسجيل السريع كضيف بالاسم ورقم الهاتف أو تسجيل الدخول أو إنشاء حساب دائم لمتابعة طلبك."
+                : "You can register quickly as a guest with name and phone, sign in, or create a full account."}
             </p>
           </div>
         </div>
       )}
 
-      {/* TAB SWITCHER: Login / Register (Only when not in forgot password mode) */}
+      {/* Sleek Horizontal Icon Tabs (3 Options Side by Side) */}
       {activeTab !== "forgot" && (
-        <>
-          {/* Tab Switcher: Login / Register */}
-          <div className="grid grid-cols-2 p-1 bg-slate-100/90 rounded-2xl mb-6">
-            <button
-              type="button"
-              onClick={() => handleSwitchTab("login")}
-              className={`py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+        <div className="flex items-center justify-between p-1 bg-slate-100/90 border border-slate-200/80 rounded-2xl mb-6 gap-1 sm:gap-1.5 shadow-2xs">
+          {/* 1. تسجيل الدخول */}
+          <button
+            type="button"
+            onClick={() => handleSwitchTab("login")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl text-xs font-bold transition-all ${
+              activeTab === "login"
+                ? "bg-white text-emerald-950 shadow-sm border border-emerald-200/60 ring-1 ring-emerald-500/10"
+                : "text-slate-500 hover:text-slate-900 hover:bg-white/60"
+            }`}
+          >
+            <span
+              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                 activeTab === "login"
-                  ? "bg-white text-emerald-950 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-slate-200/70 text-slate-500"
               }`}
             >
-              {tr.tabSignIn}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSwitchTab("register")}
-              className={`py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+              <LogIn className="w-3.5 h-3.5" />
+            </span>
+            <span className="truncate">{tr.tabSignIn}</span>
+          </button>
+
+          {/* 2. تسجيل كضيف */}
+          <button
+            type="button"
+            onClick={() => handleSwitchTab("guest")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl text-xs font-bold transition-all ${
+              activeTab === "guest"
+                ? "bg-white text-emerald-950 shadow-sm border border-emerald-300/80 ring-1 ring-emerald-500/10"
+                : "text-slate-500 hover:text-slate-900 hover:bg-white/60"
+            }`}
+          >
+            <span
+              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                activeTab === "guest"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-slate-200/70 text-slate-500"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+            </span>
+            <span className="truncate">{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+          </button>
+
+          {/* 3. إنشاء حساب */}
+          <button
+            type="button"
+            onClick={() => handleSwitchTab("register")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl text-xs font-bold transition-all ${
+              activeTab === "register"
+                ? "bg-white text-emerald-950 shadow-sm border border-emerald-200/60 ring-1 ring-emerald-500/10"
+                : "text-slate-500 hover:text-slate-900 hover:bg-white/60"
+            }`}
+          >
+            <span
+              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                 activeTab === "register"
-                  ? "bg-white text-emerald-950 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-slate-200/70 text-slate-500"
               }`}
             >
-              {tr.tabRegister}
-            </button>
-          </div>
-        </>
+              <UserPlus className="w-3.5 h-3.5" />
+            </span>
+            <span className="truncate">{tr.tabRegister}</span>
+          </button>
+        </div>
       )}
 
       {/* Error / Success Notifications */}
@@ -611,13 +753,11 @@ export function VisitorAuthCard() {
               <button
                 type="button"
                 onClick={() => {
-                  setRegEmail(loginEmail);
-                  setActiveTab("register");
-                  setErrorMsg(null);
+                  handleSwitchTab("register");
                 }}
                 className="mt-1 text-xs text-emerald-700 underline font-bold hover:text-emerald-900 block"
               >
-                {tr.createAccountLink} ←
+                {tr.tabRegister} ←
               </button>
             )}
           </div>
@@ -712,24 +852,45 @@ export function VisitorAuthCard() {
             )}
           </button>
 
-          {/* Toggle to Register */}
-          <p className="text-center text-xs text-slate-500 mt-5">
-            {tr.noAccountPrompt}{" "}
+          {/* Quick horizontal icon links */}
+          <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("guest")}
+              className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+            </button>
             <button
               type="button"
               onClick={() => handleSwitchTab("register")}
-              className="font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              {tr.createAccountLink}
+              <UserPlus className="w-3.5 h-3.5 text-slate-600" />
+              <span>{tr.tabRegister}</span>
             </button>
-          </p>
+          </div>
         </form>
       )}
 
-      {/* 2. REGISTER FORM: STRICTLY (1) Name, (2) Email, (3) Password, (4) Country Phone */}
-      {activeTab === "register" && (
-        <form onSubmit={handleRegister} className="space-y-4 text-start animate-fade-in">
-          {/* 1. Name (الاسم) */}
+      {/* 2. GUEST REGISTRATION FORM (STRICTLY NAME & PHONE ONLY) */}
+      {activeTab === "guest" && (
+        <form onSubmit={handleRegisterGuest} className="space-y-4 text-start animate-fade-in">
+          {/* Guest badge info banner */}
+          <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/60 text-emerald-950 text-xs flex items-start gap-2.5">
+            <span className="text-base shrink-0">🌱</span>
+            <div>
+              <p className="font-bold text-emerald-900">{tr.guestBadge}</p>
+              <p className="text-[11px] text-emerald-800/80 mt-0.5 leading-relaxed">
+                {language === "ar"
+                  ? "سجل اسمك ورقم الهاتف فقط للمتابعة الفورية وطلب عروض الأسعار وحجز الشحنات مباشرة دون الحاجة لكلمة مرور."
+                  : tr.guestDescription}
+              </p>
+            </div>
+          </div>
+
+          {/* 1. Name */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-slate-700">
@@ -770,7 +931,208 @@ export function VisitorAuthCard() {
             )}
           </div>
 
-          {/* 2. Email (البريد الإلكتروني) */}
+          {/* 2. Phone / WhatsApp with Country selector */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700">
+                {tr.phoneLabel} <span className="text-red-500">*</span>
+              </label>
+              {regTouched.phone && phoneValidation.isValid && (
+                <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{language === "ar" ? "رقم صحيح" : "Valid"}</span>
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {/* Country Selector Dropdown */}
+              <div className="relative shrink-0" ref={countryDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setCountryPickerOpen(!countryPickerOpen)}
+                  className="h-full flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl px-3 py-3 text-xs font-bold text-slate-800 transition-all shadow-xs"
+                  aria-expanded={countryPickerOpen}
+                >
+                  <span className="text-lg leading-none">{selectedCountry.flag}</span>
+                  <span className="font-mono text-slate-700 dir-ltr">{selectedCountry.dialCode}</span>
+                  <ChevronDownIcon />
+                </button>
+
+                {countryPickerOpen && (
+                  <div
+                    className={`absolute top-full mt-2 ${
+                      isRTL ? "right-0" : "left-0"
+                    } w-72 sm:w-80 max-h-72 overflow-hidden bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-fade-in`}
+                  >
+                    <div className="p-1 pb-2 border-b border-slate-100">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={countrySearch}
+                        onChange={(e) => setCountrySearch(e.target.value)}
+                        placeholder={tr.searchCountry}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-hidden focus:border-emerald-500 focus:bg-white"
+                      />
+                    </div>
+                    <div className="max-h-52 overflow-y-auto mt-1 space-y-0.5">
+                      {filteredCountries.map((c) => {
+                        const isSelected = c.iso === selectedCountry.iso;
+                        return (
+                          <button
+                            key={c.iso}
+                            type="button"
+                            onClick={() => {
+                              setSelectedCountry(c);
+                              setCountryPickerOpen(false);
+                              setCountrySearch("");
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
+                              isSelected
+                                ? "bg-emerald-50 text-emerald-900 font-bold"
+                                : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="text-base">{c.flag}</span>
+                              <span>{language === "ar" ? c.nameAr : c.nameEn}</span>
+                            </div>
+                            <span className="font-mono font-semibold text-slate-500 dir-ltr">
+                              {c.dialCode}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      {filteredCountries.length === 0 && (
+                        <p className="text-center text-xs text-slate-400 py-3">
+                          لا توجد نتائج مطابقة
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Phone Input */}
+              <div className="relative flex-1">
+                <input
+                  type="tel"
+                  required
+                  value={regPhone}
+                  onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, ""))}
+                  onBlur={() => setRegTouched((prev) => ({ ...prev, phone: true }))}
+                  placeholder={selectedCountry.placeholder}
+                  className={`w-full bg-slate-50 border rounded-2xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-all outline-hidden font-mono dir-ltr text-start ${
+                    regTouched.phone && !phoneValidation.isValid
+                      ? "border-red-400 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : regTouched.phone && phoneValidation.isValid
+                      ? "border-emerald-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                      : "border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            {regTouched.phone && !phoneValidation.isValid && (
+              <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                <span>{phoneValidation.error}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Submit Guest Registration */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full mt-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md shadow-emerald-500/20 active:scale-[0.99] text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <span>{tr.guestRegisterBtn}</span>
+            )}
+          </button>
+
+          {/* Quick horizontal icon links */}
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("login")}
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+            >
+              <LogIn className="w-3.5 h-3.5 text-slate-600" />
+              <span>{tr.tabSignIn}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("register")}
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-slate-600" />
+              <span>{tr.tabRegister}</span>
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* 3. FULL ACCOUNT REGISTRATION FORM */}
+      {activeTab === "register" && (
+        <form onSubmit={handleRegister} className="space-y-4 text-start animate-fade-in">
+          {/* Full account banner info */}
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-xs flex items-start gap-2.5">
+            <span className="text-base shrink-0">🔒</span>
+            <div>
+              <p className="font-bold text-slate-900">{tr.tabRegister}</p>
+              <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                {language === "ar"
+                  ? "أنشئ حساباً دائماً بكلمة مرور لتتبع طلباتك، إدارة الشحنات وتنسيق الصفقات الدولية عبر لوحة التحكم."
+                  : tr.pageSubtitle}
+              </p>
+            </div>
+          </div>
+
+          {/* 1. Name */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700">
+                {tr.nameLabel} <span className="text-red-500">*</span>
+              </label>
+              {regTouched.name && nameValidation.isValid && (
+                <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{language === "ar" ? "اسم صالح" : "Valid"}</span>
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                required
+                value={regName}
+                onChange={(e) => setRegName(e.target.value)}
+                onBlur={() => setRegTouched((prev) => ({ ...prev, name: true }))}
+                placeholder={tr.namePlaceholder}
+                className={`w-full bg-slate-50 border rounded-2xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-all outline-hidden ${
+                  regTouched.name && !nameValidation.isValid
+                    ? "border-red-400 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                    : regTouched.name && nameValidation.isValid
+                    ? "border-emerald-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                    : "border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                }`}
+              />
+              <span className={`absolute ${isRTL ? "left-3" : "right-3"} top-3.5 text-slate-400 pointer-events-none`}>
+                <User className="w-4 h-4" />
+              </span>
+            </div>
+            {regTouched.name && !nameValidation.isValid && (
+              <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                <span>{nameValidation.error}</span>
+              </p>
+            )}
+          </div>
+
+          {/* 2. Email */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-slate-700">
@@ -811,7 +1173,7 @@ export function VisitorAuthCard() {
             )}
           </div>
 
-          {/* 3. Password (كلمة المرور) مع مقياس القوة والتحقق */}
+          {/* 3. Password with Strength Meter & Checklist */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-slate-700">
@@ -913,7 +1275,7 @@ export function VisitorAuthCard() {
             )}
           </div>
 
-          {/* 4. Phone Number by Country (رقم الهاتف حسب الدولة) */}
+          {/* 4. Phone by Country */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-slate-700">
@@ -928,7 +1290,7 @@ export function VisitorAuthCard() {
             </div>
             <div className="flex gap-2">
               {/* Country Selector Dropdown */}
-              <div className="relative shrink-0" ref={countryDropdownRef}>
+              <div className="relative shrink-0">
                 <button
                   type="button"
                   onClick={() => setCountryPickerOpen(!countryPickerOpen)}
@@ -940,7 +1302,6 @@ export function VisitorAuthCard() {
                   <ChevronDownIcon />
                 </button>
 
-                {/* Country Search & Dropdown List */}
                 {countryPickerOpen && (
                   <div
                     className={`absolute top-full mt-2 ${
@@ -1015,7 +1376,6 @@ export function VisitorAuthCard() {
               </div>
             </div>
 
-            {/* Validation error if touched and invalid */}
             {regTouched.phone && !phoneValidation.isValid && (
               <p className="text-[11px] text-red-600 mt-1 font-medium flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5 text-red-600" />
@@ -1037,17 +1397,25 @@ export function VisitorAuthCard() {
             )}
           </button>
 
-          {/* Toggle to Sign In */}
-          <p className="text-center text-xs text-slate-500 mt-5">
-            {tr.hasAccountPrompt}{" "}
+          {/* Quick horizontal icon links */}
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => handleSwitchTab("login")}
-              className="font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              {tr.signInLink}
+              <LogIn className="w-3.5 h-3.5 text-slate-600" />
+              <span>{tr.tabSignIn}</span>
             </button>
-          </p>
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("guest")}
+              className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+            </button>
+          </div>
         </form>
       )}
 

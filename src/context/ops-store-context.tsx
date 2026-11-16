@@ -73,6 +73,7 @@ export type RegisteredUserRecord = {
   countryIso: string;
   createdAt: string;
   passwordHash?: string;
+  isGuest?: boolean;
 };
 
 type OpsStoreContextType = {

@@ -62,6 +62,7 @@ export async function GET() {
           phone: item.phone || "",
           countryCode: item.country_code || item.countryCode || "+20",
           countryIso: item.country_iso || item.countryIso || "EG",
+          isGuest: Boolean(item.is_guest ?? item.isGuest ?? (item.id && item.id.startsWith("gst_"))),
           createdAt: item.created_at || new Date().toISOString(),
         }))
       : [];
@@ -82,23 +83,27 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { id, name, email, phone, countryCode, countryIso, passwordHash } = body;
+    const { id, name, email, phone, countryCode, countryIso, passwordHash, isGuest } = body;
 
-    if (!name || !email) {
+    if (!name) {
       return NextResponse.json(
-        { error: "Name and Email are required" },
+        { error: "Name is required" },
         { status: 400, headers: corsHeaders() }
       );
     }
 
+    const isGuestUser = Boolean(isGuest || (id && String(id).startsWith("gst_")));
+    const userEmail = email || (phone ? `guest_${String(phone).replace(/\D/g, "")}@agriport.trade` : `guest_${Date.now()}@agriport.trade`);
+
     const newUserRecord = {
-      id: id || "usr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      id: id || (isGuestUser ? "gst_" : "usr_") + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: String(name).trim(),
-      email: String(email).trim().toLowerCase(),
+      email: String(userEmail).trim().toLowerCase(),
       phone: String(phone || "").trim(),
       country_code: String(countryCode || "+20"),
       country_iso: String(countryIso || "EG"),
-      password_hash: String(passwordHash || ""),
+      password_hash: String(passwordHash || (isGuestUser ? "GUEST_NO_PASSWORD" : "")),
+      is_guest: isGuestUser,
       created_at: new Date().toISOString(),
     };
 

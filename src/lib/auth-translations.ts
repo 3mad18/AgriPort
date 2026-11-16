@@ -63,6 +63,21 @@ export type AuthTranslations = {
   otpCodePlaceholder: string;
   codeSentNotice: string;
   simulationCodeNotice: string;
+
+  // Guest registration keys
+  guestTabLabel: string;
+  permanentTabLabel: string;
+  guestBadge: string;
+  guestDescription: string;
+  guestRegisterBtn: string;
+  guestRegisteredSuccess: string;
+  optionalEmailNote: string;
+  guestAccountNotice: string;
+  upgradeToPermanent: string;
+  guestTag: string;
+  continueAsGuestPrompt: string;
+  switchToGuestPrompt: string;
+  switchToPermanentPrompt: string;
 };
 
 export const authTranslations: Record<Language, AuthTranslations> = {
@@ -128,6 +143,21 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     otpCodePlaceholder: "0 0 0 0 0 0",
     codeSentNotice: "تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح.",
     simulationCodeNotice: "رمز التحقق الفوري للتجربة السريعة:",
+
+    // Guest registration keys
+    guestTabLabel: "تسجيل سريع كضيف",
+    permanentTabLabel: "حساب دائم (بكلمة مرور)",
+    guestBadge: "تسجيل فوري كضيف بدون كلمة مرور",
+    guestDescription: "سجل بيانات تواصلك الأساسية فقط للبدء المباشر وطلب عروض الأسعار والتصدير دون الحاجة لإنشاء كلمة مرور.",
+    guestRegisterBtn: "تسجيل ومتابعة كضيف 🌱",
+    guestRegisteredSuccess: "تم تسجيلك كضيف بنجاح! مرحباً بك في AgriPort.",
+    optionalEmailNote: "(اختياري) لتلقي عروض الأسعار والكتالوجات",
+    guestAccountNotice: "أنت مسجل حالياً بحساب ضيف سريع.",
+    upgradeToPermanent: "ترقية الحساب إلى حساب دائم",
+    guestTag: "ضيف",
+    continueAsGuestPrompt: "تفضل الدخول السريع؟",
+    switchToGuestPrompt: "سجل كضيف بدون كلمة مرور",
+    switchToPermanentPrompt: "ترغب في إنشاء حساب دائم بكلمة مرور؟",
   },
   en: {
     pageTitle: "Sign in to AgriPort",
@@ -191,6 +221,21 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     otpCodePlaceholder: "0 0 0 0 0 0",
     codeSentNotice: "Verification code sent to your email successfully.",
     simulationCodeNotice: "Quick test verification code:",
+
+    // Guest registration keys
+    guestTabLabel: "Quick Guest Sign-up",
+    permanentTabLabel: "Permanent Account",
+    guestBadge: "Instant Guest Access (No Password)",
+    guestDescription: "Enter basic contact details to start browsing and requesting export quotes immediately without a password.",
+    guestRegisterBtn: "Continue as Guest 🌱",
+    guestRegisteredSuccess: "Registered as Guest successfully! Welcome to AgriPort.",
+    optionalEmailNote: "(Optional) To receive quotes and catalogs",
+    guestAccountNotice: "You are currently logged in with a Quick Guest account.",
+    upgradeToPermanent: "Upgrade to Permanent Account",
+    guestTag: "Guest",
+    continueAsGuestPrompt: "Prefer quick access?",
+    switchToGuestPrompt: "Register as guest without password",
+    switchToPermanentPrompt: "Prefer a permanent account with password?",
   },
   fr: {
     pageTitle: "Connexion à AgriPort",
@@ -254,6 +299,21 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     otpCodePlaceholder: "0 0 0 0 0 0",
     codeSentNotice: "Code de vérification envoyé avec succès.",
     simulationCodeNotice: "Code de test rapide :",
+
+    // Guest registration keys
+    guestTabLabel: "Inscription Invité Rapide",
+    permanentTabLabel: "Compte Permanent",
+    guestBadge: "Accès Invité Rapide (Sans mot de passe)",
+    guestDescription: "Renseignez vos coordonnées de base pour explorer et demander des devis immédiatement sans mot de passe.",
+    guestRegisterBtn: "Continuer en tant qu'invité 🌱",
+    guestRegisteredSuccess: "Inscrit en tant qu'invité avec succès ! Bienvenue chez AgriPort.",
+    optionalEmailNote: "(Optionnel) Pour recevoir devis et catalogues",
+    guestAccountNotice: "Vous êtes actuellement connecté en tant qu'invité.",
+    upgradeToPermanent: "Passer à un compte permanent",
+    guestTag: "Invité",
+    continueAsGuestPrompt: "Vous préférez un accès rapide ?",
+    switchToGuestPrompt: "S'inscrire comme invité sans mot de passe",
+    switchToPermanentPrompt: "Créer un compte permanent avec mot de passe ?",
   },
   it: {
     pageTitle: "Accedi ad AgriPort",
@@ -317,6 +377,21 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     otpCodePlaceholder: "0 0 0 0 0 0",
     codeSentNotice: "Codice di verifica inviato con successo alla tua email.",
     simulationCodeNotice: "Codice di test rapido:",
+
+    // Guest registration keys
+    guestTabLabel: "Registrazione Ospite Rapida",
+    permanentTabLabel: "Account Permanente",
+    guestBadge: "Accesso Ospite Rapido (Senza password)",
+    guestDescription: "Inserisci i tuoi dati di contatto di base per esplorare e richiedere preventivi senza password.",
+    guestRegisterBtn: "Continua come Ospite 🌱",
+    guestRegisteredSuccess: "Registrato come Ospite con successo! Benvenuto in AgriPort.",
+    optionalEmailNote: "(Opzionale) Per ricevere preventivi e cataloghi",
+    guestAccountNotice: "Attualmente connesso con un account ospite.",
+    upgradeToPermanent: "Passa ad un account permanente",
+    guestTag: "Ospite",
+    continueAsGuestPrompt: "Preferisci un accesso rapido?",
+    switchToGuestPrompt: "Registrati come ospite senza password",
+    switchToPermanentPrompt: "Preferisci un account permanente con password?",
   },
   es: {
     pageTitle: "Iniciar sesión en AgriPort",
@@ -380,5 +455,20 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     otpCodePlaceholder: "0 0 0 0 0 0",
     codeSentNotice: "Código de verificación enviado con éxito a tu correo.",
     simulationCodeNotice: "Código de prueba rápida:",
+
+    // Guest registration keys
+    guestTabLabel: "Registro Rápido como Invitado",
+    permanentTabLabel: "Cuenta Permanente",
+    guestBadge: "Acceso Invitado Rápido (Sin contraseña)",
+    guestDescription: "Ingresa tus datos básicos de contacto para explorar y solicitar cotizaciones sin contraseña.",
+    guestRegisterBtn: "Continuar como Invitado 🌱",
+    guestRegisteredSuccess: "¡Registrado como invitado con éxito! Bienvenido a AgriPort.",
+    optionalEmailNote: "(Opcional) Para recibir cotizaciones y catálogos",
+    guestAccountNotice: "Has iniciado sesión con una cuenta rápida de invitado.",
+    upgradeToPermanent: "Convertir en cuenta permanente",
+    guestTag: "Invitado",
+    continueAsGuestPrompt: "¿Prefieres un acceso rápido?",
+    switchToGuestPrompt: "Registrarse como invitado sin contraseña",
+    switchToPermanentPrompt: "¿Prefieres una cuenta permanente con contraseña?",
   },
 };

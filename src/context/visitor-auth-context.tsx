@@ -22,7 +22,8 @@ export type VisitorUser = {
   countryCode?: string;
   countryIso?: string;
   avatar?: string;
-  provider: "email" | "google" | "apple";
+  provider: "email" | "google" | "apple" | "guest";
+  isGuest?: boolean;
   createdAt: string;
 };
 
@@ -34,6 +35,7 @@ export type RegisteredAccount = {
   phone: string;
   countryCode: string;
   countryIso: string;
+  isGuest?: boolean;
   createdAt: string;
 };
 
@@ -49,6 +51,13 @@ type VisitorAuthContextType = {
     phone: string;
     countryCode: string;
     countryIso: string;
+  }) => { success: boolean; error?: string };
+  registerGuestUser: (data: {
+    name: string;
+    phone?: string;
+    email?: string;
+    countryCode?: string;
+    countryIso?: string;
   }) => { success: boolean; error?: string };
   requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string; emailSent?: boolean }>;
   verifyResetCode: (email: string, code: string) => { success: boolean; error?: string };
@@ -291,6 +300,112 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const registerGuestUser = (data: {
+    name: string;
+    phone?: string;
+    email?: string;
+    countryCode?: string;
+    countryIso?: string;
+  }) => {
+    // 1. Validate Full Name
+    const nameVal = validateFullName(data.name);
+    if (!nameVal.isValid) {
+      return { success: false, error: nameVal.error };
+    }
+
+    const cleanPhone = (data.phone || "").trim();
+    const cleanEmailInput = (data.email || "").trim().toLowerCase();
+
+    // At least one of phone or email must be provided for contact
+    if (!cleanPhone && !cleanEmailInput) {
+      return {
+        success: false,
+        error: "يرجى إدخال رقم الهاتف/الواتساب أو البريد الإلكتروني للتواصل.",
+      };
+    }
+
+    let formattedPhone = cleanPhone;
+    if (cleanPhone) {
+      const phoneVal = validatePhoneNumberByCountry(cleanPhone, data.countryIso || "EG");
+      if (!phoneVal.isValid) {
+        return { success: false, error: phoneVal.error };
+      }
+      formattedPhone = phoneVal.formattedValue || cleanPhone;
+    }
+
+    let formattedEmail = cleanEmailInput;
+    if (cleanEmailInput) {
+      const emailVal = validateEmailAddress(cleanEmailInput);
+      if (!emailVal.isValid) {
+        return { success: false, error: emailVal.error };
+      }
+      formattedEmail = emailVal.formattedValue || cleanEmailInput;
+    } else {
+      // Fallback guest email for database record
+      const cleanDigits = formattedPhone.replace(/\D/g, "");
+      formattedEmail = `guest_${cleanDigits || Date.now()}@agriport.trade`;
+    }
+
+    const accounts = getRegisteredAccounts();
+
+    const newGuestAccount: RegisteredAccount = {
+      id: "gst_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: nameVal.formattedValue || data.name.trim(),
+      email: formattedEmail,
+      passwordHash: "GUEST_NO_PASSWORD",
+      phone: formattedPhone,
+      countryCode: data.countryCode || "+20",
+      countryIso: data.countryIso || "EG",
+      isGuest: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    accounts.push(newGuestAccount);
+    saveRegisteredAccounts(accounts);
+
+    // Sync newly registered guest account to API & cloud store
+    try {
+      fetch("/api/registered-users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: newGuestAccount.id,
+          name: newGuestAccount.name,
+          email: newGuestAccount.email,
+          phone: newGuestAccount.phone,
+          countryCode: newGuestAccount.countryCode,
+          countryIso: newGuestAccount.countryIso,
+          passwordHash: newGuestAccount.passwordHash,
+          isGuest: true,
+        }),
+      }).catch((e) => console.warn("Could not sync guest user to API:", e));
+    } catch {}
+
+    // Automatically authenticate the newly registered guest user
+    const sessionUser: VisitorUser = {
+      id: newGuestAccount.id,
+      name: newGuestAccount.name,
+      email: newGuestAccount.email,
+      phone: newGuestAccount.phone,
+      countryCode: newGuestAccount.countryCode,
+      countryIso: newGuestAccount.countryIso,
+      provider: "guest",
+      isGuest: true,
+      createdAt: newGuestAccount.createdAt,
+    };
+
+    saveVisitorSession(sessionUser);
+
+    try {
+      identifyUser(sessionUser.id, undefined, undefined, sessionUser.name);
+      setTag("user_role", "guest_client");
+      trackEvent("guest_registered");
+      upgradeSession("guest_registration");
+    } catch {}
+
+    return { success: true };
+  };
+
   const requestPasswordReset = async (
     email: string
   ): Promise<{ success: boolean; error?: string; emailSent?: boolean }> => {
@@ -416,6 +531,7 @@ export function VisitorAuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         loginWithEmail,
         registerUser,
+        registerGuestUser,
         requestPasswordReset,
         verifyResetCode,
         resetPasswordWithCode,

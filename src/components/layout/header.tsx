@@ -251,10 +251,15 @@ export function Header() {
                   >
                     <div className="border-b border-slate-100 pb-2.5 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                        <span className={`h-2 w-2 rounded-full ${user.isGuest ? "bg-amber-500" : "bg-emerald-500"}`}></span>
                         <p className="text-xs font-bold text-slate-900 truncate">
                           {user.name}
                         </p>
+                        {user.isGuest && (
+                          <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded-full">
+                            {language === "ar" ? "ضيف" : "Guest"}
+                          </span>
+                        )}
                       </div>
                       <p className="text-[11px] text-slate-500 truncate dir-ltr font-mono mt-0.5">
                         {user.email}
@@ -459,7 +464,14 @@ export function Header() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                      {user.isGuest && (
+                        <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded-full">
+                          {language === "ar" ? "ضيف" : "Guest"}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-500 font-mono dir-ltr">{user.email}</p>
                   </div>
                 </div>
