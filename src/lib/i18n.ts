@@ -497,7 +497,7 @@ export const translations = {
                 {
                       "icon": "🌱",
                       "title": "معاينة المزارع والقطاف",
-                      "desc": "جولة حية في مزارع الحمضيات والخضروات للتحقق من الممارسات الزراعية ومعايير GlobalG.A.P وخلو المحصول من المتبقيات."
+                      "desc": "جولة حية في مزارع الخضروات التصديرية المعتمَدة للتحقق من الممارسات الزراعية ومعايير GlobalG.A.P وخلو المحصول من المتبقيات."
                 },
                 {
                       "icon": "🔬",
@@ -561,14 +561,15 @@ export const translations = {
                       "facilitiesTitle": "المرافق والمحطات المراد تفقدها",
                       "facilitiesHelp": "يمكنك تحديد أكثر من محطة أو مرفق وفقاً لاهتمامكم التجاري",
                       "facilitiesList": {
-                            "citrus": "محطة فرز وتعبئة الموالح الإلكترونية (البرتقال، الليمون، اليوسفي)",
-                            "onionPotato": "محطة معالجة وفرز البصل والبطاطس والثوم",
-                            "farms": "المزارع الشريكة والحقول المفتوحة ومزارع الفراولة والرمان",
-                            "coldChain": "غرف التبريد السريع وأرصفة الشحن المبرد (Reefer Docks)",
-                            "qualityLab": "مختبر مراقبة الجودة وتحليل المتبقيات ومعايرة الأحجام"
+                            "artichoke": "محطة فرز وتقميع وتجهيز الخرشوف المصري للتصدير",
+                            "potatoes": "محطة غسيل وتدريج وتعبئة البطاطس المجهزة",
+                            "beansBroccoli": "محطة تدريج وتعبئة الفاصولياء الخضراء والبروكلي والقرنبيط",
+                            "farms": "المزارع وبساتين الخضروات التصديرية المعتمَدة (+600 فدان)",
+                            "coldChain": "غرف التبريد الأولي (Pre-Cooling) وأرصفة الشحن المبرد",
+                            "qualityLab": "مختبر مراقبة الجودة وفحص سلامة الغذاء ومتبقيات المبيدات (MRLs)"
                       },
                       "targetCrops": "المحاصيل الزراعية المستهدفة للاستيراد",
-                      "targetCropsPlaceholder": "مثال: برتقال صيفي، بصل ذهبي، ثوم طازج، فراولة، خرشوف...",
+                      "targetCropsPlaceholder": "مثال: خرشوف طازج، فاصولياء خضراء، بروكلي، قرنبيط، بطاطس، خس، كرنب...",
                       "airportTransfer": "الترتيبات اللوجستية",
                       "airportTransferLabel": "نعم، نطلب تنسيق الاستقبال من المطار والتنقلات الداخلية بسيارة خاصة",
                       "notes": "متطلبات أو ملاحظات إضافية",
@@ -1111,7 +1112,7 @@ export const translations = {
                 {
                       "icon": "🌱",
                       "title": "Farm & Harvest Inspection",
-                      "desc": "Live walkthrough of citrus groves and vegetable acreage verifying GlobalG.A.P. compliance, crop health, and zero-residue management."
+                      "desc": "Live walkthrough of certified export vegetable farmlands verifying GlobalG.A.P. compliance, crop health, and zero-residue management."
                 },
                 {
                       "icon": "🔬",
@@ -1175,14 +1176,15 @@ export const translations = {
                       "facilitiesTitle": "Facilities & Units to Inspect",
                       "facilitiesHelp": "Select one or more facilities according to your import focus",
                       "facilitiesList": {
-                            "citrus": "Citrus Electronic Optical Sorting & Packing Plant (Valencia, Mandarins, Lemons)",
-                            "onionPotato": "Onion, Potato & Fresh Garlic Processing & Sizing Plant",
-                            "farms": "Partner Farms, Open-Field Groves & Strawberry Cultivations",
+                            "artichoke": "Egyptian Artichoke Sorting, Trimming & Export Processing Plant",
+                            "potatoes": "Export Potato Washing, Sizing & Packhouse Facility",
+                            "beansBroccoli": "Fine Green Beans, Broccoli & Cauliflower Packing Lines",
+                            "farms": "Certified Export Vegetable Farmlands (+600 Feddans)",
                             "coldChain": "Rapid Pre-Cooling Chambers & Sealed Reefer Loading Docks",
-                            "qualityLab": "Quality Control Laboratory, Residue Testing & Calibration Center"
+                            "qualityLab": "In-House Quality Control, Food Safety & MRL Residue Testing Lab"
                       },
                       "targetCrops": "Target Crops of Interest for Import",
-                      "targetCropsPlaceholder": "e.g. Valencia Oranges, Golden Onions, Fresh Garlic, Strawberries, Artichokes...",
+                      "targetCropsPlaceholder": "e.g. Fresh Artichokes, Green Beans, Broccoli, Cauliflower, Potatoes, Lettuce...",
                       "airportTransfer": "Logistics & Transport Assistance",
                       "airportTransferLabel": "Yes, please coordinate airport pickup and private ground transportation",
                       "notes": "Special Requests & Technical Requirements",
@@ -1724,8 +1726,8 @@ export const translations = {
           "highlights": [
                 {
                       "icon": "🌱",
-                      "title": "Inspection des Vergers & Récolte",
-                      "desc": "Parcours guidé au cœur de nos vergers d'agrumes et parcelles légumières certifiés GlobalG.A.P. et sans résidus."
+                      "title": "Inspection des Domaines & Récolte",
+                      "desc": "Parcours guidé au cœur de nos domaines de légumes frais certifiés GlobalG.A.P. et sans résidus."
                 },
                 {
                       "icon": "🔬",
@@ -1789,14 +1791,15 @@ export const translations = {
                       "facilitiesTitle": "Installations à Inspecter",
                       "facilitiesHelp": "Cochez une ou plusieurs stations selon vos besoins d'importation",
                       "facilitiesList": {
-                            "citrus": "Station de calibrage optique et conditionnement d'agrumes (Valencia, mandarines, citrons)",
-                            "onionPotato": "Station de tri et conditionnement des oignons, pommes de terre et ail",
-                            "farms": "Vergers partenaires, domaines de plein champ et cultures de fraises",
-                            "coldChain": "Chambres de pré-refroidissement rapide et quais de chargement reefer",
-                            "qualityLab": "Laboratoire de contrôle qualité, analyses de résidus et calibrage"
+                            "artichoke": "Atelier de Tri, Parage et Conditionnement d'Artichauts Égyptiens",
+                            "potatoes": "Station de Lavage, Calibrage et Conditionnement de Pommes de Terre",
+                            "beansBroccoli": "Lignes de Tri et d'Emballage pour Haricots Verts, Brocolis & Choux-fleurs",
+                            "farms": "Domaines Agricoles de Légumes Frais Certifiés (+600 Feddans)",
+                            "coldChain": "Chambres de Pré-refroidissement Rapide & Quais Frigorifiques",
+                            "qualityLab": "Laboratoire d'Analyses Qualité, Sécurité Alimentaire et LMR"
                       },
                       "targetCrops": "Cultures d'Intérêt à l'Importation",
-                      "targetCropsPlaceholder": "ex. Oranges Valencia, Oignons jaunes, Ail frais, Fraises, Artichauts...",
+                      "targetCropsPlaceholder": "ex: Artichauts frais, Haricots verts, Brocolis, Choux-fleurs, Pommes de terre...",
                       "airportTransfer": "Assistance Logistique & Transport",
                       "airportTransferLabel": "Oui, nous souhaitons une prise en charge aéroportuaire et un transport privé",
                       "notes": "Demandes Particulières & Notes",
@@ -2339,7 +2342,7 @@ export const translations = {
                 {
                       "icon": "🌱",
                       "title": "Ispezione Campi e Raccolta",
-                      "desc": "Tour guidato negli agrumeti e nelle coltivazioni orticole certificate GlobalG.A.P. per verificare la totale assenza di residui."
+                      "desc": "Tour guidato nelle coltivazioni orticole da esportazione certificate GlobalG.A.P. per verificare la totale assenza di residui."
                 },
                 {
                       "icon": "🔬",
@@ -2403,14 +2406,15 @@ export const translations = {
                       "facilitiesTitle": "Strutture e Impianti da Visitare",
                       "facilitiesHelp": "Seleziona una o più strutture in base ai tuoi programmi di importazione",
                       "facilitiesList": {
-                            "citrus": "Impianto di calibratura ottica elettronica e confezionamento agrumi (arance Valencia, mandarini, limoni)",
-                            "onionPotato": "Centro di lavorazione, pulitura e calibrazione cipolle, patate e aglio",
-                            "farms": "Tenute agricole partner, coltivazioni in pieno campo e serre di fragole",
-                            "coldChain": "Celle di pre-raffreddamento rapido e baie di carico reefer sigillate",
-                            "qualityLab": "Laboratorio controllo qualità, test residui e calibrazione lotti"
+                            "artichoke": "Impianto di Calibrazione, Mondatura e Confezionamento Carciofi Egiziani",
+                            "potatoes": "Stabilimento di Lavaggio, Calibratura e Insacco Patate da Export",
+                            "beansBroccoli": "Linee di Confezionamento Fagiolini, Broccoli e Cavolfiori",
+                            "farms": "Tenute Agricole Certificate per Ortaggi da Export (+600 Feddan)",
+                            "coldChain": "Celle di Pre-refrigerazione Rapida & Baie di Carico Reefer Sigillate",
+                            "qualityLab": "Laboratorio Controllo Qualità, Sicurezza Alimentare e Residui MRL"
                       },
                       "targetCrops": "Colture di Interesse per l'Importazione",
-                      "targetCropsPlaceholder": "es. Arance Valencia, Cipolle dorate, Aglio fresco, Fragole, Carciofi...",
+                      "targetCropsPlaceholder": "es. Carciofi freschi, Fagiolini, Broccoli, Cavolfiori, Patate, Lattuga...",
                       "airportTransfer": "Assistenza Logistica e Trasporti",
                       "airportTransferLabel": "Sì, richiediamo accoglienza all'aeroporto e trasferimenti con auto dedicata",
                       "notes": "Richieste Particolari e Note Tecniche",
@@ -2953,7 +2957,7 @@ export const translations = {
                 {
                       "icon": "🌱",
                       "title": "Inspección de Fincas y Cosecha",
-                      "desc": "Recorrido guiado por huertos de cítricos y cultivos de hortalizas con certificación GlobalG.A.P. y manejo libre de residuos."
+                      "desc": "Recorrido guiado por cultivos de hortalizas de exportación con certificación GlobalG.A.P. y manejo libre de residuos."
                 },
                 {
                       "icon": "🔬",
@@ -3017,14 +3021,15 @@ export const translations = {
                       "facilitiesTitle": "Instalaciones y Módulos a Inspeccionar",
                       "facilitiesHelp": "Seleccione una o varias plantas según sus objetivos de importación",
                       "facilitiesList": {
-                            "citrus": "Planta de calibrado óptico electrónico y empaque de cítricos (naranja Valencia, mandarinas, limones)",
-                            "onionPotato": "Planta de procesamiento, calibrado y empaque de cebollas, patatas y ajo",
-                            "farms": "Fincas colaboradoras, plantaciones a cielo abierto y cultivos de fresas",
-                            "coldChain": "Cámaras de pre-enfriamiento rápido y muelles de carga reefer sellados",
-                            "qualityLab": "Laboratorio de control de calidad, análisis de residuos y calibrado"
+                            "artichoke": "Planta Central de Calibrado, Torneado y Empaque de Alcachofa",
+                            "potatoes": "Planta de Lavado, Calibrado y Ensacado de Patatas de Exportación",
+                            "beansBroccoli": "Líneas de Selección y Empaque de Judías Verdes, Brócoli y Coliflor",
+                            "farms": "Fincas Agrícolas Certificadas de Hortalizas (+600 Feddans)",
+                            "coldChain": "Túneles de Pre-enfriamiento Rápido y Muelles Refrigerados",
+                            "qualityLab": "Laboratorio Propio de Calidad Agrícola, Inocuidad y LMRs"
                       },
                       "targetCrops": "Cultivos de Interés para Importar",
-                      "targetCropsPlaceholder": "ej. Naranjas Valencia, Cebollas doradas, Ajo fresco, Fresas, Alcachofas...",
+                      "targetCropsPlaceholder": "ej. Alcachofas frescas, Judías verdes, Brócoli, Coliflor, Patatas, Lechuga...",
                       "airportTransfer": "Asistencia de Transporte y Logística",
                       "airportTransferLabel": "Sí, deseamos coordinar recepción en el aeropuerto y transporte terrestre privado",
                       "notes": "Requerimientos Especiales o Notas Técnicas",

@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       request.headers.get("x-country-code");
     const headerCity = request.headers.get("x-vercel-ip-city") || "";
 
-    let geoInfo = inferCountryFromTimeZone(timeZone || "", language || "");
+    const geoInfo = inferCountryFromTimeZone(timeZone || "", language || "");
     if (headerCountry && headerCountry.length === 2) {
       geoInfo.countryCode = headerCountry.toUpperCase();
       if (geoInfo.countryCode === "EG") { geoInfo.country = "مصر"; geoInfo.flag = "🇪🇬"; }

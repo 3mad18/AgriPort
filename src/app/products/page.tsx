@@ -151,7 +151,7 @@ export default function ProductsPage() {
                   <img
                     src={
                       item.imageUrl ||
-                      "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=800&q=80"
+                      "/images/products/artichoke.jpg"
                     }
                     alt={item.name}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

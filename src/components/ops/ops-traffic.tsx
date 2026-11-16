@@ -841,7 +841,7 @@ export function OpsTraffic() {
                 <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-start space-y-1">
                   <span className="text-xs font-extrabold text-indigo-400">2. إضافة مشروع</span>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    اضغط <strong>New Project</strong> واكتب اسم "AgriPort" ورابط موقعك.
+                    اضغط <strong>New Project</strong> واكتب اسم &quot;AgriPort&quot; ورابط موقعك.
                   </p>
                 </div>
 

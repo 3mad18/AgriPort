@@ -752,6 +752,12 @@
   .max-h-\[90vh\] {
     max-height: 90vh;
   }
+  .min-h-\[38px\] {
+    min-height: 38px;
+  }
+  .min-h-\[44px\] {
+    min-height: 44px;
+  }
   .min-h-\[240px\] {
     min-height: 240px;
   }
@@ -886,6 +892,9 @@
   }
   .min-w-\[20px\] {
     min-width: 20px;
+  }
+  .min-w-\[44px\] {
+    min-width: 44px;
   }
   .flex-1 {
     flex: 1;
@@ -1121,6 +1130,9 @@
   }
   .overflow-x-auto {
     overflow-x: auto;
+  }
+  .overflow-x-hidden {
+    overflow-x: hidden;
   }
   .overflow-y-auto {
     overflow-y: auto;
@@ -4064,6 +4076,19 @@ html.lang-hydrating body {
 html, body {
   max-width: 100%;
   overflow-x: hidden;
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+@media screen and (max-width: 768px) {
+  input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
+    font-size: 16px !important;
+  }
 }
 body {
   background-color: #ffffff;

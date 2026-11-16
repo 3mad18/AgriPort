@@ -8,7 +8,7 @@ import { FlagIcon } from "@/components/ui/flag-icon";
 import { useLanguage } from "@/context/language-context";
 import { useVisitorAuth } from "@/context/visitor-auth-context";
 import { SUPPORTED_LANGUAGES, type Language } from "@/lib/i18n";
-import { Menu, X, User, ChevronDown, Check, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 
 export function Header() {
   const { language, setLanguage, currentLangInfo, t, dir } = useLanguage();
@@ -308,7 +308,7 @@ export function Header() {
             {/* Direct Mobile Sign In / Account Button */}
             <Link
               href="/login"
-              className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 px-2.5 py-1 text-xs font-bold shadow-xs active:scale-95 transition-all"
+              className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 px-3 py-1.5 text-xs font-bold shadow-xs active:scale-95 transition-all min-h-[38px]"
               aria-label={loginLabel}
               title={loginLabel}
             >
@@ -329,7 +329,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setLangMenuOpen((prev) => !prev)}
-                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-xs active:scale-95 transition-all"
+                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs active:scale-95 transition-all min-h-[38px]"
                 aria-expanded={langMenuOpen}
                 aria-label="Change language"
               >
@@ -401,7 +401,7 @@ export function Header() {
 
             {/* Mobile Toggle */}
             <button
-              className="p-1.5 text-slate-900 hover:text-emerald-600 transition-colors"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-900 hover:text-emerald-600 transition-colors rounded-xl active:bg-slate-100"
               onClick={() => {
                 setIsMobileMenuOpen((prev) => !prev);
                 setLangMenuOpen(false);

@@ -310,7 +310,7 @@ export default function FacilitiesPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative max-w-4xl w-full overflow-hidden rounded-3xl bg-white shadow-2xl animate-zoom-in text-start"
+            className="relative max-w-4xl w-full overflow-hidden rounded-3xl bg-white shadow-2xl animate-zoom-in text-start max-h-[90vh] overflow-y-auto"
           >
             <div className="relative h-[320px] sm:h-[450px] w-full overflow-hidden bg-slate-900">
               <img
@@ -360,7 +360,7 @@ export default function FacilitiesPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative max-w-4xl w-full overflow-hidden rounded-3xl bg-slate-950 shadow-2xl border border-slate-800 text-white text-start"
+            className="relative max-w-4xl w-full overflow-hidden rounded-3xl bg-slate-950 shadow-2xl border border-slate-800 text-white text-start max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-800">
               <div className="flex items-center gap-2">

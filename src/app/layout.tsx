@@ -1,7 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { siteConfig } from "@/config/site";
 import "./globals.compiled.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#059669",
+};
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -83,7 +90,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col font-sans bg-white text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
+      <body className="flex min-h-full flex-col font-sans bg-white text-slate-900 selection:bg-emerald-100 selection:text-emerald-900 overflow-x-hidden">
         <SiteChrome>{children}</SiteChrome>
       </body>
     </html>

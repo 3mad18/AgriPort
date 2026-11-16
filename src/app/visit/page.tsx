@@ -18,9 +18,8 @@ const visitWaMessages: Record<Language, string> = {
 };
 
 function VisitPageInner() {
-  const { t, dir, language } = useLanguage();
+  const { t, language } = useLanguage();
   const v = t.visitPage;
-  const isRTL = dir === "rtl";
   const { settings: siteSettings } = useSiteSettings();
 
   const [minDate, setMinDate] = useState("");
@@ -47,7 +46,7 @@ function VisitPageInner() {
   });
 
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([
-    "citrus",
+    "artichoke",
     "coldChain",
   ]);
 
@@ -155,7 +154,7 @@ function VisitPageInner() {
       airportTransfer: false,
       notes: "",
     });
-    setSelectedFacilities(["citrus", "coldChain"]);
+    setSelectedFacilities(["artichoke", "coldChain"]);
     setIsSuccess(false);
     setSubmitError("");
   };

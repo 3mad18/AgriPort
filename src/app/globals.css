@@ -26,6 +26,31 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Mobile-first touch & responsiveness */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile input optimization: prevent iOS auto-zoom on focus while keeping smooth UI */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 body {
   background-color: #ffffff;
   color: #0f172a;
