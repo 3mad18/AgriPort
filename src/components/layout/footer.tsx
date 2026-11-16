@@ -189,7 +189,7 @@ export function Footer() {
         </div>
 
         {/* 3. Clean Bottom Bar */}
-        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500 font-medium">
+        <div className="pt-6 flex items-center justify-center text-xs text-slate-500 font-medium text-center">
           <p>
             &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
             {footer.rights}.
