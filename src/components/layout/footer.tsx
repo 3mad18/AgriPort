@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/language-context";
 import { useSiteSettings } from "@/lib/use-site-settings";
-import { MapPin, Mail, Phone, User, ShieldCheck } from "lucide-react";
+import { MapPin, Mail, Phone } from "lucide-react";
 
 const CURRENT_YEAR = 2026;
 
@@ -170,32 +170,6 @@ export function Footer() {
               &copy; {CURRENT_YEAR} {siteSettings.companyName || "AgriPort"} Technologies & Exports.{" "}
               {footer.rights}.
             </p>
-            <span className="text-slate-700 hidden sm:inline">|</span>
-            <Link
-              href="/login"
-              className="text-xs text-slate-400 hover:text-emerald-400 transition-colors inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-800/40 hover:bg-slate-800"
-              title={
-                language === "ar"
-                  ? "بوابة دخول الزوار والعملاء"
-                  : "Visitor & Client Portal"
-              }
-            >
-              <User className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>{language === "ar" ? "بوابة الزوار" : "Visitor Login"}</span>
-            </Link>
-            <span className="text-slate-700 hidden sm:inline">|</span>
-            <Link
-              href="/ops"
-              className="text-xs text-slate-500 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800/40 hover:bg-slate-800"
-              title={
-                language === "ar"
-                  ? "بوابة إدارة العمليات والموقع"
-                  : "Operations Suite Portal"
-              }
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>{language === "ar" ? "لوحة العمليات" : "Ops Portal"}</span>
-            </Link>
           </div>
         </div>
       </div>
