@@ -69,12 +69,13 @@ function ContactFormInner() {
         if (item.id === matchedProduct.id) return true;
         const lowerName = (matchedProduct.name || "").toLowerCase();
         if (lowerName.includes("خرشوف") && item.id === "artichoke") return true;
-        if (lowerName.includes("موالح") && item.id === "citrus") return true;
-        if (lowerName.includes("بصل") && item.id === "onions") return true;
-        if (lowerName.includes("فراولة") && item.id === "strawberries") return true;
-        if (lowerName.includes("رمان") && item.id === "pomegranates") return true;
+        if (lowerName.includes("فاصوليا") && item.id === "green-beans") return true;
+        if (lowerName.includes("بروكلي") && item.id === "broccoli") return true;
+        if (lowerName.includes("قرنبيط") && item.id === "cauliflower") return true;
+        if ((lowerName.includes("احمر") || lowerName.includes("أحمر")) && item.id === "red-cabbage") return true;
+        if (lowerName.includes("كرنب") && item.id === "cabbage") return true;
         if (lowerName.includes("بطاطس") && item.id === "potatoes") return true;
-        if (lowerName.includes("عنب") && item.id === "grapes") return true;
+        if (lowerName.includes("خس") && item.id === "lettuce") return true;
         return false;
       })
     : null;

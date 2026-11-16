@@ -81,9 +81,9 @@ export function FeatureGrid() {
 
         {/* Asymmetrical Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 md:auto-rows-[320px]">
-          {/* Box 1: Large Product (Span 2 cols, 2 rows) */}
+          {/* Box 1: Large Product (Span 2 cols, 2 rows - Egyptian Artichoke) */}
           <Link
-            href="/products#citrus"
+            href="/products#artichoke"
             className="md:col-span-2 md:row-span-2 min-h-[300px] md:min-h-0 bg-white rounded-2xl sm:rounded-[2rem] p-1 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col group overflow-hidden relative cursor-pointer"
           >
             <div className="absolute top-6 start-6 sm:top-8 sm:start-8 z-10 max-w-[85%] sm:max-w-[70%] text-start">
@@ -93,32 +93,80 @@ export function FeatureGrid() {
               <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-md mb-2">
                 {bento.card1Title}
               </h3>
-              <p className="text-white/90 text-xs sm:text-sm drop-shadow font-medium">
+              <p className="text-white/90 text-xs sm:text-sm drop-shadow font-medium leading-relaxed">
                 {bento.card1Desc}
               </p>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=1000&q=80"
-              alt="Citrus Exports"
+              src="/images/products/artichoke.jpg"
+              alt="Egyptian Artichoke Exports"
               className="w-full h-full min-h-[300px] md:min-h-0 object-cover rounded-[1.3rem] sm:rounded-[1.8rem] group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-1 rounded-[1.3rem] sm:rounded-[1.8rem] bg-gradient-to-t from-black/60 via-black/20 to-black/60 pointer-events-none" />
           </Link>
 
           {/* Box 2: Feature (Cold Chain) */}
-          <div className="bg-white rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group text-start min-h-[220px] md:min-h-0">
-            <div className="w-12 h-12 bg-[#F7F9FC] rounded-xl flex items-center justify-center text-slate-900 mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-colors">
-              <Snowflake />
+          <Link
+            href="/facilities#cold-chain-pre-cooling"
+            className="bg-slate-950 rounded-2xl sm:rounded-[2rem] p-5 sm:p-7 border border-slate-800/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group text-start min-h-[300px] md:min-h-0 relative overflow-hidden cursor-pointer"
+          >
+            {/* Expressive Cold Chain Facility Image */}
+            <img
+              src="/images/cold-chain-facility.jpg"
+              alt="Agricultural Cold Chain Integrity"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.85]"
+            />
+
+            {/* Multi-layered Cinematic Gradient Scrim for crisp text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-900/40 pointer-events-none" />
+            <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay pointer-events-none" />
+
+            {/* Top Bar: Floating Temperature Chip & Icon */}
+            <div className="relative z-10 flex items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-950/75 border border-white/20 px-3 py-1.5 backdrop-blur-md shadow-xs">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                </span>
+                <span className="text-xs font-bold text-emerald-400 tracking-tight font-mono">0°C – 4°C</span>
+                <span className="text-white/30 text-xs">|</span>
+                <span className="text-[11px] font-semibold text-slate-200">
+                  {bento.card2Tag}
+                </span>
+              </div>
+
+              <div className="w-10 h-10 rounded-xl bg-slate-950/60 border border-white/20 backdrop-blur-md flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shadow-xs">
+                <Snowflake />
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-2">
+
+            {/* Bottom Content: Coordinated Typography & Technical Specifications */}
+            <div className="relative z-10 pt-6">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1.5">
+                <span>❄️</span>
+                <span>{bento.card2Badge}</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2 drop-shadow-md group-hover:text-emerald-300 transition-colors">
                 {bento.card2Title}
               </h3>
-              <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-200/95 font-medium leading-relaxed drop-shadow-xs line-clamp-2 mb-3">
                 {bento.card2Desc}
               </p>
+
+              {/* Technical Specifications Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-[11px] text-white/90 font-medium">
+                <span className="rounded-md bg-white/15 px-2 py-0.5 backdrop-blur-xs border border-white/10">
+                  Pre-Cooling ⚡
+                </span>
+                <span className="rounded-md bg-white/15 px-2 py-0.5 backdrop-blur-xs border border-white/10">
+                  Reefer Docks 🚛
+                </span>
+                <span className="rounded-md bg-white/15 px-2 py-0.5 backdrop-blur-xs border border-white/10">
+                  IoT 24/7 📡
+                </span>
+              </div>
             </div>
-          </div>
+          </Link>
 
           {/* Box 3: Product (Potatoes) */}
           <Link
@@ -134,15 +182,15 @@ export function FeatureGrid() {
               </p>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80"
+              src="/images/products/potatoes.jpg"
               alt="Potatoes"
               className="w-full h-full min-h-[240px] md:min-h-0 object-cover group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent pointer-events-none" />
           </Link>
 
-          {/* Box 4: Global Sourcing Map/Feature (Span 2 cols) */}
-          <div className="md:col-span-2 bg-slate-900 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 border border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center justify-between overflow-hidden relative group text-white text-start">
+          {/* Box 4: Global Sourcing Map/Feature (Span 3 cols full width) */}
+          <div className="md:col-span-3 bg-slate-900 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 border border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center justify-between overflow-hidden relative group text-white text-start">
             <div className="relative z-10 md:w-3/5">
               <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-emerald-400 mb-6">
                 <Globe />

@@ -13,111 +13,118 @@ export type ExportProduct = {
 
 export const EXPORT_CATALOG: ExportProduct[] = [
   {
-    id: "citrus",
-    name: "الموالح والبرتقال المصري",
-    category: "موالح",
-    variety: "برتقال فالنسيا (صيفي)، أبو صرة، ليمون، يوسفي",
-    season: "نوفمبر — مايو",
-    pack: "كراتين تليسكوبيك 15 كجم، أوبن توب، شبك",
-    specs: "معايرات كاليبر: 40، 48، 56، 64، 72، 80، 88",
-    imageUrl:
-      "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=800&q=80",
-    icon: "🍊",
-    status: "متاح للتصدير",
-  },
-  {
-    id: "onions",
-    name: "البصل المصري (الأحمر والذهبي)",
+    id: "artichoke",
+    name: "الخرشوف المصري الفاخر",
     category: "خضروات",
-    variety: "بصل أحمر إيطالي، بصل ذهبي مجفف طبيعياً",
-    season: "فبراير — أغسطس",
-    pack: "أكياس شبكية 10 كجم و 25 كجم، جامبو باج 1 طن",
-    specs: "أحجام: 40/60 مم، 50/70 مم، 70/90 مم، 80/100 مم",
-    imageUrl:
-      "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80",
-    icon: "🧅",
+    variety: "خرشوف بلدي، خرشوف فرنساوي، فيوليت",
+    season: "نوفمبر — مايو",
+    pack: "براميل حفظ غذائية (محلول ملحي)، كراتين تبريد، أكياس مفرغة",
+    specs: "أحجام كاليبر: 50، 60، 65 مم نخب أول، أقماع وقلوب مجهزة ومطابقة للمواصفات الأوروبية",
+    imageUrl: "/images/products/artichoke.jpg",
+    icon: "🌱",
     status: "متاح للتصدير",
   },
   {
-    id: "strawberries",
-    name: "الفراولة الطازجة الفاخرة",
-    category: "فواكه",
-    variety: "فورتونا، فستيفال، سنشريشن",
-    season: "نوفمبر — مارس",
-    pack: "بانيتات 250 جم داخل كراتين 2 كجم و 2.5 كجم",
-    specs: "شحن جوي مبرد سريع، خالية من متبقيات المبيدات",
-    imageUrl:
-      "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=800&q=80",
-    icon: "🍓",
+    id: "green-beans",
+    name: "الفاصولياء الخضراء الفاخرة",
+    category: "خضروات",
+    variety: "بولستا (Polesta)، برونكو (Bronco)، فالنتينو",
+    season: "أكتوبر — مايو",
+    pack: "كراتين مقواة 4-5 كجم، بانيتات 250 و 500 جم مبردة",
+    specs: "قرون مستقيمة ناضرة خالية من الخيوط، طول 10-14 سم، درجات نقاوة Fine & Extra Fine",
+    imageUrl: "/images/products/green-beans.jpg",
+    icon: "🫘",
     status: "متاح للتصدير",
   },
   {
-    id: "pomegranates",
-    name: "الرمان الوندرفول الفاخر",
-    category: "فواكه",
-    variety: "رمان وندرفول أحمر داكن عالي السكرية",
-    season: "سبتمبر — ديسمبر",
-    pack: "كراتين 4.5 كجم و 5 كجم (بانيتات أو كراتين مفتوحة)",
-    specs: "أحجام: 6، 7، 8، 9، 10، 12، 14 حبة بالكرتونة",
-    imageUrl:
-      "https://images.unsplash.com/photo-1541344999736-83eca272f6fc?auto=format&fit=crop&w=800&q=80",
-    icon: "🍎",
-    status: "موسم قادم",
+    id: "broccoli",
+    name: "البروكلي الأخضر الطازج",
+    category: "خضروات",
+    variety: "كالابريزي (Calabrese)، باراثون، هيريتيدج",
+    season: "نوفمبر — أبريل",
+    pack: "صناديق بوليسترين مع ثلج مجروش (Iced Styrofoam) 5-6 كجم، كراتين مبردة",
+    specs: "رؤوس متراصة مغلقة بلون أخضر داكن مزرق، قطر 10-15 سم، ساق مقصوصة 2-3 سم، تبريد فوري Pre-cooling",
+    imageUrl: "/images/products/broccoli.jpg",
+    icon: "🥦",
+    status: "متاح للتصدير",
+  },
+  {
+    id: "cauliflower",
+    name: "القرنبيط الأبيض الفاخر",
+    category: "خضروات",
+    variety: "سنوبول (Snowball)، فريمانت، إينكلاين",
+    season: "نوفمبر — أبريل",
+    pack: "كراتين كرتونية مبطنة 6-8 حبات، تغليف محكم بغشاء مسامي (Shrink Wrap)",
+    specs: "أقراص زهرية ناصعة البياض كثيفة وصلبة، أوزان 1.0 - 1.8 كجم، محاطة بأوراق حماية مشذبة",
+    imageUrl: "/images/products/cauliflower.jpg",
+    icon: "🥬",
+    status: "متاح للتصدير",
+  },
+  {
+    id: "cabbage",
+    name: "الكرنب الأخضر المجهز للتصدير",
+    category: "خضروات",
+    variety: "كرنب بلدي فاخر، أصناف هجينة (براونشفايغ، برونكو)",
+    season: "ديسمبر — مايو",
+    pack: "أكياس شبكية 15-20 كجم، صناديق خشبية، باليتات مبردة للشحن البحري",
+    specs: "رؤوس كروية متماسكة جيدة الالتفاف، أوزان متجانسة 1.5 - 2.5 كجم، خالية تماماً من العيوب",
+    imageUrl: "/images/products/cabbage.jpg",
+    icon: "🥬",
+    status: "متاح للتصدير",
   },
   {
     id: "potatoes",
     name: "البطاطس المجهزة للتصدير",
     category: "خضروات",
-    variety: "سبونتا، مونديال، ليدي روزيتا، كارا",
+    variety: "سبونتا (Spunta)، مونديال، ليدي روزيتا، كارا، هيرميس",
     season: "يناير — يونيو",
-    pack: "أكياس شبك 10 كجم، 25 كجم، جامبو باج 1250 كجم",
-    specs: "مغسولة ومجففة، أحجام 35/55 مم و 55+ مم",
-    imageUrl:
-      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80",
+    pack: "أكياس شبك 10 كجم و 25 كجم، جامبو باج 1250 كجم، كراتين مبردة",
+    specs: "مغسولة ومجففة أو معفرة بالرمال، أحجام مدرجة: 35/55 مم، 55/65 مم، 65+ مم",
+    imageUrl: "/images/products/potatoes.jpg",
     icon: "🥔",
     status: "متاح للتصدير",
   },
   {
-    id: "grapes",
-    name: "العنب الطازج بدون بذور",
-    category: "فواكه",
-    variety: "إيرلي سويت، سوبيريور، فليم، كريمسون",
-    season: "مايو — أغسطس",
-    pack: "بانيتات 500 جم أو كيس ورقي داخل كرتونة 4.5 كجم",
-    specs: "مستوى بريكس مرتفع، قطر الحبة 18-22 مم+",
-    imageUrl:
-      "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=800&q=80",
-    icon: "🍇",
+    id: "lettuce",
+    name: "خس الكابوتشا والخس الروماني",
+    category: "خضروات",
+    variety: "آيسبيرج (Iceberg)، خس روماني (Romaine)، لولو روسو",
+    season: "نوفمبر — مايو",
+    pack: "كراتين مموجة 10-12 حبة مغلفة فردياً بأكياس مسامية (Micro-perforated bags)",
+    specs: "رؤوس مقرمشة مبردة بتقنية Vacuum Cooling فور الحصاد، أوزان متناسقة 400 - 700 جم",
+    imageUrl: "/images/products/lettuce.jpg",
+    icon: "🥗",
     status: "متاح للتصدير",
   },
   {
-    id: "artichoke",
-    name: "الخرشوف المصري الفاخر",
+    id: "red-cabbage",
+    name: "الكرنب الأحمر الفاخر",
     category: "خضروات",
-    variety: "خرشوف فرنساوي، خرشوف بلدي",
-    season: "نوفمبر — مايو",
-    pack: "براميل حفظ غذائية، كراتين مبردة، أكياس مجهزة",
-    specs: "أحجام كاليبر: 50، 60، 55 مم نخب أول",
-    imageUrl:
-      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80",
-    icon: "🌱",
+    variety: "روبي بول (Ruby Ball)، رودو، روكسي",
+    season: "ديسمبر — مايو",
+    pack: "أكياس شبك تهوية 10 و 15 كجم، كراتين تبريد تليسكوبيك، صناديق تصدير",
+    specs: "لون أرجواني أحمر غامق متألق، أوراق متراصة شديدة الصلابة، أوزان 1 - 2 كجم للحبة، تحمل شحن وتخزين فائق",
+    imageUrl: "/images/products/red-cabbage.jpg",
+    icon: "🟣",
     status: "متاح للتصدير",
   },
 ];
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config";
 
-function syncLocalInquiry(item: any) {
+function syncLocalInquiry(item: { id?: string; [key: string]: unknown }) {
   if (typeof window === "undefined") return;
   try {
     const raw = localStorage.getItem("agriport_ops_inquiries");
     const list = raw ? JSON.parse(raw) : [];
-    if (!list.some((existing: any) => existing.id === item.id)) {
+    if (!list.some((existing: { id?: string }) => existing.id === item.id)) {
       const updated = [item, ...list];
       localStorage.setItem("agriport_ops_inquiries", JSON.stringify(updated));
       window.dispatchEvent(new Event("agriport_ops_store_change"));
     }
-  } catch (e) {}
+  } catch {
+    // ignore
+  }
 }
 
 import { trackEvent, upgradeSession, setTag } from "@/lib/clarity";

@@ -18,7 +18,7 @@ type FacilityItem = {
 };
 
 export default function FacilitiesPage() {
-  const { t, dir, language } = useLanguage();
+  const { t, dir } = useLanguage();
   const f = t.facilitiesPage;
   const isRTL = dir === "rtl";
 
@@ -188,6 +188,7 @@ export default function FacilitiesPage() {
           {filteredItems.map((item) => (
             <div
               key={item.id}
+              id={item.id}
               onClick={() => setSelectedMedia(item)}
               className="group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white shadow-xs transition-all hover:border-slate-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer text-start"
             >

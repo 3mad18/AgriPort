@@ -18,9 +18,9 @@ export const SETTINGS_CACHE_KEY = "agriport_live_settings_cache";
 export const SETTINGS_EVENT = "agriport_live_settings_change";
 export const OPS_STORE_EVENT = "agriport_ops_store_change";
 
-export const PRODUCTS_KEY = "agriport_ops_products";
-export const PRODUCTS_CACHE_KEY = "agriport_live_products_cache";
-export const PRODUCTS_EVENT = "agriport_live_products_change";
+export const PRODUCTS_KEY = "agriport_ops_products_v2";
+export const PRODUCTS_CACHE_KEY = "agriport_live_products_cache_v2";
+export const PRODUCTS_EVENT = "agriport_live_products_change_v2";
 
 export function getSupabaseHeaders(extra?: Record<string, string>) {
   return {

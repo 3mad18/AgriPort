@@ -28,18 +28,55 @@ function subscribe(callback: () => void) {
 
 function getSnapshot(): ExportProduct[] {
   if (typeof window === "undefined") return EXPORT_CATALOG;
+
+  // Clean up legacy unversioned storage caches
+  try {
+    localStorage.removeItem("agriport_ops_products");
+    localStorage.removeItem("agriport_live_products_cache");
+  } catch {
+    // ignore
+  }
+
   const raw =
     localStorage.getItem(PRODUCTS_KEY) ||
     localStorage.getItem(PRODUCTS_CACHE_KEY);
 
   if (raw === cachedRaw && cachedProducts) return cachedProducts;
-  if (!raw) return EXPORT_CATALOG;
+  if (!raw) {
+    cachedProducts = EXPORT_CATALOG;
+    cachedRaw = JSON.stringify(EXPORT_CATALOG);
+    try {
+      localStorage.setItem(PRODUCTS_KEY, cachedRaw);
+      localStorage.setItem(PRODUCTS_CACHE_KEY, cachedRaw);
+    } catch {
+      // ignore
+    }
+    return EXPORT_CATALOG;
+  }
+
   try {
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
+    const isValid =
+      Array.isArray(parsed) &&
+      parsed.length >= 8 &&
+      parsed.some((p: { id?: string }) => p.id === "green-beans") &&
+      parsed.some((p: { id?: string }) => p.id === "broccoli") &&
+      !parsed.some((p: { id?: string }) => p.id === "citrus");
+
+    if (isValid) {
       cachedProducts = parsed;
       cachedRaw = raw;
       return cachedProducts;
+    }
+
+    // Cache is obsolete, overwrite with current EXPORT_CATALOG
+    cachedProducts = EXPORT_CATALOG;
+    cachedRaw = JSON.stringify(EXPORT_CATALOG);
+    try {
+      localStorage.setItem(PRODUCTS_KEY, cachedRaw);
+      localStorage.setItem(PRODUCTS_CACHE_KEY, cachedRaw);
+    } catch {
+      // ignore
     }
     return EXPORT_CATALOG;
   } catch {
@@ -71,8 +108,27 @@ export function useLiveProducts() {
         );
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0 && isMounted) {
-            const mapped: ExportProduct[] = data.map((item: any) => ({
+          // Only adopt remote data if it matches the current updated crops (contains green-beans & broccoli and not citrus)
+          const isRemoteUpdated =
+            Array.isArray(data) &&
+            data.length >= 8 &&
+            data.some((item: { id?: string }) => item.id === "green-beans") &&
+            !data.some((item: { id?: string }) => item.id === "citrus");
+
+          if (isRemoteUpdated && isMounted) {
+            const mapped: ExportProduct[] = data.map((item: {
+              id: string;
+              name: string;
+              category: "موالح" | "خضروات" | "فواكه" | "أخرى";
+              variety: string;
+              season: string;
+              pack: string;
+              specs: string;
+              image_url?: string;
+              imageUrl?: string;
+              icon?: string;
+              status?: "متاح للتصدير" | "موسم قادم" | "نفد مؤقتاً";
+            }) => ({
               id: item.id,
               name: item.name,
               category: item.category,
@@ -80,7 +136,7 @@ export function useLiveProducts() {
               season: item.season,
               pack: item.pack,
               specs: item.specs,
-              imageUrl: item.image_url || item.imageUrl,
+              imageUrl: item.image_url || item.imageUrl || "/images/products/artichoke.jpg",
               icon: item.icon || "🌿",
               status: item.status || "متاح للتصدير",
             }));
@@ -96,7 +152,7 @@ export function useLiveProducts() {
             }
           }
         }
-      } catch (err) {
+      } catch {
         // silent
       }
     }

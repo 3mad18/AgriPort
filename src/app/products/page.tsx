@@ -39,12 +39,48 @@ export default function ProductsPage() {
       ) {
         return true;
       }
-      if (lowerCatName.includes("موالح") && item.id === "citrus") return true;
-      if (lowerCatName.includes("بصل") && item.id === "onions") return true;
-      if (lowerCatName.includes("فراولة") && item.id === "strawberries") return true;
-      if (lowerCatName.includes("رمان") && item.id === "pomegranates") return true;
-      if (lowerCatName.includes("بطاطس") && item.id === "potatoes") return true;
-      if (lowerCatName.includes("عنب") && item.id === "grapes") return true;
+      if (
+        (lowerCatName.includes("فاصوليا") || cat.id.toLowerCase().includes("bean")) &&
+        (item.id === "green-beans" || lowerItemName.includes("bean") || lowerItemName.includes("haricot") || lowerItemName.includes("fagiolin") || lowerItemName.includes("judía"))
+      ) {
+        return true;
+      }
+      if (
+        (lowerCatName.includes("بروكلي") || cat.id.toLowerCase().includes("broccoli")) &&
+        (item.id === "broccoli" || lowerItemName.includes("broccoli") || lowerItemName.includes("brocoli"))
+      ) {
+        return true;
+      }
+      if (
+        (lowerCatName.includes("قرنبيط") || cat.id.toLowerCase().includes("cauliflower")) &&
+        (item.id === "cauliflower" || lowerItemName.includes("cauliflower") || lowerItemName.includes("chou-fleur") || lowerItemName.includes("cavolfiore") || lowerItemName.includes("coliflor"))
+      ) {
+        return true;
+      }
+      if (
+        (lowerCatName.includes("احمر") || lowerCatName.includes("أحمر") || cat.id.toLowerCase().includes("red-cabbage")) &&
+        (item.id === "red-cabbage" || lowerItemName.includes("red cabbage") || lowerItemName.includes("chou rouge") || lowerItemName.includes("rosso") || lowerItemName.includes("lombarda") || lowerItemName.includes("roja"))
+      ) {
+        return true;
+      }
+      if (
+        (lowerCatName.includes("كرنب") || cat.id.toLowerCase().includes("cabbage")) &&
+        (item.id === "cabbage" || lowerItemName.includes("cabbage") || lowerItemName.includes("chou") || lowerItemName.includes("cavolo") || lowerItemName.includes("repollo"))
+      ) {
+        return true;
+      }
+      if (
+        (lowerCatName.includes("بطاطس") || cat.id.toLowerCase().includes("potato")) &&
+        (item.id === "potatoes" || lowerItemName.includes("potato") || lowerItemName.includes("pomme de terre") || lowerItemName.includes("patat"))
+      ) {
+        return true;
+      }
+      if (
+        (lowerCatName.includes("خس") || cat.id.toLowerCase().includes("lettuce")) &&
+        (item.id === "lettuce" || lowerItemName.includes("lettuce") || lowerItemName.includes("laitue") || lowerItemName.includes("lattuga") || lowerItemName.includes("lechuga"))
+      ) {
+        return true;
+      }
       return false;
     });
 
