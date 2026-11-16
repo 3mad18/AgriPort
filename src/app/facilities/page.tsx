@@ -107,8 +107,8 @@ export default function FacilitiesPage() {
         <div className="relative overflow-hidden rounded-3xl sm:rounded-[2.5rem] bg-slate-900 text-white border border-slate-800 shadow-xl group">
           <div className="relative h-[340px] sm:h-[440px] lg:h-[500px] w-full overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=1600&q=85"
-              alt="Live Packing Station Video"
+              src="/images/cold-chain-facility.jpg"
+              alt="Live Vegetable Packing Station & Cold Chain"
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-[0.7]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
@@ -381,7 +381,7 @@ export default function FacilitiesPage() {
 
             <div className="relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center">
               <img
-                src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=1600&q=85"
+                src="/images/facilities/artichoke-processing.jpg"
                 alt="Packing station showcase"
                 className="h-full w-full object-cover opacity-80"
               />
