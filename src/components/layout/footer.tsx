@@ -100,12 +100,6 @@ export function Footer() {
                 {footer.linkProducts}
               </Link>
               <Link
-                href="/facilities"
-                className="text-slate-300 hover:text-emerald-400 transition-colors"
-              >
-                {footer.linkColdChain}
-              </Link>
-              <Link
                 href="/about"
                 className="text-slate-300 hover:text-emerald-400 transition-colors"
               >
@@ -122,12 +116,6 @@ export function Footer() {
                 className="text-slate-300 hover:text-emerald-400 transition-colors"
               >
                 {footer.linkAbout}
-              </Link>
-              <Link
-                href="/facilities"
-                className="text-slate-300 hover:text-emerald-400 transition-colors"
-              >
-                {footer.linkFarms}
               </Link>
               <Link
                 href="/about"
