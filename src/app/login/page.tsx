@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { VisitorAuthCard } from "@/components/auth/visitor-auth-card";
+import { VisitorAuthCard, VisitorLoadingFallback } from "@/components/auth/visitor-auth-card";
 import { Globe2 } from "lucide-react";
 import { VISITOR_SESSION_KEY, type VisitorUser } from "@/context/visitor-auth-context";
 
@@ -28,14 +28,7 @@ export default function VisitorLoginPage() {
       />
 
       <div className="relative z-10 w-full max-w-lg">
-        <Suspense
-          fallback={
-            <div className="w-full max-w-lg mx-auto bg-white/80 rounded-3xl p-12 border border-slate-200 text-center shadow-xl">
-              <div className="h-8 w-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-sm font-semibold text-slate-500">جاري تحميل بيانات الحساب...</p>
-            </div>
-          }
-        >
+        <Suspense fallback={<VisitorLoadingFallback />}>
           <VisitorAuthCardLoader />
         </Suspense>
 

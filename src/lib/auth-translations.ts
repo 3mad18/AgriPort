@@ -81,6 +81,8 @@ export type AuthTranslations = {
   continueAsGuestPrompt: string;
   switchToGuestPrompt: string;
   switchToPermanentPrompt: string;
+  loadingAccount: string;
+  verifyingAccount: string;
 };
 
 export const authTranslations: Record<Language, AuthTranslations> = {
@@ -155,7 +157,7 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     permanentTabLabel: "حساب دائم (بكلمة مرور)",
     guestBadge: "تسجيل فوري كضيف بدون كلمة مرور",
     guestDescription: "سجل بيانات تواصلك الأساسية فقط للبدء المباشر وطلب عروض الأسعار والتصدير دون الحاجة لإنشاء كلمة مرور.",
-    guestRegisterBtn: "تسجيل ومتابعة كضيف 🌱",
+    guestRegisterBtn: "تسجيل ومتابعة كضيف",
     guestRegisteredSuccess: "تم تسجيلك كضيف بنجاح! مرحباً بك في AgriPort.",
     optionalEmailNote: "(اختياري) لتلقي عروض الأسعار والكتالوجات",
     guestAccountNotice: "أنت مسجل حالياً بحساب ضيف سريع.",
@@ -164,6 +166,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     continueAsGuestPrompt: "تفضل الدخول السريع؟",
     switchToGuestPrompt: "سجل كضيف بدون كلمة مرور",
     switchToPermanentPrompt: "ترغب في إنشاء حساب دائم بكلمة مرور؟",
+    loadingAccount: "جاري تحميل بيانات الحساب...",
+    verifyingAccount: "جاري التحقق من بيانات الحساب...",
   },
   en: {
     pageTitle: "Sign in to AgriPort",
@@ -236,7 +240,7 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     permanentTabLabel: "Permanent Account",
     guestBadge: "Instant Guest Access (No Password)",
     guestDescription: "Enter basic contact details to start browsing and requesting export quotes immediately without a password.",
-    guestRegisterBtn: "Continue as Guest 🌱",
+    guestRegisterBtn: "Continue as Guest",
     guestRegisteredSuccess: "Registered as Guest successfully! Welcome to AgriPort.",
     optionalEmailNote: "(Optional) To receive quotes and catalogs",
     guestAccountNotice: "You are currently logged in with a Quick Guest account.",
@@ -245,6 +249,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     continueAsGuestPrompt: "Prefer quick access?",
     switchToGuestPrompt: "Register as guest without password",
     switchToPermanentPrompt: "Prefer a permanent account with password?",
+    loadingAccount: "Loading account details...",
+    verifyingAccount: "Verifying account details...",
   },
   fr: {
     pageTitle: "Connexion à AgriPort",
@@ -317,7 +323,7 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     permanentTabLabel: "Compte Permanent",
     guestBadge: "Accès Invité Rapide (Sans mot de passe)",
     guestDescription: "Renseignez vos coordonnées de base pour explorer et demander des devis immédiatement sans mot de passe.",
-    guestRegisterBtn: "Continuer en tant qu'invité 🌱",
+    guestRegisterBtn: "Continuer en tant qu'invité",
     guestRegisteredSuccess: "Inscrit en tant qu'invité avec succès ! Bienvenue chez AgriPort.",
     optionalEmailNote: "(Optionnel) Pour recevoir devis et catalogues",
     guestAccountNotice: "Vous êtes actuellement connecté en tant qu'invité.",
@@ -326,6 +332,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     continueAsGuestPrompt: "Vous préférez un accès rapide ?",
     switchToGuestPrompt: "S'inscrire comme invité sans mot de passe",
     switchToPermanentPrompt: "Créer un compte permanent avec mot de passe ?",
+    loadingAccount: "Chargement des données du compte...",
+    verifyingAccount: "Vérification des détails du compte...",
   },
   it: {
     pageTitle: "Accedi ad AgriPort",
@@ -398,7 +406,7 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     permanentTabLabel: "Account Permanente",
     guestBadge: "Accesso Ospite Rapido (Senza password)",
     guestDescription: "Inserisci i tuoi dati di contatto di base per esplorare e richiedere preventivi senza password.",
-    guestRegisterBtn: "Continua come Ospite 🌱",
+    guestRegisterBtn: "Continua come Ospite",
     guestRegisteredSuccess: "Registrato come Ospite con successo! Benvenuto in AgriPort.",
     optionalEmailNote: "(Opzionale) Per ricevere preventivi e cataloghi",
     guestAccountNotice: "Attualmente connesso con un account ospite.",
@@ -407,6 +415,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     continueAsGuestPrompt: "Preferisci un accesso rapido?",
     switchToGuestPrompt: "Registrati come ospite senza password",
     switchToPermanentPrompt: "Preferisci un account permanente con password?",
+    loadingAccount: "Caricamento dei dettagli dell'account...",
+    verifyingAccount: "Verifica dei dettagli dell'account...",
   },
   es: {
     pageTitle: "Iniciar sesión en AgriPort",
@@ -479,7 +489,7 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     permanentTabLabel: "Cuenta Permanente",
     guestBadge: "Acceso Invitado Rápido (Sin contraseña)",
     guestDescription: "Ingresa tus datos básicos de contacto para explorar y solicitar cotizaciones sin contraseña.",
-    guestRegisterBtn: "Continuar como Invitado 🌱",
+    guestRegisterBtn: "Continuar como Invitado",
     guestRegisteredSuccess: "¡Registrado como invitado con éxito! Bienvenido a AgriPort.",
     optionalEmailNote: "(Opcional) Para recibir cotizaciones y catálogos",
     guestAccountNotice: "Has iniciado sesión con una cuenta rápida de invitado.",
@@ -488,5 +498,7 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     continueAsGuestPrompt: "¿Prefieres un acceso rápido?",
     switchToGuestPrompt: "Registrarse como invitado sin contraseña",
     switchToPermanentPrompt: "¿Prefieres una cuenta permanente con contraseña?",
+    loadingAccount: "Cargando datos de la cuenta...",
+    verifyingAccount: "Verificando los datos de la cuenta...",
   },
 };

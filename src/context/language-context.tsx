@@ -60,6 +60,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = useCallback((lang: Language) => {
     localStorage.setItem(STORAGE_KEY, lang);
+    if (typeof document !== "undefined") {
+      document.cookie = `${STORAGE_KEY}=${encodeURIComponent(lang)}; path=/; max-age=31536000; SameSite=Lax`;
+    }
     const matched = SUPPORTED_LANGUAGES.find((item) => item.code === lang);
     if (matched) {
       document.documentElement.lang = matched.code;
@@ -77,6 +80,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       document.documentElement.lang = currentLangInfo.code;
       document.documentElement.dir = currentLangInfo.dir;
       document.documentElement.classList.remove("lang-hydrating");
+      document.cookie = `${STORAGE_KEY}=${encodeURIComponent(currentLangInfo.code)}; path=/; max-age=31536000; SameSite=Lax`;
     }
   }, [currentLangInfo]);
 

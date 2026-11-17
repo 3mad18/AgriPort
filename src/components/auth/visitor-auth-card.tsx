@@ -43,6 +43,20 @@ type VisitorAuthCardProps = {
   initialUser?: VisitorUser | null;
 };
 
+export function VisitorLoadingFallback() {
+  const { language } = useLanguage();
+  const tr = authTranslations[language] || authTranslations.en;
+
+  return (
+    <div className="w-full max-w-lg mx-auto bg-white/80 rounded-3xl p-12 border border-slate-200 text-center shadow-xl">
+      <div className="h-8 w-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+      <p className="text-sm font-semibold text-slate-500">
+        {tr.loadingAccount}
+      </p>
+    </div>
+  );
+}
+
 export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -540,7 +554,7 @@ export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
       <div className="w-full max-w-md mx-auto bg-white/95 backdrop-blur-xl rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-2xl text-center animate-pulse">
         <div className="h-10 w-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-xs font-bold text-slate-500">
-          {language === "ar" ? "جاري التحقق من بيانات الحساب..." : "Verifying account details..."}
+          {tr.verifyingAccount || (language === "ar" ? "جاري التحقق من بيانات الحساب..." : "Verifying account details...")}
         </p>
       </div>
     );
@@ -575,7 +589,7 @@ export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
               user.isGuest ? "bg-amber-600 animate-pulse" : "bg-emerald-600 animate-pulse"
             }`}
           ></span>
-          {user.isGuest ? (language === "ar" ? "حساب ضيف سريع" : "Quick Guest Account") : tr.visitorAccount}
+          {user.isGuest ? tr.guestTag : tr.visitorAccount}
         </span>
 
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">{user.name}</h3>
@@ -599,6 +613,12 @@ export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
             <p className="text-[11px] text-amber-800/90 mt-1 leading-relaxed">
               {language === "ar"
                 ? "يمكنك تصفح المحاصيل وطلب عروض الأسعار وحجز الشحنات مباشرة."
+                : language === "fr"
+                ? "Vous pouvez parcourir les produits, demander des devis et planifier vos expéditions."
+                : language === "it"
+                ? "Puoi esplorare i prodotti, richiedere preventivi e pianificare le spedizioni."
+                : language === "es"
+                ? "Puedes explorar los productos, solicitar cotizaciones y coordinar envíos."
                 : "You can browse fresh produce, request quotes, and coordinate export shipments."}
             </p>
           </div>
@@ -613,10 +633,22 @@ export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
               {cropName
                 ? language === "ar"
                   ? `متابعة طلب تسعير ${cropName}`
+                  : language === "fr"
+                  ? `Poursuivre la demande pour ${cropName}`
+                  : language === "it"
+                  ? `Continua richiesta per ${cropName}`
+                  : language === "es"
+                  ? `Continuar cotización de ${cropName}`
                   : `Continue Quote for ${cropName}`
                 : redirectParam
                 ? language === "ar"
                   ? "متابعة الطلب"
+                  : language === "fr"
+                  ? "Poursuivre la demande"
+                  : language === "it"
+                  ? "Continua richiesta"
+                  : language === "es"
+                  ? "Continuar solicitud"
                   : "Continue Inquiry"
                 : tr.backToHome}
             </span>
