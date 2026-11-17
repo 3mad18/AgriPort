@@ -21,50 +21,7 @@ import {
   Paperclip,
 } from "lucide-react";
 
-export const EMOJI_OPTIONS = [
-  // 1. الموالح والحمضيات (Citrus)
-  { emoji: "🍊", label: "برتقال وموالح صيفية (Oranges & Citrus)", category: "موالح" },
-  { emoji: "🍋", label: "ليمون أصفر وأخضر (Lemons & Limes)", category: "موالح" },
-  { emoji: "🍈", label: "يوسفي وكلمنتينا وشمام (Mandarins & Melons)", category: "موالح" },
-
-  // 2. الخضروات الرئيسية (Vegetables)
-  { emoji: "🧅", label: "بصل أحمر وذهبي (Red & Golden Onions)", category: "خضروات" },
-  { emoji: "🧄", label: "ثوم طازج وأبيض وأحمر (Fresh Garlic)", category: "خضروات" },
-  { emoji: "🥔", label: "بطاطس مائدة وتصنيع (Fresh Potatoes)", category: "خضروات" },
-  { emoji: "🌱", label: "خرشوف ونباتات مجهزة (Artichoke & Plants)", category: "خضروات" },
-  { emoji: "🍅", label: "طماطم تصدير وشيري (Fresh Tomatoes)", category: "خضروات" },
-  { emoji: "🥒", label: "خيار صيفي وشتوي (Fresh Cucumbers)", category: "خضروات" },
-  { emoji: "🫑", label: "فلفل ألوان ورومي (Bell Peppers)", category: "خضروات" },
-  { emoji: "🌶️", label: "فلفل حار وشطة (Chili Peppers)", category: "خضروات" },
-  { emoji: "🥕", label: "جزر أصفر وبرتقالي (Carrots)", category: "خضروات" },
-  { emoji: "🥬", label: "خس وخضروات ورقية (Lettuce & Cabbage)", category: "خضروات" },
-  { emoji: "🥦", label: "بروكلي وقرنبيط (Broccoli & Cauliflower)", category: "خضروات" },
-  { emoji: "🍆", label: "باذنجان رومي وأبيض (Eggplants)", category: "خضروات" },
-  { emoji: "🌽", label: "ذرة سكرية وصفراء (Sweet Corn)", category: "خضروات" },
-  { emoji: "🫒", label: "زيتون مائدة وزيت (Fresh Olives)", category: "خضروات" },
-  { emoji: "🌿", label: "أعشاب ونباتات طبية وعطرية (Herbs & Mint)", category: "خضروات" },
-
-  // 3. الفواكه الطازجة (Fresh Fruits)
-  { emoji: "🍓", label: "فراولة طازجة (Fresh Strawberries)", category: "فواكه" },
-  { emoji: "🍇", label: "عنب مائدة أبيض وأحمر (Table Grapes)", category: "فواكه" },
-  { emoji: "🥭", label: "مانجو مصري فاخر (Fresh Mangoes)", category: "فواكه" },
-  { emoji: "🍉", label: "بطيخ طازج (Fresh Watermelon)", category: "فواكه" },
-  { emoji: "🍎", label: "تفاح أحمر وأخضر (Apples)", category: "فواكه" },
-  { emoji: "🍐", label: "كمثرى (Pears)", category: "فواكه" },
-  { emoji: "🍑", label: "خوخ ونكتارين (Peaches & Nectarines)", category: "فواكه" },
-  { emoji: "🍒", label: "كرز وبرقوق ومشمش (Cherries & Plums)", category: "فواكه" },
-  { emoji: "🥑", label: "أفوكادو (Avocado)", category: "فواكه" },
-  { emoji: "🍌", label: "موز طازج (Bananas)", category: "فواكه" },
-  { emoji: "🍍", label: "أنـاناس (Pineapple)", category: "فواكه" },
-  { emoji: "🥝", label: "كيـوي (Kiwi)", category: "فواكه" },
-
-  // 4. التعبئة واللوجستيات (Packaging & Logistics)
-  { emoji: "🌾", label: "حبوب وغلال وبقوليات (Grains & Wheat)", category: "أخرى" },
-  { emoji: "📦", label: "كرتون وعبوات تصدير (Packaged Goods)", category: "أخرى" },
-  { emoji: "❄️", label: "سلسلة تبريد وشحنات مبردة (Cold Chain)", category: "أخرى" },
-  { emoji: "🏭", label: "محطة تعبئة وتجهيز (Packing Station)", category: "أخرى" },
-  { emoji: "🚢", label: "حاويات وشحن بحري (Maritime Reefer)", category: "أخرى" },
-];
+export const EMOJI_OPTIONS: { emoji: string; label: string; category: string }[] = [];
 
 export const SAMPLE_CROPS_LIBRARY = [
   { name: "خرشوف بلدي تصدير", url: "/images/products/artichoke.jpg", category: "خضروات" },
@@ -122,7 +79,7 @@ export function OpsProducts({
     pack: "",
     specs: "",
     imageUrl: "",
-    icon: "🍊",
+    icon: "",
     status: "متاح للتصدير",
     featured: false,
     description: "",
@@ -182,7 +139,7 @@ export function OpsProducts({
       pack: "",
       specs: "",
       imageUrl: "",
-      icon: "🍊",
+      icon: "",
       status: "متاح للتصدير",
       featured: false,
       description: "",
@@ -628,10 +585,11 @@ export function OpsProducts({
                       </span>
                     </div>
 
-                    {/* Category & Icon */}
+                    {/* Category */}
                     <div className="absolute bottom-3 start-3">
-                      <span className="rounded-lg bg-slate-900/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-xs">
-                        {item.icon} {item.category}
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-xs">
+                        <Sprout className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{item.category}</span>
                       </span>
                     </div>
 
@@ -1321,115 +1279,25 @@ export function OpsProducts({
                 </div>
               </div>
 
-              {/* Icon Emoji and Status */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    أيقونة الإيموجي للمحصول
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-xl shadow-2xs">
-                      {form.icon || "🌱"}
-                    </div>
-
-                    <select
-                      value={form.icon}
-                      onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900 focus:border-emerald-500 focus:outline-none"
-                    >
-                      {form.icon &&
-                        !EMOJI_OPTIONS.some((o) => o.emoji === form.icon) && (
-                          <option value={form.icon}>
-                            {form.icon} (إيموجي حالي مخصص)
-                          </option>
-                        )}
-
-                      <optgroup label="🍊 الموالح والحمضيات (Citrus)">
-                        {EMOJI_OPTIONS.filter((o) => o.category === "موالح").map(
-                          (o) => (
-                            <option key={o.emoji} value={o.emoji}>
-                              {o.emoji} {o.label}
-                            </option>
-                          )
-                        )}
-                      </optgroup>
-
-                      <optgroup label="🥗 الخضروات والمحاصيل الحقلية (Vegetables)">
-                        {EMOJI_OPTIONS.filter((o) => o.category === "خضروات").map(
-                          (o) => (
-                            <option key={o.emoji} value={o.emoji}>
-                              {o.emoji} {o.label}
-                            </option>
-                          )
-                        )}
-                      </optgroup>
-
-                      <optgroup label="🍓 الفواكه الطازجة (Fresh Fruits)">
-                        {EMOJI_OPTIONS.filter((o) => o.category === "فواكه").map(
-                          (o) => (
-                            <option key={o.emoji} value={o.emoji}>
-                              {o.emoji} {o.label}
-                            </option>
-                          )
-                        )}
-                      </optgroup>
-
-                      <optgroup label="📦 التعبئة واللوجستيات (Packaging & Logistics)">
-                        {EMOJI_OPTIONS.filter((o) => o.category === "أخرى").map(
-                          (o) => (
-                            <option key={o.emoji} value={o.emoji}>
-                              {o.emoji} {o.label}
-                            </option>
-                          )
-                        )}
-                      </optgroup>
-                    </select>
-                  </div>
-
-                  {/* Quick Pick Chips */}
-                  <div className="mt-2 flex flex-wrap items-center gap-1">
-                    <span className="text-[10px] text-slate-400 font-semibold me-0.5">
-                      شائع:
-                    </span>
-                    {["🍊", "🍋", "🧅", "🧄", "🍓", "🥔", "🌱", "🍇", "🥭", "🍅"].map(
-                      (em) => (
-                        <button
-                          key={em}
-                          type="button"
-                          onClick={() => setForm({ ...form, icon: em })}
-                          className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs transition-all ${
-                            form.icon === em
-                              ? "bg-emerald-600 text-white shadow-xs scale-110"
-                              : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                          }`}
-                          title={em}
-                        >
-                          {em}
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    حالة التصدير
-                  </label>
-                  <select
-                    value={form.status}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        status: e.target.value as Product["status"],
-                      })
-                    }
-                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"
-                  >
-                    <option value="متاح للتصدير">متاح للتصدير (Available)</option>
-                    <option value="موسم قادم">موسم قادم (Upcoming)</option>
-                    <option value="نفد مؤقتاً">نفد مؤقتاً (Out of Stock)</option>
-                  </select>
-                </div>
+              {/* Export Status */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  حالة التصدير
+                </label>
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      status: e.target.value as Product["status"],
+                    })
+                  }
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"
+                >
+                  <option value="متاح للتصدير">متاح للتصدير (Available)</option>
+                  <option value="موسم قادم">موسم قادم (Upcoming)</option>
+                  <option value="نفد مؤقتاً">نفد مؤقتاً (Out of Stock)</option>
+                </select>
               </div>
 
               {/* Submit Buttons */}

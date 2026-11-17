@@ -597,8 +597,8 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
       <div class="product-info">
         <div class="badges">
           <span class="badge badge-status">● ${escapeHtml(status)}</span>
-          <span class="badge badge-cat">${product.icon || "🌱"} ${escapeHtml(category)}</span>
-          <span class="badge badge-cat">🌍 ${escapeHtml(origin)}</span>
+          <span class="badge badge-cat">${escapeHtml(category)}</span>
+          <span class="badge badge-cat">${escapeHtml(origin)}</span>
         </div>
         <h1>${escapeHtml(title)}</h1>
         <div class="variety">${escapeHtml(variety)}</div>

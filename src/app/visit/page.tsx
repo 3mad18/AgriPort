@@ -8,7 +8,17 @@ import { useLanguage } from "@/context/language-context";
 import { useSiteSettings } from "@/lib/use-site-settings";
 import { submitQuoteInquiry } from "@/lib/catalog";
 import type { Language } from "@/lib/i18n";
-import { MessageSquare, MapPin } from "lucide-react";
+import {
+  MessageSquare,
+  MapPin,
+  Sprout,
+  Microscope,
+  ThermometerSnowflake,
+  Handshake,
+  Plane,
+  Globe2,
+  ClipboardCheck,
+} from "lucide-react";
 
 const visitWaMessages: Record<Language, string> = {
   ar: "مرحباً، أود تنسيق موعد لزيارة مزارع ومحطات تعبئة AgriPort في مصر.",
@@ -197,22 +207,32 @@ function VisitPageInner() {
           </div>
 
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {v.highlights.map((item, index) => (
-              <div
-                key={index}
-                className="group relative rounded-2xl sm:rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs transition-all hover:border-emerald-500/30 hover:shadow-md"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600 transition-transform group-hover:scale-110">
-                  {item.icon}
+            {v.highlights.map((item, index) => {
+              const HighlightIcon =
+                index === 0
+                  ? Sprout
+                  : index === 1
+                  ? Microscope
+                  : index === 2
+                  ? ThermometerSnowflake
+                  : Handshake;
+              return (
+                <div
+                  key={index}
+                  className="group relative rounded-2xl sm:rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs transition-all hover:border-emerald-500/30 hover:shadow-md"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 transition-transform group-hover:scale-110">
+                    <HighlightIcon className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h3 className="mt-4 text-base font-bold text-slate-900 tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+                    {item.desc}
+                  </p>
                 </div>
-                <h3 className="mt-4 text-base font-bold text-slate-900 tracking-tight">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -232,24 +252,27 @@ function VisitPageInner() {
               </div>
 
               <div className="space-y-4">
-                {v.vipServices.map((svc, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3.5 rounded-2xl bg-white p-4 border border-slate-100 shadow-2xs"
-                  >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-xl">
-                      {svc.icon}
-                    </span>
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">
-                        {svc.title}
-                      </h4>
-                      <p className="mt-1 text-xs text-slate-500 font-medium leading-relaxed">
-                        {svc.desc}
-                      </p>
+                {v.vipServices.map((svc, idx) => {
+                  const SvcIcon = idx === 0 ? Plane : idx === 1 ? Globe2 : ClipboardCheck;
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3.5 rounded-2xl bg-white p-4 border border-slate-100 shadow-2xs"
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                        <SvcIcon className="w-5 h-5 text-emerald-600" />
+                      </span>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          {svc.title}
+                        </h4>
+                        <p className="mt-1 text-xs text-slate-500 font-medium leading-relaxed">
+                          {svc.desc}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

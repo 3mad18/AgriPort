@@ -15,6 +15,9 @@ import {
   MapPin,
   Sparkles,
   ExternalLink,
+  Globe2,
+  Award,
+  Zap,
 } from "lucide-react";
 
 export default function AboutPage() {
@@ -373,22 +376,25 @@ export default function AboutPage() {
               {about.pillarsTitle || "Our Core Export Pillars"}
             </h3>
             <div className="grid gap-6 sm:grid-cols-3">
-              {about.pillars.map((pillar) => (
-                <div
-                  key={pillar.title}
-                  className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-6 sm:p-8 shadow-xs transition-all hover:border-slate-200 hover:shadow-md"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-2xl">
-                    {pillar.icon}
+              {about.pillars.map((pillar, pIdx) => {
+                const PillarIcon = pIdx === 0 ? Globe2 : pIdx === 1 ? Award : Zap;
+                return (
+                  <div
+                    key={pillar.title}
+                    className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-6 sm:p-8 shadow-xs transition-all hover:border-slate-200 hover:shadow-md"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                      <PillarIcon className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <h4 className="mt-5 text-lg font-bold tracking-tight text-slate-900">
+                      {pillar.title}
+                    </h4>
+                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-500 font-medium">
+                      {pillar.desc}
+                    </p>
                   </div>
-                  <h4 className="mt-5 text-lg font-bold tracking-tight text-slate-900">
-                    {pillar.title}
-                  </h4>
-                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-500 font-medium">
-                    {pillar.desc}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
