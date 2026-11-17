@@ -19,6 +19,8 @@ import {
   Sparkles,
   Globe,
   AlertCircle,
+  User,
+  CheckCircle2,
 } from "lucide-react";
 
 export function OpsUsers() {
@@ -502,11 +504,13 @@ export function OpsUsers() {
                               </p>
                               {user.isGuest || user.id.startsWith("gst_") ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                                  🌱 ضيف
+                                  <User className="w-2.5 h-2.5 text-amber-700" />
+                                  <span>ضيف</span>
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                                  ✓ دائم
+                                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                                  <span>دائم</span>
                                 </span>
                               )}
                             </div>

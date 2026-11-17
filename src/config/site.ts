@@ -1,5 +1,6 @@
 export const siteConfig = {
   name: "Agri Port",
+  url: "https://agri-port-zeta.vercel.app",
   tagline: "تصدير أجود الخضروات والفواكه الطازجة",
   description:
     "شركة Agri Port لتصدير وتوريد أرقى المحاصيل الزراعية والخضروات والفواكه الطازجة من مصر إلى كافة أنحاء العالم وفق أعلى معايير الجودة العالمية.",

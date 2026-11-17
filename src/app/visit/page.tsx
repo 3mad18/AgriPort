@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/language-context";
 import { useSiteSettings } from "@/lib/use-site-settings";
 import { submitQuoteInquiry } from "@/lib/catalog";
 import type { Language } from "@/lib/i18n";
+import { MessageSquare, MapPin } from "lucide-react";
 
 const visitWaMessages: Record<Language, string> = {
   ar: "مرحباً، أود تنسيق موعد لزيارة مزارع ومحطات تعبئة AgriPort في مصر.",
@@ -269,13 +270,13 @@ function VisitPageInner() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs sm:text-sm font-bold text-white shadow-xs transition-all hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span>💬</span>
+                <MessageSquare className="w-4 h-4" />
                 <span>{v.contactBox.whatsappBtn}</span>
               </a>
 
               <div className="space-y-3 pt-3 border-t border-slate-100 text-xs font-medium text-slate-600">
                 <div className="flex items-start gap-2.5">
-                  <span className="text-base">📍</span>
+                  <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-slate-900 block">
                       {v.contactBox.locationLabel}
@@ -402,7 +403,7 @@ function VisitPageInner() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 text-xs font-bold transition-all shadow-xs"
                     >
-                      <span>💬</span>
+                      <MessageSquare className="w-3.5 h-3.5" />
                       <span>{v.contactBox.whatsappBtn}</span>
                     </a>
                   </div>

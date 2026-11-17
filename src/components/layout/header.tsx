@@ -98,7 +98,7 @@ export function Header() {
           isScrolled ? "py-3 bg-white/90 shadow-sm" : "py-4"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex justify-between items-center gap-2 sm:gap-4">
           {/* Logo */}
           <BrandLogo />
 
@@ -304,39 +304,52 @@ export function Header() {
           </div>
 
           {/* Mobile Right Controls: Sign In + Language Pill + Menu Toggle */}
-          <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 md:hidden">
             {/* Direct Mobile Sign In / Account Button */}
             <Link
               href="/login"
-              className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 px-3 py-1.5 text-xs font-bold shadow-xs active:scale-95 transition-all min-h-[38px]"
+              className="flex items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 px-2.5 sm:px-3 py-1.5 text-xs font-bold shadow-xs active:scale-95 transition-all h-9 shrink-0 whitespace-nowrap"
               aria-label={loginLabel}
               title={loginLabel}
             >
               {isAuthenticated && user ? (
-                <div className="h-5 w-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
-                  {user.name.charAt(0).toUpperCase()}
+                <div className="h-5 w-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden">
+                  {user.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
                 </div>
               ) : (
-                <User className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
               )}
-              <span className="text-[11px] font-bold">
-                {isAuthenticated && user ? user.name.split(" ")[0] : loginLabel}
+              <span className="hidden min-[420px]:inline text-[11px] font-bold">
+                {isAuthenticated && user
+                  ? user.name.split(" ")[0]
+                  : language === "ar"
+                  ? "دخول"
+                  : "Sign In"}
               </span>
             </Link>
 
             {/* Mobile Language Button & Popover */}
-            <div className="relative" ref={mobileLangRef}>
+            <div className="relative shrink-0" ref={mobileLangRef}>
               <button
                 type="button"
                 onClick={() => setLangMenuOpen((prev) => !prev)}
-                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs active:scale-95 transition-all min-h-[38px]"
+                className="flex items-center gap-1 sm:gap-1.5 rounded-full border border-slate-200 bg-white px-2 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs active:scale-95 transition-all h-9 shrink-0"
                 aria-expanded={langMenuOpen}
                 aria-label="Change language"
               >
-                <FlagIcon code={language} className="h-3 w-4.5 rounded-xs" />
-                <span>{currentLangInfo.code.toUpperCase()}</span>
+                <FlagIcon code={language} className="h-3 w-4.5 rounded-xs shrink-0" />
+                <span className="font-semibold text-xs">{currentLangInfo.code.toUpperCase()}</span>
                 <svg
-                  className={`h-2.5 w-2.5 text-slate-400 transition-transform duration-200 ${
+                  className={`h-2.5 w-2.5 text-slate-400 shrink-0 transition-transform duration-200 ${
                     langMenuOpen ? "rotate-180" : ""
                   }`}
                   viewBox="0 0 24 24"
@@ -401,14 +414,14 @@ export function Header() {
 
             {/* Mobile Toggle */}
             <button
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-900 hover:text-emerald-600 transition-colors rounded-xl active:bg-slate-100"
+              className="h-9 w-9 flex items-center justify-center text-slate-900 hover:text-emerald-600 transition-colors rounded-xl active:bg-slate-100 shrink-0"
               onClick={() => {
                 setIsMobileMenuOpen((prev) => !prev);
                 setLangMenuOpen(false);
               }}
               aria-label="Toggle navigation menu"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>

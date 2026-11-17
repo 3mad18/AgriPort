@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Phone,
   Mail,
+  MapPin,
 } from "lucide-react";
 
 export default function TermsPage() {
@@ -197,7 +198,7 @@ export default function TermsPage() {
                     {item.name}
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 mb-3">
-                    <span>📍</span>
+                    <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                     <span>{item.ports}</span>
                   </div>
 

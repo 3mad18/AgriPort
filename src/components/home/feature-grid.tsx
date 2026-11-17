@@ -3,62 +3,19 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
-
-const Snowflake = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="12" x2="12" y1="2" y2="22" />
-    <line x1="12" x2="12" y1="12" y2="22" />
-    <path d="m20 16-4-4 4-4" />
-    <path d="m4 8 4 4-4 4" />
-    <path d="m16 4-4 4-4-4" />
-    <path d="m8 20 4-4 4 4" />
-  </svg>
-);
-
-const Globe = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    <path d="M2 12h20" />
-  </svg>
-);
+import {
+  Snowflake,
+  Globe,
+  ArrowRight as LucideArrowRight,
+  Zap,
+  Truck,
+  Activity,
+} from "lucide-react";
 
 const ArrowRight = ({ isRTL = false }: { isRTL?: boolean }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={`transition-transform ${isRTL ? "rotate-180" : ""}`}
-  >
-    <path d="M5 12h14" />
-    <path d="m12 5 7 7-7 7" />
-  </svg>
+  <LucideArrowRight
+    className={`w-4 h-4 transition-transform ${isRTL ? "rotate-180" : ""}`}
+  />
 );
 
 export function FeatureGrid() {
@@ -143,7 +100,7 @@ export function FeatureGrid() {
             {/* Bottom Content: Coordinated Typography & Technical Specifications */}
             <div className="relative z-10 pt-6">
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1.5">
-                <span>❄️</span>
+                <Snowflake className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span>{bento.card2Badge}</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2 drop-shadow-md group-hover:text-emerald-300 transition-colors">
@@ -155,14 +112,17 @@ export function FeatureGrid() {
 
               {/* Technical Specifications Pills */}
               <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-[11px] text-white/90 font-medium">
-                <span className="rounded-md bg-white/15 px-2 py-0.5 backdrop-blur-xs border border-white/10">
-                  Pre-Cooling ⚡
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-white/15 px-2.5 py-1 backdrop-blur-xs border border-white/10">
+                  <Zap className="w-3 h-3 text-emerald-300 shrink-0" />
+                  <span>Pre-Cooling</span>
                 </span>
-                <span className="rounded-md bg-white/15 px-2 py-0.5 backdrop-blur-xs border border-white/10">
-                  Reefer Docks 🚛
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-white/15 px-2.5 py-1 backdrop-blur-xs border border-white/10">
+                  <Truck className="w-3 h-3 text-emerald-300 shrink-0" />
+                  <span>Reefer Docks</span>
                 </span>
-                <span className="rounded-md bg-white/15 px-2 py-0.5 backdrop-blur-xs border border-white/10">
-                  IoT 24/7 📡
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-white/15 px-2.5 py-1 backdrop-blur-xs border border-white/10">
+                  <Activity className="w-3 h-3 text-emerald-300 shrink-0" />
+                  <span>IoT 24/7</span>
                 </span>
               </div>
             </div>

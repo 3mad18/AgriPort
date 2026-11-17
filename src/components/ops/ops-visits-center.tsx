@@ -14,6 +14,13 @@ import {
   Eye,
   Trash2,
   X,
+  Calendar,
+  Users,
+  User,
+  Building2,
+  Sprout,
+  FileText,
+  MessageSquare,
 } from "lucide-react";
 
 export function isFacilityVisit(inquiry: Inquiry): boolean {
@@ -345,7 +352,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
     <table class="header-table">
       <tr>
         <td>
-          <div class="brand-title">🏛️ AgriPort Operations — جدول الزيارات الميدانية للوفود والمستوردين</div>
+          <div class="brand-title">AgriPort Operations — جدول الزيارات الميدانية للوفود والمستوردين</div>
           <div class="brand-sub">إدارة التنسيق والبروتوكول الدولي وتفقد محطات التعبئة والمزارع</div>
         </td>
         <td style="text-align: left; font-size: 11px; color: #475569;">
@@ -534,7 +541,7 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
       {/* 4. Visits Cards List */}
       {filteredVisits.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-12 text-center">
-          <span className="text-4xl block mb-2">🤝</span>
+          <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
           <h3 className="text-base font-bold text-slate-800">
             لا توجد حجوزات زيارات تطابق البحث
           </h3>
@@ -563,8 +570,8 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                 {/* Top Row: Visitor Info & Status */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 text-xl font-bold">
-                      👤
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 shadow-2xs">
+                      <User className="w-5 h-5 text-emerald-700" />
                     </span>
                     <div>
                       <div className="flex items-center gap-2">
@@ -617,8 +624,9 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 py-4 text-xs font-medium">
                   {/* Proposed Date */}
                   <div className="rounded-2xl bg-[#F8FAFC] p-3 border border-slate-100">
-                    <span className="text-[11px] font-bold text-slate-400 block mb-0.5">
-                      📅 تاريخ وموعد الزيارة
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 mb-1">
+                      <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>تاريخ وموعد الزيارة</span>
                     </span>
                     <span className="text-sm font-extrabold text-emerald-700">
                       {v.preferredDate}
@@ -627,8 +635,9 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
 
                   {/* Delegation Size */}
                   <div className="rounded-2xl bg-[#F8FAFC] p-3 border border-slate-100">
-                    <span className="text-[11px] font-bold text-slate-400 block mb-0.5">
-                      👥 حجم الوفد الزائر
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 mb-1">
+                      <Users className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>حجم الوفد الزائر</span>
                     </span>
                     <span className="text-xs font-bold text-slate-800">
                       {v.delegationSize}
@@ -653,8 +662,9 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
 
                   {/* Target Crops */}
                   <div className="rounded-2xl bg-[#F8FAFC] p-3 border border-slate-100">
-                    <span className="text-[11px] font-bold text-slate-400 block mb-0.5">
-                      🍊 المحاصيل المستهدفة
+                    <span className="text-[11px] font-bold text-slate-400 block mb-0.5 flex items-center gap-1">
+                      <Sprout className="w-3 h-3 text-emerald-600" />
+                      <span>المحاصيل المستهدفة</span>
                     </span>
                     <span className="text-xs font-bold text-slate-800 truncate block">
                       {v.targetCrops || "حاصلات زراعية عامة"}
@@ -672,9 +682,10 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                       {v.facilities.map((fac, i) => (
                         <span
                           key={i}
-                          className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-emerald-100"
+                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-emerald-100"
                         >
-                          🏭 {fac}
+                          <Building2 className="w-3 h-3 text-emerald-600" />
+                          <span>{fac}</span>
                         </span>
                       ))}
                     </div>
@@ -684,8 +695,9 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                 {/* Notes if any */}
                 {v.notes && (
                   <div className="mb-4 rounded-xl bg-amber-50/50 p-3 border border-amber-200/50 text-xs font-medium text-amber-900 leading-relaxed">
-                    <span className="font-bold block text-amber-800 mb-0.5">
-                      📝 ملاحظات ومتطلبات الوفد:
+                    <span className="font-bold flex items-center gap-1 text-amber-800 mb-0.5">
+                      <FileText className="w-3.5 h-3.5 text-amber-700" />
+                      <span>ملاحظات ومتطلبات الوفد:</span>
                     </span>
                     {v.notes}
                   </div>
@@ -903,16 +915,18 @@ export function OpsVisitsCenter({ searchQuery }: { searchQuery: string }) {
                   href={getWhatsAppLink(selectedVisit)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 text-xs font-bold transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 text-xs font-bold transition-colors"
                 >
-                  💬 فتح محادثة واتساب
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>فتح محادثة واتساب</span>
                 </a>
 
                 <a
                   href={getEmailLink(selectedVisit)}
-                  className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2.5 text-xs font-bold transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2.5 text-xs font-bold transition-colors"
                 >
-                  ✉️ مراسلة بالإيميل
+                  <Mail className="w-3.5 h-3.5 text-slate-500" />
+                  <span>مراسلة بالإيميل</span>
                 </a>
               </div>
 

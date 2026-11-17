@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   experimental: {
     cpus: 1,
+    agentUpgrade: "security",
   },
 };
 

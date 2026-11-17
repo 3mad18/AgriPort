@@ -10,11 +10,23 @@ import { useLiveProducts } from "@/lib/use-live-products";
 import { useSiteSettings } from "@/lib/use-site-settings";
 import { useLanguage } from "@/context/language-context";
 import { useVisitorAuth } from "@/context/visitor-auth-context";
+import { getLocalizedProduct } from "@/lib/product-translations";
 import {
   getProductCategoryTranslation,
   translateAgriText,
   type Language,
 } from "@/lib/i18n";
+import {
+  Mail,
+  Phone,
+  MessageSquare,
+  MapPin,
+  ShieldCheck,
+  Sprout,
+  X,
+  CheckCircle2,
+  Lock,
+} from "lucide-react";
 
 const waMessages: Record<Language, string> = {
   ar: "مرحباً، أود الاستفسار عن تفاصيل وأسعار تصدير الحاصلات الزراعية",
@@ -64,35 +76,24 @@ function ContactFormInner() {
     return false;
   });
 
-  const localizedItem = matchedProduct
-    ? p.productsList?.find((item) => {
-        if (item.id === matchedProduct.id) return true;
-        const lowerName = (matchedProduct.name || "").toLowerCase();
-        if (lowerName.includes("خرشوف") && item.id === "artichoke") return true;
-        if (lowerName.includes("فاصوليا") && item.id === "green-beans") return true;
-        if (lowerName.includes("بروكلي") && item.id === "broccoli") return true;
-        if (lowerName.includes("قرنبيط") && item.id === "cauliflower") return true;
-        if ((lowerName.includes("احمر") || lowerName.includes("أحمر")) && item.id === "red-cabbage") return true;
-        if (lowerName.includes("كرنب") && item.id === "cabbage") return true;
-        if (lowerName.includes("بطاطس") && item.id === "potatoes") return true;
-        if (lowerName.includes("خس") && item.id === "lettuce") return true;
-        return false;
-      })
+  const validLang = (["ar", "en", "fr", "it", "es"].includes(language)
+    ? language
+    : "en") as Language;
+
+  const localizedProduct = matchedProduct
+    ? getLocalizedProduct(matchedProduct, validLang)
     : null;
 
-  const rawProductName =
-    localizedItem?.name || matchedProduct?.name || cropParam;
-  const rawVariety =
-    localizedItem?.variety || matchedProduct?.variety || "";
-
   const resolvedProductName =
-    language !== "ar"
-      ? translateAgriText(rawProductName, language)
-      : rawProductName;
+    localizedProduct?.name ||
+    (validLang !== "ar" && cropParam
+      ? translateAgriText(cropParam, validLang)
+      : cropParam);
   const resolvedVariety =
-    language !== "ar"
-      ? translateAgriText(rawVariety, language)
-      : rawVariety;
+    localizedProduct?.variety ||
+    (validLang !== "ar" && matchedProduct?.variety
+      ? translateAgriText(matchedProduct.variety, validLang)
+      : matchedProduct?.variety || "");
 
   const [isCleared, setIsCleared] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -201,30 +202,30 @@ function ContactFormInner() {
 
   return (
     <PageShell title={c.title} description={c.description}>
-      <div className="grid gap-8 lg:grid-cols-12">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-12 w-full min-w-0">
         {/* Direct Contact Info Sidebar (5 Cols) */}
-        <div className="space-y-6 lg:col-span-5">
-          <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-8 shadow-sm">
-            <h3 className="text-xl font-bold tracking-tight text-slate-900">
+        <div className="space-y-6 lg:col-span-5 w-full min-w-0">
+          <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-4 sm:p-8 shadow-sm w-full min-w-0 overflow-hidden">
+            <h3 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
               {c.directTitle}
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500 font-medium">
+            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-relaxed text-slate-500 font-medium">
               {c.directDesc}
             </p>
 
-            <div className="mt-8 space-y-5">
+            <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-5 w-full min-w-0">
               {/* Email */}
-              <div className="flex items-start gap-3.5">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-lg">
-                  ✉
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                  <Mail className="w-5 h-5" />
                 </span>
-                <div>
-                  <div className="text-xs font-semibold text-slate-400">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] sm:text-xs font-semibold text-slate-400">
                     {c.emailLabel}
                   </div>
                   <a
                     href={`mailto:${siteSettings.email || "agriporteg@gmail.com"}`}
-                    className="font-bold text-slate-900 hover:text-emerald-600 transition-colors"
+                    className="font-bold text-slate-900 hover:text-emerald-600 transition-colors text-xs sm:text-sm break-all block mt-0.5"
                   >
                     {siteSettings.email || "agriporteg@gmail.com"}
                   </a>
@@ -232,18 +233,18 @@ function ContactFormInner() {
               </div>
 
               {/* Phone */}
-              <div className="flex items-start gap-3.5">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-lg">
-                  📞
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                  <Phone className="w-5 h-5" />
                 </span>
-                <div>
-                  <div className="text-xs font-semibold text-slate-400">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] sm:text-xs font-semibold text-slate-400">
                     {c.phoneLabel}
                   </div>
                   <a
                     href={`tel:${(siteSettings.phone || "+20 100 720 2636").replace(/\s+/g, "")}`}
                     dir="ltr"
-                    className="font-bold text-slate-900 hover:text-emerald-600 transition-colors block text-start font-mono"
+                    className="font-bold text-slate-900 hover:text-emerald-600 transition-colors block text-start font-mono text-xs sm:text-sm mt-0.5"
                   >
                     {siteSettings.phone || "+20 100 720 2636"}
                   </a>
@@ -253,24 +254,24 @@ function ContactFormInner() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg transition-colors"
+                    className="inline-flex items-center gap-1.5 mt-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg transition-colors border border-emerald-100"
                   >
-                    <span>💬</span>
+                    <MessageSquare className="w-3.5 h-3.5" />
                     <span>{waButtons[language] || waButtons.en}</span>
                   </a>
                 </div>
               </div>
 
               {/* Location */}
-              <div className="flex items-start gap-3.5">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-lg">
-                  📍
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                  <MapPin className="w-5 h-5" />
                 </span>
-                <div>
-                  <div className="text-xs font-semibold text-slate-400">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] sm:text-xs font-semibold text-slate-400">
                     {c.locationLabel}
                   </div>
-                  <div className="text-sm font-medium text-slate-600">
+                  <div className="text-xs sm:text-sm font-medium text-slate-600 mt-0.5 leading-relaxed break-words">
                     {language === "ar" && siteSettings.location
                       ? siteSettings.location
                       : c.locationValue}
@@ -280,31 +281,31 @@ function ContactFormInner() {
             </div>
 
             {/* Quality Certifications Badge */}
-            <div className="mt-8 rounded-2xl bg-slate-50 p-4 border border-slate-100">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                <span>🛡</span>
-                <span>GLOBALG.A.P. | ISO 22000 | BRCGS | FDA Reg</span>
+            <div className="mt-6 sm:mt-8 rounded-2xl bg-slate-50 p-3 sm:p-4 border border-slate-100 w-full min-w-0">
+              <div className="flex items-center gap-2 text-[11px] sm:text-xs font-bold text-slate-600 flex-wrap">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="break-words leading-relaxed">GLOBALG.A.P. | ISO 22000 | BRCGS | FDA Reg</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Interactive Quote Request Form (7 Cols) */}
-        <div className="lg:col-span-7">
-          <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-8 shadow-sm">
-            <h3 className="text-xl font-bold tracking-tight text-slate-900">
+        <div className="lg:col-span-7 w-full min-w-0">
+          <div className="rounded-2xl sm:rounded-[2rem] border border-slate-100 bg-white p-4 sm:p-8 shadow-sm w-full min-w-0 overflow-hidden">
+            <h3 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
               {c.formTitle}
             </h3>
-            <p className="mt-1 text-sm text-slate-500 font-medium">
+            <p className="mt-1 text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
               {c.formDesc}
             </p>
 
             {/* Active Selected Product Badge */}
             {!isCleared && resolvedProductName && formData.product && (
-              <div className="mt-5 flex items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-50/70 p-3 sm:p-4 shadow-2xs">
-                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+              <div className="mt-4 sm:mt-5 flex items-center justify-between gap-2.5 sm:gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-50/70 p-3 sm:p-4 shadow-2xs w-full min-w-0">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {matchedProduct?.imageUrl ? (
-                    <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-emerald-500/20 shadow-2xs">
+                    <div className="relative h-11 w-11 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-emerald-500/20 shadow-2xs">
                       <img
                         src={matchedProduct.imageUrl}
                         alt={resolvedProductName}
@@ -312,29 +313,30 @@ function ContactFormInner() {
                       />
                     </div>
                   ) : (
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-2xl">
-                      🌿
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                      <Sprout className="w-6 h-6" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
                         {c.selectedCropBadge}
                       </span>
-                      {(localizedItem?.category || matchedProduct?.category) && (
-                        <span className="rounded-full bg-emerald-200/60 px-2 py-0.5 text-[10px] font-bold text-emerald-900">
-                          {getProductCategoryTranslation(
-                            localizedItem?.category || matchedProduct?.category || "",
-                            language
-                          )}
+                      {(localizedProduct?.category || matchedProduct?.category) && (
+                        <span className="rounded-full bg-emerald-200/60 px-1.5 py-0.2 text-[9px] sm:text-[10px] font-bold text-emerald-900">
+                          {localizedProduct?.category ||
+                            getProductCategoryTranslation(
+                              matchedProduct?.category || "",
+                              validLang
+                            )}
                         </span>
                       )}
                     </div>
-                    <h4 className="text-sm font-bold text-slate-900 mt-0.5 truncate">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 truncate">
                       {resolvedProductName}
                     </h4>
                     {resolvedVariety && (
-                      <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">
+                      <p className="text-[11px] sm:text-xs text-slate-600 truncate mt-0.5 font-medium">
                         {resolvedVariety}
                       </p>
                     )}
@@ -343,18 +345,18 @@ function ContactFormInner() {
                 <button
                   type="button"
                   onClick={handleClearSelectedProduct}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-400 hover:text-rose-600 shadow-2xs border border-slate-200/60 hover:border-rose-200 transition-colors"
+                  className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-400 hover:text-rose-600 shadow-2xs border border-slate-200/60 hover:border-rose-200 transition-colors"
                   title={c.clearSelection}
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
 
             {submitted ? (
-              <div className="mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-8 text-center animate-in fade-in duration-200">
-                <span className="text-4xl">🎉</span>
-                <h4 className="mt-3 text-lg font-bold text-slate-900">
+              <div className="mt-6 sm:mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 sm:p-8 text-center animate-in fade-in duration-200">
+                <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+                <h4 className="mt-3 text-base sm:text-lg font-bold text-slate-900">
                   {f.successMsg}
                 </h4>
                 <button
@@ -369,16 +371,18 @@ function ContactFormInner() {
               <>
                 {/* Notice if requesting a quote while not logged in */}
                 {!isAuthenticated && (cropParam || idParam || formData.product) && (
-                  <div className="mt-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in text-start">
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl shrink-0 mt-0.5">🔒</span>
-                      <div>
-                        <h4 className="text-sm font-bold text-amber-950">
+                  <div className="mt-4 sm:mt-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 animate-fade-in text-start w-full min-w-0">
+                    <div className="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800 mt-0.5">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs sm:text-sm font-bold text-amber-950">
                           {language === "ar"
                             ? "تسجيل الدخول مطلوب لإتمام طلب عرض السعر"
                             : "Sign in required to request a quote"}
                         </h4>
-                        <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                        <p className="text-[11px] sm:text-xs text-amber-800 mt-1 leading-relaxed">
                           {language === "ar"
                             ? `لطلب تسعير محصول «${resolvedProductName || formData.product || "المحدد"}»، يُرجى إنشاء حساب سريعاً أو تسجيل الدخول للمتابعة.`
                             : `To request a quote for ${resolvedProductName || formData.product || "the selected crop"}, please register or sign in first.`}
@@ -389,7 +393,7 @@ function ContactFormInner() {
                       href={`/login?tab=register&redirect=${encodeURIComponent(
                         `/contact?id=${encodeURIComponent(idParam)}&crop=${encodeURIComponent(cropParam || formData.product)}`
                       )}&cropName=${encodeURIComponent(resolvedProductName || cropParam || formData.product)}`}
-                      className="shrink-0 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-xs text-center whitespace-nowrap active:scale-95"
+                      className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all shadow-xs text-center whitespace-nowrap active:scale-95 shrink-0"
                     >
                       {language === "ar" ? "تسجيل الدخول / إنشاء حساب" : "Sign In / Register"}
                     </Link>
@@ -398,25 +402,29 @@ function ContactFormInner() {
 
                 {/* Verified user badge */}
                 {isAuthenticated && user && (
-                  <div className="mt-5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 p-3 sm:p-4 flex items-center justify-between gap-3 text-start animate-fade-in">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
-                      <p className="text-xs font-semibold text-emerald-950 truncate">
-                        {language === "ar" ? "طلب تسعير بحساب: " : "Quoting as: "}
-                        <span className="font-bold text-slate-900">{user.name}</span>
-                        <span className="text-emerald-700 font-mono text-[11px] ms-1.5 dir-ltr">({user.email})</span>
-                      </p>
+                  <div className="mt-4 sm:mt-5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 text-start animate-fade-in w-full min-w-0">
+                    <div className="flex items-start sm:items-center gap-2 min-w-0 flex-1">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0 mt-1 sm:mt-0"></span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-emerald-950 truncate">
+                          {language === "ar" ? "طلب تسعير بحساب: " : "Quoting as: "}
+                          <span className="font-bold text-slate-900">{user.name}</span>
+                        </p>
+                        <p className="text-emerald-700 font-mono text-[11px] truncate dir-ltr">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full shrink-0 border border-emerald-200/50">
+                    <span className="text-[10px] sm:text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full shrink-0 border border-emerald-200/50 self-start sm:self-auto">
                       {language === "ar" ? "عميل معتمد" : "Verified"}
                     </span>
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <form onSubmit={handleSubmit} className="mt-5 sm:mt-6 space-y-3.5 sm:space-y-4 w-full min-w-0">
                 {/* Name & Company */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 w-full min-w-0">
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.name} *
                     </label>
@@ -427,11 +435,11 @@ function ContactFormInner() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder={f.namePlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
 
-                  <div>
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.company} *
                     </label>
@@ -442,14 +450,14 @@ function ContactFormInner() {
                       value={formData.company}
                       onChange={handleChange}
                       placeholder={f.companyPlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Country & Email */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 w-full min-w-0">
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.country} *
                     </label>
@@ -460,11 +468,11 @@ function ContactFormInner() {
                       value={formData.country}
                       onChange={handleChange}
                       placeholder={f.countryPlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
 
-                  <div>
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.email} *
                     </label>
@@ -475,14 +483,14 @@ function ContactFormInner() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder={f.emailPlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Phone & Product */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 w-full min-w-0">
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.phone}
                     </label>
@@ -492,11 +500,11 @@ function ContactFormInner() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder={f.phonePlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
 
-                  <div>
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.product} *
                     </label>
@@ -507,14 +515,14 @@ function ContactFormInner() {
                       value={formData.product}
                       onChange={handleChange}
                       placeholder={f.productPlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Quantity, Incoterms, & Port */}
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div>
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-3 w-full min-w-0">
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.quantity} *
                     </label>
@@ -525,11 +533,11 @@ function ContactFormInner() {
                       value={formData.quantity}
                       onChange={handleChange}
                       placeholder={f.quantityPlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
 
-                  <div>
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.incoterms}
                     </label>
@@ -537,7 +545,7 @@ function ContactFormInner() {
                       name="incoterms"
                       value={formData.incoterms}
                       onChange={handleChange}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     >
                       <option value="FOB">FOB (Alexandria / Damietta)</option>
                       <option value="CIF">CIF (Discharge Port)</option>
@@ -546,7 +554,7 @@ function ContactFormInner() {
                     </select>
                   </div>
 
-                  <div>
+                  <div className="w-full min-w-0">
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.destinationPort}
                     </label>
@@ -556,13 +564,13 @@ function ContactFormInner() {
                       value={formData.destinationPort}
                       onChange={handleChange}
                       placeholder={f.destinationPortPlaceholder}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                      className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Message */}
-                <div>
+                <div className="w-full min-w-0">
                   <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                     {f.message}
                   </label>
@@ -572,7 +580,7 @@ function ContactFormInner() {
                     value={formData.message}
                     onChange={handleChange}
                     placeholder={f.messagePlaceholder}
-                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none leading-relaxed"
+                    className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none leading-relaxed transition-colors"
                   />
                 </div>
 
@@ -580,7 +588,7 @@ function ContactFormInner() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 py-3.5 text-sm font-semibold text-white shadow-xs hover:shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 py-3.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
                 >
                   <span>
                     {isSubmitting ? f.submittingBtn : f.submitBtn}

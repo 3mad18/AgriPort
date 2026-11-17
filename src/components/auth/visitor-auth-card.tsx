@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/language-context";
-import { useVisitorAuth } from "@/context/visitor-auth-context";
+import { useVisitorAuth, type VisitorUser } from "@/context/visitor-auth-context";
 import { POPULAR_COUNTRIES, DEFAULT_COUNTRY, type CountryPhone } from "@/lib/country-phone-data";
 import { authTranslations } from "@/lib/auth-translations";
 import {
@@ -28,6 +28,7 @@ import {
   LogIn,
   UserPlus,
   Sparkles,
+  Phone,
 } from "lucide-react";
 
 // SVG Icons
@@ -38,7 +39,11 @@ const ChevronDownIcon = () => (
   <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
 );
 
-export function VisitorAuthCard() {
+type VisitorAuthCardProps = {
+  initialUser?: VisitorUser | null;
+};
+
+export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { language, dir } = useLanguage();
@@ -51,8 +56,9 @@ export function VisitorAuthCard() {
   const cropName = searchParams?.get("cropName");
 
   const {
-    user,
-    isAuthenticated,
+    user: contextUser,
+    isAuthenticated: contextIsAuthenticated,
+    isLoading,
     loginWithEmail,
     registerUser,
     registerGuestUser,
@@ -61,6 +67,10 @@ export function VisitorAuthCard() {
     resetPasswordWithCode,
     logout,
   } = useVisitorAuth();
+
+  // Smooth hydration resolver: instantly display authenticated view without flashing login form
+  const user = isLoading ? (contextUser || initialUser) : contextUser;
+  const isAuthenticated = isLoading ? (contextIsAuthenticated || !!initialUser) : contextIsAuthenticated;
 
   // Active view: "login" | "guest" | "register" | "forgot"
   const tabParam = searchParams?.get("tab");
@@ -524,6 +534,18 @@ export function VisitorAuthCard() {
     );
   };
 
+  // If session is still resolving on initial mount and no initialUser, render neutral card instead of flashing login form
+  if (isLoading && !initialUser) {
+    return (
+      <div className="w-full max-w-md mx-auto bg-white/95 backdrop-blur-xl rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-2xl text-center animate-pulse">
+        <div className="h-10 w-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-xs font-bold text-slate-500">
+          {language === "ar" ? "جاري التحقق من بيانات الحساب..." : "Verifying account details..."}
+        </p>
+      </div>
+    );
+  }
+
   // If already authenticated: show pleasant profile summary card
   if (isAuthenticated && user) {
     return (
@@ -561,7 +583,7 @@ export function VisitorAuthCard() {
 
         {user.phone && (
           <p className="text-xs text-slate-600 mt-2 font-mono dir-ltr inline-flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200">
-            <span>📞</span>
+            <Phone className="w-3.5 h-3.5 text-slate-400" />
             <span>
               {user.countryCode} {user.phone}
             </span>
@@ -571,7 +593,7 @@ export function VisitorAuthCard() {
         {user.isGuest && (
           <div className="mt-3 p-3 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs text-start">
             <p className="font-bold flex items-center gap-1.5">
-              <span>🌱</span>
+              <Sparkles className="w-4 h-4 text-amber-600" />
               <span>{tr.guestAccountNotice}</span>
             </p>
             <p className="text-[11px] text-amber-800/90 mt-1 leading-relaxed">
@@ -619,9 +641,9 @@ export function VisitorAuthCard() {
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto bg-white/95 backdrop-blur-2xl rounded-3xl p-6 sm:p-9 border border-slate-200/90 shadow-2xl shadow-emerald-950/10 animate-fade-in relative overflow-hidden">
+    <div className="w-full max-w-lg mx-auto bg-white/95 backdrop-blur-2xl rounded-3xl p-4 sm:p-8 border border-slate-200/90 shadow-2xl shadow-emerald-950/10 animate-fade-in relative overflow-hidden">
       {/* Decorative accent top glow */}
-      <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
+      <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 rounded-t-3xl"></div>
 
       {/* Header section */}
       <div className="text-center mb-6">
@@ -672,73 +694,85 @@ export function VisitorAuthCard() {
         </div>
       )}
 
-      {/* Sleek Horizontal Icon Tabs (3 Options Side by Side) */}
+      {/* Sleek Horizontal Icon Tabs (3 Options Side by Side - Responsive Grid) */}
       {activeTab !== "forgot" && (
-        <div className="flex items-center justify-between p-1 bg-slate-100/90 border border-slate-200/80 rounded-2xl mb-6 gap-1 sm:gap-1.5 shadow-2xs">
+        <div className="grid grid-cols-3 p-1 bg-slate-100/90 border border-slate-200/80 rounded-2xl mb-6 gap-1 sm:gap-1.5 shadow-2xs">
           {/* 1. تسجيل الدخول */}
           <button
             type="button"
             onClick={() => handleSwitchTab("login")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl text-xs font-bold transition-all ${
+            title={tr.tabSignIn}
+            className={`w-full min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === "login"
                 ? "bg-white text-emerald-950 shadow-sm border border-emerald-200/60 ring-1 ring-emerald-500/10"
                 : "text-slate-500 hover:text-slate-900 hover:bg-white/60"
             }`}
           >
             <span
-              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                 activeTab === "login"
                   ? "bg-emerald-100 text-emerald-700"
                   : "bg-slate-200/70 text-slate-500"
               }`}
             >
-              <LogIn className="w-3.5 h-3.5" />
+              <LogIn className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             </span>
-            <span className="truncate">{tr.tabSignIn}</span>
+            <span className="min-w-0 truncate text-[11px] sm:text-xs">
+              <span className="sm:hidden">{tr.tabSignInShort || tr.tabSignIn}</span>
+              <span className="hidden sm:inline">{tr.tabSignIn}</span>
+            </span>
           </button>
 
           {/* 2. تسجيل كضيف */}
           <button
             type="button"
             onClick={() => handleSwitchTab("guest")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl text-xs font-bold transition-all ${
+            title={tr.guestTabLabel}
+            className={`w-full min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === "guest"
                 ? "bg-white text-emerald-950 shadow-sm border border-emerald-300/80 ring-1 ring-emerald-500/10"
                 : "text-slate-500 hover:text-slate-900 hover:bg-white/60"
             }`}
           >
             <span
-              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                 activeTab === "guest"
                   ? "bg-emerald-100 text-emerald-700"
                   : "bg-slate-200/70 text-slate-500"
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             </span>
-            <span className="truncate">{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+            <span className="min-w-0 truncate text-[11px] sm:text-xs">
+              <span className="sm:hidden">{tr.guestTabLabelShort || (language === "ar" ? "ضيف" : "Guest")}</span>
+              <span className="hidden sm:inline">{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+            </span>
           </button>
 
           {/* 3. إنشاء حساب */}
           <button
             type="button"
             onClick={() => handleSwitchTab("register")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl text-xs font-bold transition-all ${
+            title={tr.tabRegister}
+            className={`w-full min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === "register"
                 ? "bg-white text-emerald-950 shadow-sm border border-emerald-200/60 ring-1 ring-emerald-500/10"
                 : "text-slate-500 hover:text-slate-900 hover:bg-white/60"
             }`}
           >
             <span
-              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                 activeTab === "register"
                   ? "bg-emerald-100 text-emerald-700"
                   : "bg-slate-200/70 text-slate-500"
               }`}
             >
-              <UserPlus className="w-3.5 h-3.5" />
+              <UserPlus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             </span>
-            <span className="truncate">{tr.tabRegister}</span>
+            <span className="min-w-0 truncate text-[11px] sm:text-xs">
+              <span className="sm:hidden">{tr.tabRegisterShort || tr.tabRegister}</span>
+              <span className="hidden sm:inline">{tr.tabRegister}</span>
+            </span>
           </button>
         </div>
       )}
@@ -853,22 +887,30 @@ export function VisitorAuthCard() {
           </button>
 
           {/* Quick horizontal icon links */}
-          <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-2">
+          <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => handleSwitchTab("guest")}
-              className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+              title={tr.guestTabLabel}
+              className="w-full min-w-0 flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-2 sm:px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="truncate">
+                <span className="sm:hidden">{tr.guestTabLabelShort || (language === "ar" ? "ضيف" : "Guest")}</span>
+                <span className="hidden sm:inline">{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+              </span>
             </button>
             <button
               type="button"
               onClick={() => handleSwitchTab("register")}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+              title={tr.tabRegister}
+              className="w-full min-w-0 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-2 sm:px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              <UserPlus className="w-3.5 h-3.5 text-slate-600" />
-              <span>{tr.tabRegister}</span>
+              <UserPlus className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <span className="truncate">
+                <span className="sm:hidden">{tr.tabRegisterShort || tr.tabRegister}</span>
+                <span className="hidden sm:inline">{tr.tabRegister}</span>
+              </span>
             </button>
           </div>
         </form>
@@ -879,7 +921,7 @@ export function VisitorAuthCard() {
         <form onSubmit={handleRegisterGuest} className="space-y-4 text-start animate-fade-in">
           {/* Guest badge info banner */}
           <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/60 text-emerald-950 text-xs flex items-start gap-2.5">
-            <span className="text-base shrink-0">🌱</span>
+            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <div>
               <p className="font-bold text-emerald-900">{tr.guestBadge}</p>
               <p className="text-[11px] text-emerald-800/80 mt-0.5 leading-relaxed">
@@ -1054,22 +1096,30 @@ export function VisitorAuthCard() {
           </button>
 
           {/* Quick horizontal icon links */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-center gap-2">
+          <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => handleSwitchTab("login")}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+              title={tr.tabSignIn}
+              className="w-full min-w-0 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-2 sm:px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              <LogIn className="w-3.5 h-3.5 text-slate-600" />
-              <span>{tr.tabSignIn}</span>
+              <LogIn className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <span className="truncate">
+                <span className="sm:hidden">{tr.tabSignInShort || tr.tabSignIn}</span>
+                <span className="hidden sm:inline">{tr.tabSignIn}</span>
+              </span>
             </button>
             <button
               type="button"
               onClick={() => handleSwitchTab("register")}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+              title={tr.tabRegister}
+              className="w-full min-w-0 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-2 sm:px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              <UserPlus className="w-3.5 h-3.5 text-slate-600" />
-              <span>{tr.tabRegister}</span>
+              <UserPlus className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <span className="truncate">
+                <span className="sm:hidden">{tr.tabRegisterShort || tr.tabRegister}</span>
+                <span className="hidden sm:inline">{tr.tabRegister}</span>
+              </span>
             </button>
           </div>
         </form>
@@ -1080,7 +1130,7 @@ export function VisitorAuthCard() {
         <form onSubmit={handleRegister} className="space-y-4 text-start animate-fade-in">
           {/* Full account banner info */}
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-xs flex items-start gap-2.5">
-            <span className="text-base shrink-0">🔒</span>
+            <ShieldCheck className="w-4 h-4 text-slate-700 shrink-0 mt-0.5" />
             <div>
               <p className="font-bold text-slate-900">{tr.tabRegister}</p>
               <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
@@ -1398,22 +1448,30 @@ export function VisitorAuthCard() {
           </button>
 
           {/* Quick horizontal icon links */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-center gap-2">
+          <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => handleSwitchTab("login")}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+              title={tr.tabSignIn}
+              className="w-full min-w-0 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-2 sm:px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              <LogIn className="w-3.5 h-3.5 text-slate-600" />
-              <span>{tr.tabSignIn}</span>
+              <LogIn className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <span className="truncate">
+                <span className="sm:hidden">{tr.tabSignInShort || tr.tabSignIn}</span>
+                <span className="hidden sm:inline">{tr.tabSignIn}</span>
+              </span>
             </button>
             <button
               type="button"
               onClick={() => handleSwitchTab("guest")}
-              className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-3.5 py-2 rounded-xl transition-all shadow-2xs"
+              title={tr.guestTabLabel}
+              className="w-full min-w-0 flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-2 sm:px-3.5 py-2 rounded-xl transition-all shadow-2xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="truncate">
+                <span className="sm:hidden">{tr.guestTabLabelShort || (language === "ar" ? "ضيف" : "Guest")}</span>
+                <span className="hidden sm:inline">{language === "ar" ? "تسجيل كضيف" : tr.guestTabLabel}</span>
+              </span>
             </button>
           </div>
         </form>

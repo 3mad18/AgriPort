@@ -20,20 +20,29 @@ import {
   PRODUCTS_CACHE_KEY,
   PRODUCTS_EVENT,
 } from "@/lib/supabase-config";
+import { packProductSpecs, unpackProductRow } from "@/lib/product-packer";
 
 
 export type Product = {
   id: string;
   name: string;
-  category: "موالح" | "خضروات" | "فواكه" | "أخرى";
+  category: "موالح" | "خضروات" | "فواكه" | "أخرى" | string;
   variety: string;
   season: string;
   pack: string;
   specs: string;
   imageUrl: string;
   icon: string;
-  status: "متاح للتصدير" | "موسم قادم" | "نفد مؤقتاً";
+  status: "متاح للتصدير" | "موسم قادم" | "نفد مؤقتاً" | string;
   featured?: boolean;
+  description?: string;
+  images?: string[];
+  pdfUrl?: string;
+  pdfName?: string;
+  origin?: string;
+  hsCode?: string;
+  storageTemp?: string;
+  shelfLife?: string;
 };
 
 export type Inquiry = {
@@ -62,6 +71,13 @@ export type SiteSettings = {
   location: string;
   exportBannerText: string;
   showExportBanner: boolean;
+  commercialRegister?: string;
+  taxCard?: string;
+  exporterRegNumber?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+  googleVerificationId?: string;
 };
 
 export type RegisteredUserRecord = {
@@ -73,6 +89,7 @@ export type RegisteredUserRecord = {
   countryIso: string;
   createdAt: string;
   passwordHash?: string;
+  isGuest?: boolean;
 };
 
 type OpsStoreContextType = {
@@ -115,6 +132,16 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🌱",
     status: "متاح للتصدير",
     featured: true,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0709.91.00",
+    storageTemp: "0°C — 2°C (نسبة رطوبة 95%)",
+    shelfLife: "21 — 28 يوماً في سلسلة التبريد المعتمدة",
+    description: "خرشوف مصري طازج ومجهز مطابق للمواصفات التصديرية للاتحاد الأوروبي والأسواق الدولية. يتميز بأقماع مدمجة صلبة وقلوب غنية خالية من الألياف، يقطف يدوياً بعناية في الصباح الباكر مع تطبيق التبريد الأولي الفوري Pre-cooling لضمان النضارة التامة.",
+    images: [
+      "/images/products/artichoke.jpg",
+      "/images/facilities/artichoke-processing.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "green-beans",
@@ -128,6 +155,16 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🫘",
     status: "متاح للتصدير",
     featured: true,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0708.20.00",
+    storageTemp: "4°C — 7°C (نسبة رطوبة 90-95%)",
+    shelfLife: "14 — 21 يوماً",
+    description: "فاصوليا خضراء نقية نخب أول، تمتاز بقرون نضرة مستقيمة موحدة اللون وبدون خيوط أو تجويفات بذرية. تفرز وتعبأ يدوياً في محطات التعبئة المعتمدة لدينا مع خيارات تغليف مرنة للبانيتات والكراتين المبردة للشحن الجوي والبحري.",
+    images: [
+      "/images/products/green-beans.jpg",
+      "/images/facilities/broccoli-beans-packing.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "broccoli",
@@ -141,6 +178,16 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🥦",
     status: "متاح للتصدير",
     featured: true,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.10.00",
+    storageTemp: "0°C — 1°C مع ثلج مجروش ملامس",
+    shelfLife: "21 — 25 يوماً",
+    description: "رؤوس بروكلي عالية الجودة بزهيرات متراصة مشدودة بلون أخضر داكن غني، خالية تماماً من الاصفرار أو التفتح الزهري. يعبأ في صناديق بوليسترين عازلة مع تغطية بالثلج المجهري للحفاظ على الرطوبة والنضارة الفائقة طوال مسار الشحن.",
+    images: [
+      "/images/products/broccoli.jpg",
+      "/images/facilities/broccoli-beans-packing.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "cauliflower",
@@ -154,6 +201,15 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🥬",
     status: "متاح للتصدير",
     featured: true,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.10.00",
+    storageTemp: "0°C — 2°C (نسبة رطوبة 95%)",
+    shelfLife: "21 — 30 يوماً",
+    description: "أقراص قرنبيط بيضاء نقية عالية الكثافة والصلابة بدون فراغات، محصودة في درجات النضج المثالية ومحمية بأوراق خارجية مشذبة أو مغلفة فردياً بغشاء مسامي مانع للرطوبة لحمايتها أثناء الشحن البحري والجوي.",
+    images: [
+      "/images/products/cauliflower.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "cabbage",
@@ -167,6 +223,15 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🥬",
     status: "متاح للتصدير",
     featured: false,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.90.10",
+    storageTemp: "0°C — 1°C (رطوبة نسبية 98%)",
+    shelfLife: "4 — 6 أسابيع",
+    description: "كرنب أخضر صلب مجهز بعناية للتصدير الخارجي، رؤوس كروية متجانسة الأوزان بأوراق لامعة مشدودة، خالية من أي إصابات حشرية أو ميكانيكية، ومفرزة آلياً ومحملة على باليتات تبريد وفق المعايير الدولية.",
+    images: [
+      "/images/products/cabbage.jpg",
+      "/images/facilities/cabbage-packing.jpg",
+    ],
   },
   {
     id: "potatoes",
@@ -180,6 +245,15 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🥔",
     status: "متاح للتصدير",
     featured: true,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0701.90.00",
+    storageTemp: "4°C — 8°C (حسب الصنف والاستخدام مائدة أو تصنيع)",
+    shelfLife: "3 — 5 أشهر في بيئة تخزين متحكم بها",
+    description: "بطاطس مائدة وتصنيع شيبس مستخرجة من أراضٍ صحراوية بكر خالية من العفن البني ومطابقة للبروتوكولات الصارمة للاتحاد الأوروبي والمملكة المتحدة وروسيا والدول العربية. فرز وغسيل وتجفيف ومعايرة إلكترونية دقيقة.",
+    images: [
+      "/images/products/potatoes.jpg",
+      "/images/facilities/potatoes-packhouse.jpg",
+    ],
   },
   {
     id: "lettuce",
@@ -193,6 +267,15 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🥗",
     status: "متاح للتصدير",
     featured: false,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0705.11.00",
+    storageTemp: "1°C — 2°C (رطوبة نسبية 95-98%)",
+    shelfLife: "18 — 24 يوماً",
+    description: "خس آيسبيرج وروماني عالي القرمشة والامتلاء الداخلي، محصود في الصباح الباكر ويخضع مباشرة لتقنية التبريد بالشفط الفراغي Vacuum Cooling لخفض حرارة اللب في دقائق وحماية الأوراق من التلف وضمان أطول فترة رف في أسواق الاستيراد.",
+    images: [
+      "/images/products/lettuce.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "red-cabbage",
@@ -206,6 +289,15 @@ const DEFAULT_PRODUCTS: Product[] = [
     icon: "🟣",
     status: "متاح للتصدير",
     featured: false,
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.90.90",
+    storageTemp: "0°C — 1°C",
+    shelfLife: "6 — 8 أسابيع",
+    description: "كرنب أحمر كروي ممتاز ذو لون بنفسجي داكن جذاب وبنية شديدة الكثافة، يمتاز بقدرة فائقة على تحمل فترات الشحن البحري الطويلة والاحتفاظ بالنضارة والقوام الصلب ومحتواه العالي من مضادات الأكسدة الطبيعية.",
+    images: [
+      "/images/products/red-cabbage.jpg",
+      "/images/facilities/cabbage-packing.jpg",
+    ],
   },
 ];
 
@@ -288,14 +380,50 @@ Special Notes: نصل إلى مطار القاهرة الدولي على رحل�
   },
 ];
 
+export const DEFAULT_SEO_KEYWORDS: string[] = [
+  "AgriPort",
+  "تصدير حاصلات زراعية مصرية",
+  "Egyptian agricultural produce export",
+  "خضروات وفواكه طازجة للتصدير",
+  "Fresh vegetables exporter Egypt",
+  "تصدير خرشوف مصري",
+  "Fresh Egyptian Artichokes",
+  "تصدير فاصوليا خضراء مصرية",
+  "Egyptian Green Beans export",
+  "تصدير بروكلي وقرنبيط",
+  "Fresh Broccoli Egypt",
+  "بطاطس مصرية للتصدير",
+  "Egyptian Potatoes Spunta",
+  "موالح وبرتقال مصري صيفي",
+  "Egyptian Citrus exporter",
+  "محطات تعبئة كفر الدوار والبحيرة",
+  "GlobalGAP certified farms Egypt",
+  "ISO 22000 BRCGS export packhouse",
+  "تصدير زراعي ميناء الإسكندرية ودمياط",
+  "Alexandria Damietta port fresh export",
+  "قرية البضائع مطار القاهرة شحن جوي",
+  "Cairo Air Cargo chilled produce",
+  "Export légumes frais Égypte",
+  "Esportazione verdure fresche Egitto",
+  "Exportación hortalizas frescas Egipto",
+];
+
 const DEFAULT_SETTINGS: SiteSettings = {
   companyName: "AgriPort Operations",
   tagline: "منظومة إدارة وتصدير الحاصلات الزراعية والخضروات والفواكه الطازجة",
   email: "ops@agriport.com",
   phone: "+20 100 000 0000",
   location: "جمهورية مصر العربية — محافظة البحيرة / كفر الدوار",
+  commercialRegister: "108420",
+  taxCard: "629-418-735",
+  exporterRegNumber: "28410",
   exportBannerText: "موسم تصدير البرتقال والبصل مفتوح حالياً للشحن الفوري إلى أوروبا ودول الخليج!",
   showExportBanner: true,
+  seoTitle: "AgriPort — تصدير الحاصلات الزراعية والخضروات المصرية الفاخرة",
+  seoDescription:
+    "شركة AgriPort الرائدة في تصدير الحاصلات الزراعية والخضروات والفواكه الطازجة وفق شهادات GlobalGAP و BRCGS وسلسلة التبريد المعتمدة إلى أوروبا ودول العالم.",
+  seoKeywords: DEFAULT_SEO_KEYWORDS,
+  googleVerificationId: "",
 };
 
 // PRODUCTS_KEY imported
@@ -307,11 +435,23 @@ const USERS_STORAGE_KEY = "agriport_visitor_registered_accounts";
 function subscribeStore(callback: () => void) {
   window.addEventListener("storage", callback);
   window.addEventListener(STORE_EVENT, callback);
+  window.addEventListener(PRODUCTS_EVENT, callback);
   window.addEventListener("agriport_visitor_auth_change", callback);
+
+  let bc: BroadcastChannel | null = null;
+  try {
+    bc = new BroadcastChannel("agriport_products_channel");
+    bc.onmessage = () => {
+      callback();
+    };
+  } catch {}
+
   return () => {
     window.removeEventListener("storage", callback);
     window.removeEventListener(STORE_EVENT, callback);
+    window.removeEventListener(PRODUCTS_EVENT, callback);
     window.removeEventListener("agriport_visitor_auth_change", callback);
+    if (bc) bc.close();
   };
 }
 
@@ -319,22 +459,19 @@ let cachedProducts: Product[] | null = null;
 let cachedProductsRaw: string | null = null;
 
 function getProductsSnapshot(): Product[] {
-  if (typeof window === "undefined") return DEFAULT_PRODUCTS;
-
-  // Clean up legacy unversioned caches
-  try {
-    localStorage.removeItem("agriport_ops_products");
-  } catch {
-    // ignore
+  if (typeof window === "undefined") {
+    return cachedProducts || DEFAULT_PRODUCTS;
   }
 
-  const raw = localStorage.getItem(PRODUCTS_KEY);
+  const raw = localStorage.getItem(PRODUCTS_KEY) || localStorage.getItem(PRODUCTS_CACHE_KEY);
   if (raw === cachedProductsRaw && cachedProducts) return cachedProducts;
   if (!raw) {
+    if (cachedProducts && cachedProducts.length > 0) return cachedProducts;
     cachedProducts = DEFAULT_PRODUCTS;
     cachedProductsRaw = JSON.stringify(DEFAULT_PRODUCTS);
     try {
       localStorage.setItem(PRODUCTS_KEY, cachedProductsRaw);
+      localStorage.setItem(PRODUCTS_CACHE_KEY, cachedProductsRaw);
     } catch {
       // ignore
     }
@@ -343,30 +480,14 @@ function getProductsSnapshot(): Product[] {
 
   try {
     const parsed = JSON.parse(raw);
-    const isValid =
-      Array.isArray(parsed) &&
-      parsed.length >= 8 &&
-      parsed.some((p: { id?: string }) => p.id === "green-beans") &&
-      parsed.some((p: { id?: string }) => p.id === "broccoli") &&
-      !parsed.some((p: { id?: string }) => p.id === "citrus");
-
-    if (isValid) {
+    if (Array.isArray(parsed) && parsed.length > 0) {
       cachedProducts = parsed;
       cachedProductsRaw = raw;
-      return cachedProducts!;
+      return cachedProducts;
     }
-
-    // Overwrite obsolete cache with DEFAULT_PRODUCTS
-    cachedProducts = DEFAULT_PRODUCTS;
-    cachedProductsRaw = JSON.stringify(DEFAULT_PRODUCTS);
-    try {
-      localStorage.setItem(PRODUCTS_KEY, cachedProductsRaw);
-    } catch {
-      // ignore
-    }
-    return DEFAULT_PRODUCTS;
+    return cachedProducts || DEFAULT_PRODUCTS;
   } catch {
-    return DEFAULT_PRODUCTS;
+    return cachedProducts || DEFAULT_PRODUCTS;
   }
 }
 
@@ -429,11 +550,31 @@ function getUsersSnapshot(): RegisteredUserRecord[] {
 
 const OpsStoreContext = createContext<OpsStoreContextType | undefined>(undefined);
 
-export function OpsStoreProvider({ children }: { children: ReactNode }) {
+export function OpsStoreProvider({
+  children,
+  initialProducts,
+}: {
+  children: ReactNode;
+  initialProducts?: Product[];
+}) {
+  if (initialProducts && Array.isArray(initialProducts) && initialProducts.length > 0) {
+    const serialized = JSON.stringify(initialProducts);
+    if (cachedProductsRaw !== serialized) {
+      cachedProducts = initialProducts;
+      cachedProductsRaw = serialized;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(PRODUCTS_KEY, serialized);
+          localStorage.setItem(PRODUCTS_CACHE_KEY, serialized);
+        } catch {}
+      }
+    }
+  }
+
   const products = useSyncExternalStore(
     subscribeStore,
     getProductsSnapshot,
-    () => DEFAULT_PRODUCTS,
+    () => (initialProducts && initialProducts.length > 0 ? initialProducts : (cachedProducts || DEFAULT_PRODUCTS)),
   );
 
   const inquiries = useSyncExternalStore(
@@ -506,10 +647,10 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               createdAt: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
             }));
           } else {
-            console.error("❌ [AgriPort Ops] Direct Supabase fetch failed:", sbRes.status, await sbRes.text());
+            console.warn("⚠️ [AgriPort Ops] Direct Supabase fetch returned non-ok status:", sbRes.status);
           }
         } catch (sbErr) {
-          console.error("❌ [AgriPort Ops] Direct Supabase connection error:", sbErr);
+          console.warn("⚠️ [AgriPort Ops] Direct Supabase offline or paused, falling back to local cached inquiries.");
         }
       } else {
         console.warn("⚠️ [AgriPort Ops] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set in Ops environment!");
@@ -565,50 +706,82 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
     async function syncProductsFromCloud() {
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
-      if (!supabaseUrl || !supabaseKey) return;
-      try {
-        const res = await fetch(
-          `${supabaseUrl}/rest/v1/products?select=*&order=sort_order.asc,created_at.asc`,
-          {
-            headers: {
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
-            },
-            cache: "no-store",
-          }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          const isRemoteUpdated =
-            Array.isArray(data) &&
-            data.length >= 8 &&
-            data.some((item: { id?: string }) => item.id === "green-beans") &&
-            !data.some((item: { id?: string }) => item.id === "citrus");
+      let cloudProducts: Product[] | null = null;
 
-          if (isRemoteUpdated && isMounted) {
-            const mapped: Product[] = data.map((item: any) => ({
-              id: item.id,
-              name: item.name,
-              category: item.category,
-              variety: item.variety,
-              season: item.season,
-              pack: item.pack,
-              specs: item.specs,
-              imageUrl: item.image_url || item.imageUrl,
-              icon: item.icon || "🌿",
-              status: item.status || "متاح للتصدير",
-              featured: item.featured ?? false,
-            }));
-            localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mapped));
-            localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(mapped));
-            window.dispatchEvent(new Event(PRODUCTS_EVENT));
-            cachedProducts = mapped;
-            cachedProductsRaw = JSON.stringify(mapped);
-            notifyChange();
+      // 1. Try local API route
+      try {
+        const apiRes = await fetch("/api/products", { cache: "no-store" });
+        if (apiRes.ok) {
+          const apiData = await apiRes.json();
+          if (apiData.success && Array.isArray(apiData.products) && apiData.products.length > 0) {
+            cloudProducts = apiData.products;
           }
         }
-      } catch (err) {
-        // Silently skip if network offline
+      } catch {}
+
+      // 2. Direct Supabase fetch if needed
+      if (!cloudProducts && supabaseUrl && supabaseKey) {
+        try {
+          const res = await fetch(
+            `${supabaseUrl}/rest/v1/products?select=*&order=sort_order.asc,created_at.asc`,
+            {
+              headers: {
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
+              },
+              cache: "no-store",
+            }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              cloudProducts = data.map(unpackProductRow);
+            }
+          }
+        } catch {}
+      }
+
+      // 3. Adopt remote products into store
+      if (cloudProducts && cloudProducts.length > 0 && isMounted) {
+        const defaultMap = new Map(DEFAULT_PRODUCTS.map((d) => [d.id, d]));
+        const mapped: Product[] = cloudProducts.map((item: any) => {
+          const base = defaultMap.get(item.id);
+          const imagesList = Array.isArray(item.images)
+            ? item.images
+            : (item.imageUrl ? [item.imageUrl] : (base?.images || []));
+
+          return {
+            id: item.id,
+            name: item.name || base?.name || "",
+            category: item.category || base?.category || "خضروات",
+            variety: item.variety || base?.variety || "",
+            season: item.season || base?.season || "",
+            pack: item.pack || base?.pack || "",
+            specs: item.specs || base?.specs || "",
+            imageUrl: item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "") || base?.imageUrl || "/images/products/artichoke.jpg",
+            icon: item.icon || base?.icon || "🌿",
+            status: item.status || base?.status || "متاح للتصدير",
+            featured: item.featured ?? base?.featured ?? false,
+            description: item.description !== undefined ? item.description : (base?.description || ""),
+            images: imagesList,
+            pdfUrl: item.pdfUrl !== undefined ? item.pdfUrl : (base?.pdfUrl || ""),
+            pdfName: item.pdfName !== undefined ? item.pdfName : (base?.pdfName || ""),
+            origin: item.origin || base?.origin || "جمهورية مصر العربية (Egypt)",
+            hsCode: item.hsCode || base?.hsCode || "",
+            storageTemp: item.storageTemp || base?.storageTemp || "",
+            shelfLife: item.shelfLife || base?.shelfLife || "",
+          };
+        });
+
+        const raw = JSON.stringify(mapped);
+        if (raw !== localStorage.getItem(PRODUCTS_KEY)) {
+          localStorage.setItem(PRODUCTS_KEY, raw);
+          localStorage.setItem(PRODUCTS_CACHE_KEY, raw);
+          window.dispatchEvent(new Event(PRODUCTS_EVENT));
+          cachedProducts = mapped;
+          cachedProductsRaw = raw;
+          notifyChange();
+        }
       }
     }
 
@@ -628,6 +801,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0 && isMounted) {
             const row = data[0];
+            const local = getSettingsSnapshot();
             const mapped: SiteSettings = {
               companyName: row.company_name || DEFAULT_SETTINGS.companyName,
               tagline: row.tagline || DEFAULT_SETTINGS.tagline,
@@ -636,6 +810,15 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               location: row.location || DEFAULT_SETTINGS.location,
               exportBannerText: row.export_banner_text || DEFAULT_SETTINGS.exportBannerText,
               showExportBanner: row.show_export_banner ?? true,
+              commercialRegister: row.commercial_register || local.commercialRegister || DEFAULT_SETTINGS.commercialRegister,
+              taxCard: row.tax_card || local.taxCard || DEFAULT_SETTINGS.taxCard,
+              exporterRegNumber: row.exporter_reg_number || local.exporterRegNumber || DEFAULT_SETTINGS.exporterRegNumber,
+              seoTitle: row.seo_title || local.seoTitle || DEFAULT_SETTINGS.seoTitle,
+              seoDescription: row.seo_description || local.seoDescription || DEFAULT_SETTINGS.seoDescription,
+              seoKeywords: Array.isArray(row.seo_keywords) && row.seo_keywords.length > 0
+                ? row.seo_keywords
+                : (local.seoKeywords && local.seoKeywords.length > 0 ? local.seoKeywords : DEFAULT_SETTINGS.seoKeywords),
+              googleVerificationId: row.google_verification_id || local.googleVerificationId || "",
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(mapped));
             localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(mapped));
@@ -713,31 +896,49 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       const newProduct: Product = {
         ...item,
         id: "prod-" + Date.now(),
+        imageUrl: item.imageUrl || (Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : "") || "/images/products/artichoke.jpg",
+        images: Array.isArray(item.images) ? item.images : (item.imageUrl ? [item.imageUrl] : []),
       };
       const updated = [newProduct, ...current];
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
       localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
-      window.dispatchEvent(new Event(PRODUCTS_EVENT));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
+      window.dispatchEvent(new Event(PRODUCTS_EVENT));
       notifyChange();
+
+      try {
+        const bc = new BroadcastChannel("agriport_products_channel");
+        bc.postMessage({ type: "ADD_PRODUCT", product: newProduct });
+        bc.close();
+      } catch {}
+
       triggerOpsToast(
         `تمت إضافة منتج "${newProduct.name}" بنجاح إلى الموقع.`,
         "success",
         "تم الحفظ بنجاح"
       );
 
+      // Sync via Next.js API route
+      fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProduct),
+      }).catch(() => {});
+
+      // Direct Supabase upsert using packed specs
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
+          const packedSpecs = packProductSpecs(newProduct);
           await fetch(`${supabaseUrl}/rest/v1/products`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               apikey: supabaseKey,
               Authorization: `Bearer ${supabaseKey}`,
-              Prefer: "return=minimal",
+              Prefer: "resolution=merge-duplicates,return=representation",
             },
             body: JSON.stringify({
               id: newProduct.id,
@@ -746,8 +947,8 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               variety: newProduct.variety,
               season: newProduct.season,
               pack: newProduct.pack,
-              specs: newProduct.specs,
-              image_url: newProduct.imageUrl,
+              specs: packedSpecs,
+              image_url: newProduct.imageUrl || (Array.isArray(newProduct.images) ? newProduct.images[0] : "") || "/images/products/artichoke.jpg",
               icon: newProduct.icon || "🌿",
               status: newProduct.status,
               featured: newProduct.featured ?? false,
@@ -755,7 +956,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
             }),
           });
         } catch (e) {
-          console.error("Failed to push product to Supabase:", e);
+          console.warn("⚠️ Failed to push product to Supabase:", e);
         }
       }
     },
@@ -769,43 +970,64 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
         p.id === id ? { ...p, ...partial } : p,
       );
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
+      localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
+      window.dispatchEvent(new Event(PRODUCTS_EVENT));
       notifyChange();
+
+      try {
+        const bc = new BroadcastChannel("agriport_products_channel");
+        bc.postMessage({ type: "UPDATE_PRODUCT", id, partial });
+        bc.close();
+      } catch {}
+
       triggerOpsToast(
         "تم حفظ وتحديث بيانات المنتج في الموقع بنجاح.",
         "success",
         "تم الحفظ بنجاح"
       );
 
+      // Sync via Next.js API route
+      fetch("/api/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...partial }),
+      }).catch(() => {});
+
+      // Direct Supabase upsert using packed specs
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
-          const payload: Record<string, any> = {};
-          if (partial.name !== undefined) payload.name = partial.name;
-          if (partial.category !== undefined) payload.category = partial.category;
-          if (partial.variety !== undefined) payload.variety = partial.variety;
-          if (partial.season !== undefined) payload.season = partial.season;
-          if (partial.pack !== undefined) payload.pack = partial.pack;
-          if (partial.specs !== undefined) payload.specs = partial.specs;
-          if (partial.imageUrl !== undefined) payload.image_url = partial.imageUrl;
-          if (partial.icon !== undefined) payload.icon = partial.icon;
-          if (partial.status !== undefined) payload.status = partial.status;
-          if (partial.featured !== undefined) payload.featured = partial.featured;
-
-          await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
-              Prefer: "return=minimal",
-            },
-            body: JSON.stringify(payload),
-          });
+          const productToSave = updated.find((p) => p.id === id);
+          if (productToSave) {
+            const packedSpecs = packProductSpecs(productToSave);
+            await fetch(`${supabaseUrl}/rest/v1/products`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
+                Prefer: "resolution=merge-duplicates,return=representation",
+              },
+              body: JSON.stringify({
+                id: productToSave.id,
+                name: productToSave.name,
+                category: productToSave.category,
+                variety: productToSave.variety,
+                season: productToSave.season,
+                pack: productToSave.pack,
+                specs: packedSpecs,
+                image_url: productToSave.imageUrl || (Array.isArray(productToSave.images) ? productToSave.images[0] : "") || "/images/products/artichoke.jpg",
+                icon: productToSave.icon || "🌿",
+                status: productToSave.status || "متاح للتصدير",
+                featured: productToSave.featured ?? false,
+              }),
+            });
+          }
         } catch (e) {
-          console.error("Failed to patch product in Supabase:", e);
+          console.warn("⚠️ Failed to update product in Supabase:", e);
         }
       }
     },
@@ -817,10 +1039,24 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       const current = getProductsSnapshot();
       const updated = current.filter((p) => p.id !== id);
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
+      localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
+      window.dispatchEvent(new Event(PRODUCTS_EVENT));
       notifyChange();
+
+      try {
+        const bc = new BroadcastChannel("agriport_products_channel");
+        bc.postMessage({ type: "DELETE_PRODUCT", id });
+        bc.close();
+      } catch {}
+
       triggerOpsToast("تم حذف المنتج من الكتالوج بنجاح 🗑️");
+
+      // Sync via Next.js API route
+      fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      }).catch(() => {});
 
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
@@ -834,7 +1070,7 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
             },
           });
         } catch (e) {
-          console.error("Failed to delete product in Supabase:", e);
+          console.warn("⚠️ Failed to delete product in Supabase:", e);
         }
       }
     },
@@ -975,7 +1211,26 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
       const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
-          const res = await fetch(`${supabaseUrl}/rest/v1/site_settings`, {
+          const payload: Record<string, any> = {
+            id: "main",
+            company_name: updated.companyName,
+            tagline: updated.tagline,
+            email: updated.email,
+            phone: updated.phone,
+            location: updated.location,
+            export_banner_text: updated.exportBannerText,
+            show_export_banner: updated.showExportBanner,
+            updated_at: new Date().toISOString(),
+          };
+          if (updated.commercialRegister !== undefined) payload.commercial_register = updated.commercialRegister;
+          if (updated.taxCard !== undefined) payload.tax_card = updated.taxCard;
+          if (updated.exporterRegNumber !== undefined) payload.exporter_reg_number = updated.exporterRegNumber;
+          if (updated.seoTitle !== undefined) payload.seo_title = updated.seoTitle;
+          if (updated.seoDescription !== undefined) payload.seo_description = updated.seoDescription;
+          if (updated.seoKeywords !== undefined) payload.seo_keywords = updated.seoKeywords;
+          if (updated.googleVerificationId !== undefined) payload.google_verification_id = updated.googleVerificationId;
+
+          let res = await fetch(`${supabaseUrl}/rest/v1/site_settings`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -983,18 +1238,36 @@ export function OpsStoreProvider({ children }: { children: ReactNode }) {
               Authorization: `Bearer ${supabaseKey}`,
               Prefer: "resolution=merge-duplicates,return=representation",
             },
-            body: JSON.stringify({
-              id: "main",
-              company_name: updated.companyName,
-              tagline: updated.tagline,
-              email: updated.email,
-              phone: updated.phone,
-              location: updated.location,
-              export_banner_text: updated.exportBannerText,
-              show_export_banner: updated.showExportBanner,
-              updated_at: new Date().toISOString(),
-            }),
+            body: JSON.stringify(payload),
           });
+
+          // If extra columns aren't in Supabase schema yet, retry with base columns
+          if (!res.ok) {
+            const errText = await res.text();
+            if (errText.includes("column") || res.status === 400) {
+              const basePayload = {
+                id: "main",
+                company_name: updated.companyName,
+                tagline: updated.tagline,
+                email: updated.email,
+                phone: updated.phone,
+                location: updated.location,
+                export_banner_text: updated.exportBannerText,
+                show_export_banner: updated.showExportBanner,
+                updated_at: new Date().toISOString(),
+              };
+              res = await fetch(`${supabaseUrl}/rest/v1/site_settings`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey: supabaseKey,
+                  Authorization: `Bearer ${supabaseKey}`,
+                  Prefer: "resolution=merge-duplicates,return=representation",
+                },
+                body: JSON.stringify(basePayload),
+              });
+            }
+          }
 
           if (!res.ok) {
             const errText = await res.text();

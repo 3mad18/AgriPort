@@ -1,14 +1,23 @@
 export type ExportProduct = {
   id: string;
   name: string;
-  category: "موالح" | "خضروات" | "فواكه" | "أخرى";
+  category: "موالح" | "خضروات" | "فواكه" | "أخرى" | string;
   variety: string;
   season: string;
   pack: string;
   specs: string;
   imageUrl: string;
   icon: string;
-  status: "متاح للتصدير" | "موسم قادم" | "نفد مؤقتاً";
+  status: "متاح للتصدير" | "موسم قادم" | "نفد مؤقتاً" | string;
+  featured?: boolean;
+  description?: string;
+  images?: string[];
+  pdfUrl?: string;
+  pdfName?: string;
+  origin?: string;
+  hsCode?: string;
+  storageTemp?: string;
+  shelfLife?: string;
 };
 
 export const EXPORT_CATALOG: ExportProduct[] = [
@@ -23,6 +32,16 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/artichoke.jpg",
     icon: "🌱",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0709.91.00",
+    storageTemp: "0°C — 2°C (نسبة رطوبة 95%)",
+    shelfLife: "21 — 28 يوماً في سلسلة التبريد المعتمدة",
+    description: "خرشوف مصري طازج ومجهز مطابق للمواصفات التصديرية للاتحاد الأوروبي والأسواق الدولية. يتميز بأقماع مدمجة صلبة وقلوب غنية خالية من الألياف، يقطف يدوياً بعناية في الصباح الباكر مع تطبيق التبريد الأولي الفوري Pre-cooling لضمان النضارة التامة.",
+    images: [
+      "/images/products/artichoke.jpg",
+      "/images/facilities/artichoke-processing.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "green-beans",
@@ -35,6 +54,16 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/green-beans.jpg",
     icon: "🫘",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0708.20.00",
+    storageTemp: "4°C — 7°C (نسبة رطوبة 90-95%)",
+    shelfLife: "14 — 21 يوماً",
+    description: "فاصوليا خضراء نقية نخب أول، تمتاز بقرون نضرة مستقيمة موحدة اللون وبدون خيوط أو تجويفات بذرية. تفرز وتعبأ يدوياً في محطات التعبئة المعتمدة لدينا مع خيارات تغليف مرنة للبانيتات والكراتين المبردة للشحن الجوي والبحري.",
+    images: [
+      "/images/products/green-beans.jpg",
+      "/images/facilities/broccoli-beans-packing.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "broccoli",
@@ -47,6 +76,16 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/broccoli.jpg",
     icon: "🥦",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.10.00",
+    storageTemp: "0°C — 1°C مع ثلج مجروش ملامس",
+    shelfLife: "21 — 25 يوماً",
+    description: "رؤوس بروكلي عالية الجودة بزهيرات متراصة مشدودة بلون أخضر داكن غني، خالية تماماً من الاصفرار أو التفتح الزهري. يعبأ في صناديق بوليسترين عازلة مع تغطية بالثلج المجهري للحفاظ على الرطوبة والنضارة الفائقة طوال مسار الشحن.",
+    images: [
+      "/images/products/broccoli.jpg",
+      "/images/facilities/broccoli-beans-packing.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "cauliflower",
@@ -59,6 +98,15 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/cauliflower.jpg",
     icon: "🥬",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.10.00",
+    storageTemp: "0°C — 2°C (نسبة رطوبة 95%)",
+    shelfLife: "21 — 30 يوماً",
+    description: "أقراص قرنبيط بيضاء نقية عالية الكثافة والصلابة بدون فراغات، محصودة في درجات النضج المثالية ومحمية بأوراق خارجية مشذبة أو مغلفة فردياً بغشاء مسامي مانع للرطوبة لحمايتها أثناء الشحن البحري والجوي.",
+    images: [
+      "/images/products/cauliflower.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "cabbage",
@@ -71,6 +119,15 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/cabbage.jpg",
     icon: "🥬",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.90.10",
+    storageTemp: "0°C — 1°C (رطوبة نسبية 98%)",
+    shelfLife: "4 — 6 أسابيع",
+    description: "كرنب أخضر صلب مجهز بعناية للتصدير الخارجي، رؤوس كروية متجانسة الأوزان بأوراق لامعة مشدودة، خالية من أي إصابات حشرية أو ميكانيكية، ومفرزة آلياً ومحملة على باليتات تبريد وفق المعايير الدولية.",
+    images: [
+      "/images/products/cabbage.jpg",
+      "/images/facilities/cabbage-packing.jpg",
+    ],
   },
   {
     id: "potatoes",
@@ -83,6 +140,15 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/potatoes.jpg",
     icon: "🥔",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0701.90.00",
+    storageTemp: "4°C — 8°C (حسب الصنف والاستخدام مائدة أو تصنيع)",
+    shelfLife: "3 — 5 أشهر في بيئة تخزين متحكم بها",
+    description: "بطاطس مائدة وتصنيع شيبس مستخرجة من أراضٍ صحراوية بكر خالية من العفن البني ومطابقة للبروتوكولات الصارمة للاتحاد الأوروبي والمملكة المتحدة وروسيا والدول العربية. فرز وغسيل وتجفيف ومعايرة إلكترونية دقيقة.",
+    images: [
+      "/images/products/potatoes.jpg",
+      "/images/facilities/potatoes-packhouse.jpg",
+    ],
   },
   {
     id: "lettuce",
@@ -95,6 +161,15 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/lettuce.jpg",
     icon: "🥗",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0705.11.00",
+    storageTemp: "1°C — 2°C (رطوبة نسبية 95-98%)",
+    shelfLife: "18 — 24 يوماً",
+    description: "خس آيسبيرج وروماني عالي القرمشة والامتلاء الداخلي، محصود في الصباح الباكر ويخضع مباشرة لتقنية التبريد بالشفط الفراغي Vacuum Cooling لخفض حرارة اللب في دقائق وحماية الأوراق من التلف وضمان أطول فترة رف في أسواق الاستيراد.",
+    images: [
+      "/images/products/lettuce.jpg",
+      "/images/facilities/vegetable-farms.jpg",
+    ],
   },
   {
     id: "red-cabbage",
@@ -107,6 +182,15 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     imageUrl: "/images/products/red-cabbage.jpg",
     icon: "🟣",
     status: "متاح للتصدير",
+    origin: "جمهورية مصر العربية (Egypt)",
+    hsCode: "0704.90.90",
+    storageTemp: "0°C — 1°C",
+    shelfLife: "6 — 8 أسابيع",
+    description: "كرنب أحمر كروي ممتاز ذو لون بنفسجي داكن جذاب وبنية شديدة الكثافة، يمتاز بقدرة فائقة على تحمل فترات الشحن البحري الطويلة والاحتفاظ بالنضارة والقوام الصلب ومحتواه العالي من مضادات الأكسدة الطبيعية.",
+    images: [
+      "/images/products/red-cabbage.jpg",
+      "/images/facilities/cabbage-packing.jpg",
+    ],
   },
 ];
 

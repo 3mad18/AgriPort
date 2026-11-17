@@ -19,6 +19,7 @@ import {
   LayoutDashboard,
   Bell,
   Landmark,
+  Package,
   Boxes,
   Users,
   Activity,
@@ -445,7 +446,11 @@ export function OpsShell() {
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-                              <span>{isVisit ? "🏛️" : "📦"}</span>
+                              {isVisit ? (
+                                <Landmark className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                              ) : (
+                                <Package className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                              )}
                               <span>{item.name}</span>
                             </span>
                             <span className="text-[10px] text-slate-400">

@@ -25,8 +25,8 @@ export function BrandLogo({
   return (
     <Link
       href="/"
-      className={`group inline-flex ${
-        isStacked ? "flex-col items-center text-center gap-2" : "flex-row items-center gap-3"
+      className={`group inline-flex shrink-0 ${
+        isStacked ? "flex-col items-center text-center gap-2" : "flex-row items-center gap-2 sm:gap-3"
       } transition-opacity hover:opacity-95 ${className}`}
       aria-label="AgriPort - Global Agriculture & Export"
     >
@@ -36,14 +36,14 @@ export function BrandLogo({
           src={isDark ? "/brand/agri-flow-symbol-dark.png" : "/brand/agri-flow-symbol.png"}
           alt="AgriPort"
           className={`${
-            isStacked ? "h-16 sm:h-20 w-auto" : "h-8 sm:h-9 w-auto"
+            isStacked ? "h-16 sm:h-20 w-auto" : "h-7 sm:h-9 w-auto"
           } object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-md`}
         />
       </div>
 
       {/* Brand Name as real Font Text: Agri [Green] + Port [Bold Black/White] */}
       <div className={`flex flex-col ${isStacked ? "items-center" : "text-start"} leading-none`} dir="ltr">
-        <div className={`flex items-center tracking-tight text-xl sm:text-2xl ${spaceGrotesk.className}`}>
+        <div className={`flex items-center tracking-tight text-lg sm:text-2xl ${spaceGrotesk.className}`}>
           <span className={`font-medium ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>
             Agri
           </span>

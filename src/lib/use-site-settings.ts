@@ -9,6 +9,9 @@ import {
   SETTINGS_EVENT,
   OPS_STORE_EVENT,
 } from "./supabase-config";
+import { DEFAULT_SEO_KEYWORDS } from "@/config/seo-keywords";
+
+export { DEFAULT_SEO_KEYWORDS };
 
 export type PublicSiteSettings = {
   companyName: string;
@@ -21,6 +24,10 @@ export type PublicSiteSettings = {
   commercialRegister?: string;
   taxCard?: string;
   exporterRegNumber?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+  googleVerificationId?: string;
 };
 
 const DEFAULT_SETTINGS: PublicSiteSettings = {
@@ -35,6 +42,11 @@ const DEFAULT_SETTINGS: PublicSiteSettings = {
   exportBannerText:
     "موسم تصدير الخرشوف والفاصولياء الخضراء والبروكلي والقرنبيط مفتوح حالياً للشحن الفوري لأوروبا والموانئ العالمية!",
   showExportBanner: true,
+  seoTitle: "AgriPort — تصدير الحاصلات الزراعية والخضروات المصرية الفاخرة",
+  seoDescription:
+    "شركة AgriPort الرائدة في تصدير الحاصلات الزراعية والخضروات والفواكه الطازجة وفق شهادات GlobalGAP و BRCGS وسلسلة التبريد المعتمدة إلى أوروبا ودول العالم.",
+  seoKeywords: DEFAULT_SEO_KEYWORDS,
+  googleVerificationId: "",
 };
 
 let cachedSettings: PublicSiteSettings | null = null;
@@ -76,6 +88,12 @@ function parseSettings(raw: string | null): PublicSiteSettings | null {
         taxCard: parsed.taxCard || DEFAULT_SETTINGS.taxCard,
         exporterRegNumber:
           parsed.exporterRegNumber || DEFAULT_SETTINGS.exporterRegNumber,
+        seoTitle: parsed.seoTitle || DEFAULT_SETTINGS.seoTitle,
+        seoDescription: parsed.seoDescription || DEFAULT_SETTINGS.seoDescription,
+        seoKeywords: Array.isArray(parsed.seoKeywords) && parsed.seoKeywords.length > 0
+          ? parsed.seoKeywords
+          : DEFAULT_SETTINGS.seoKeywords,
+        googleVerificationId: parsed.googleVerificationId || "",
       };
     }
   } catch {}

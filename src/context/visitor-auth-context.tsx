@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useSyncExternalStore,
+  useEffect,
   type ReactNode,
 } from "react";
 import {
@@ -81,11 +82,20 @@ export function saveVisitorSession(user: VisitorUser | null) {
     localStorage.removeItem(VISITOR_SESSION_KEY);
     cachedVisitorUser = null;
     cachedVisitorUserRaw = null;
+    try {
+      document.cookie = `${VISITOR_SESSION_KEY}=; path=/; max-age=0; SameSite=Lax`;
+      document.cookie = `${VISITOR_SESSION_KEY}_data=; path=/; max-age=0; SameSite=Lax`;
+    } catch {}
   } else {
     const raw = JSON.stringify(user);
     localStorage.setItem(VISITOR_SESSION_KEY, raw);
     cachedVisitorUser = user;
     cachedVisitorUserRaw = raw;
+    try {
+      document.cookie = `${VISITOR_SESSION_KEY}=1; path=/; max-age=2592000; SameSite=Lax`;
+      const encoded = encodeURIComponent(raw);
+      document.cookie = `${VISITOR_SESSION_KEY}_data=${encoded}; path=/; max-age=2592000; SameSite=Lax`;
+    } catch {}
   }
   window.dispatchEvent(new Event(VISITOR_AUTH_EVENT));
 }
@@ -149,6 +159,18 @@ export function getVisitorAuthSnapshot(): VisitorUser | null {
 const emptySubscribe = () => () => {};
 
 export function VisitorAuthProvider({ children }: { children: ReactNode }) {
+  // Auto-sync cookie if localStorage already holds an active session from an earlier turn
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(VISITOR_SESSION_KEY);
+      if (raw && !document.cookie.includes(`${VISITOR_SESSION_KEY}_data=`)) {
+        document.cookie = `${VISITOR_SESSION_KEY}=1; path=/; max-age=2592000; SameSite=Lax`;
+        document.cookie = `${VISITOR_SESSION_KEY}_data=${encodeURIComponent(raw)}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+    } catch {}
+  }, []);
+
   const isHydrated = useSyncExternalStore(
     emptySubscribe,
     () => true,

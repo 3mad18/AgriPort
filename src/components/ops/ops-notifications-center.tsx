@@ -18,6 +18,8 @@ import {
   Check,
   Trash2,
   X,
+  Inbox,
+  MessageSquare,
 } from "lucide-react";
 
 export function OpsNotificationsCenter({
@@ -137,11 +139,11 @@ export function OpsNotificationsCenter({
             </td>
             <td>
               <div style="font-weight: 600; color: #1e293b;">${escape(item.country)}</div>
-              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">⚓ ${escape(item.destinationPort)}</div>
+              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">${escape(item.destinationPort)}</div>
             </td>
             <td>
               <div style="font-weight: 700; color: #047857;">${escape(item.product)}</div>
-              <div style="font-size: 11px; color: #334155; margin-top: 2px;">📦 ${escape(item.quantity)}</div>
+              <div style="font-size: 11px; color: #334155; margin-top: 2px;">${escape(item.quantity)}</div>
             </td>
             <td style="text-align: center;">
               <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; color: #334155;">
@@ -366,11 +368,11 @@ export function OpsNotificationsCenter({
 <body>
   <div class="no-print print-actions">
     <div style="font-size: 13px; font-weight: 600;">
-      📄 تم توليد تقرير طلبات التصدير بنجاح (${listToExport.length} طلب) • يمكنك حفظه كملف PDF
+      تم توليد تقرير طلبات التصدير بنجاح (${listToExport.length} طلب) • يمكنك حفظه كملف PDF
     </div>
     <div style="display: flex; gap: 8px;">
       <button onclick="window.print()" class="print-btn">
-        🖨️ طباعة / حفظ بتنسيق PDF
+        طباعة / حفظ بتنسيق PDF
       </button>
       <button onclick="window.close()" class="close-btn">
         إغلاق
@@ -586,7 +588,7 @@ export function OpsNotificationsCenter({
       {/* Inquiries Cards List */}
       {filtered.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-12 text-center">
-          <div className="text-3xl mb-2">📭</div>
+          <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
           <h3 className="text-base font-bold text-slate-800">
             لا توجد طلبات تطابق الفلتر الحالي
           </h3>
@@ -669,8 +671,9 @@ export function OpsNotificationsCenter({
 
                     {/* Customer Notes Preview */}
                     {item.message && (
-                      <p className="text-xs text-slate-500 font-medium line-clamp-1 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                        💬 &ldquo;{item.message}&rdquo;
+                      <p className="text-xs text-slate-500 font-medium line-clamp-1 bg-slate-50 p-2 rounded-lg border border-slate-100 flex items-center gap-1.5">
+                        <MessageSquare className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                        <span className="truncate">&ldquo;{item.message}&rdquo;</span>
                       </p>
                     )}
                   </div>

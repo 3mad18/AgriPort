@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Bell,
   Landmark,
+  Package,
   Boxes,
   Handshake,
   Users,
@@ -250,8 +251,12 @@ export function OpsOverview({
                   }`}
                 >
                   <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
-                    <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200 text-base sm:text-lg shadow-xs">
-                      {isVisit ? "🏛️" : "📦"}
+                    <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-700 shadow-xs">
+                      {isVisit ? (
+                        <Landmark className="w-5 h-5 text-teal-600" />
+                      ) : (
+                        <Package className="w-5 h-5 text-emerald-600" />
+                      )}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -315,7 +320,7 @@ export function OpsOverview({
             <div className="space-y-3.5 text-xs">
               <div>
                 <div className="flex justify-between font-bold text-slate-700 mb-1">
-                  <span>🍊 برتقال فالنسيا وموالح صيفية</span>
+                  <span>برتقال فالنسيا وموالح صيفية</span>
                   <span className="text-emerald-600 font-extrabold">42%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
@@ -328,7 +333,7 @@ export function OpsOverview({
 
               <div>
                 <div className="flex justify-between font-bold text-slate-700 mb-1">
-                  <span>🧅 بصل أحمر وذهبي مجفف</span>
+                  <span>بصل أحمر وذهبي مجفف</span>
                   <span className="text-emerald-600 font-extrabold">26%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
@@ -341,7 +346,7 @@ export function OpsOverview({
 
               <div>
                 <div className="flex justify-between font-bold text-slate-700 mb-1">
-                  <span>🍓 فراولة طازجة (شحن جوي)</span>
+                  <span>فراولة طازجة (شحن جوي)</span>
                   <span className="text-emerald-600 font-extrabold">18%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
@@ -354,7 +359,7 @@ export function OpsOverview({
 
               <div>
                 <div className="flex justify-between font-bold text-slate-700 mb-1">
-                  <span>🥔 بطاطس تصدير وتصنيع</span>
+                  <span>بطاطس تصدير وتصنيع</span>
                   <span className="text-emerald-600 font-extrabold">14%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">

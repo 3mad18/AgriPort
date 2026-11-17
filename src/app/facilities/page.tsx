@@ -5,6 +5,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { useLanguage } from "@/context/language-context";
+import {
+  Building2,
+  Sprout,
+  ThermometerSnowflake,
+  Zap,
+  Maximize2,
+  Settings2,
+} from "lucide-react";
 
 type FacilityItem = {
   id: string;
@@ -48,8 +56,8 @@ export default function FacilitiesPage() {
         <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#F7F9FC] p-5 sm:p-6 text-start">
             <div className="flex items-center gap-2.5 text-emerald-600 mb-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100/70 text-lg">
-                🏭
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                <Building2 className="w-5 h-5" />
               </span>
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 {f.stats.stations}
@@ -62,8 +70,8 @@ export default function FacilitiesPage() {
 
           <div className="rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#F7F9FC] p-5 sm:p-6 text-start">
             <div className="flex items-center gap-2.5 text-emerald-600 mb-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100/70 text-lg">
-                🌱
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                <Sprout className="w-5 h-5" />
               </span>
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 {f.stats.farms}
@@ -76,8 +84,8 @@ export default function FacilitiesPage() {
 
           <div className="rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#F7F9FC] p-5 sm:p-6 text-start">
             <div className="flex items-center gap-2.5 text-emerald-600 mb-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100/70 text-lg">
-                ❄️
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                <ThermometerSnowflake className="w-5 h-5" />
               </span>
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 {f.stats.coldChain}
@@ -90,8 +98,8 @@ export default function FacilitiesPage() {
 
           <div className="rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#F7F9FC] p-5 sm:p-6 text-start">
             <div className="flex items-center gap-2.5 text-emerald-600 mb-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100/70 text-lg">
-                ⚡
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+                <Zap className="w-5 h-5" />
               </span>
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 {f.stats.capacity}
@@ -218,8 +226,8 @@ export default function FacilitiesPage() {
 
                   {/* Zoom Indicator (Bottom End) */}
                   <div className="absolute bottom-4 end-4">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                      🔍
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Maximize2 className="w-3.5 h-3.5 text-white" />
                     </span>
                   </div>
                 </div>
@@ -238,7 +246,7 @@ export default function FacilitiesPage() {
               {/* Technical Specifications Footer */}
               <div className="p-5 sm:p-6 pt-0 border-t border-slate-100 mt-2">
                 <div className="flex items-center gap-2 pt-3 text-xs text-slate-600 font-medium">
-                  <span className="text-emerald-500">⚙️</span>
+                  <Settings2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>{item.specs}</span>
                 </div>
               </div>

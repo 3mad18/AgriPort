@@ -65,8 +65,26 @@ CREATE TABLE IF NOT EXISTS public.products (
     icon TEXT NOT NULL,
     status TEXT NOT NULL,
     featured BOOLEAN DEFAULT false NOT NULL,
-    sort_order INT DEFAULT 0
+    sort_order INT DEFAULT 0,
+    description TEXT DEFAULT '',
+    images JSONB DEFAULT '[]'::jsonb,
+    pdf_url TEXT DEFAULT '',
+    pdf_name TEXT DEFAULT '',
+    origin TEXT DEFAULT 'جمهورية مصر العربية (Egypt)',
+    hs_code TEXT DEFAULT '',
+    storage_temp TEXT DEFAULT '',
+    shelf_life TEXT DEFAULT ''
 );
+
+-- Ensure all new columns exist on existing databases:
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS description TEXT DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS pdf_url TEXT DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS pdf_name TEXT DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS origin TEXT DEFAULT 'جمهورية مصر العربية (Egypt)';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS hs_code TEXT DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS storage_temp TEXT DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS shelf_life TEXT DEFAULT '';
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
@@ -211,6 +229,15 @@ ON public.site_settings FOR ALL
 TO anon, authenticated, service_role
 USING (true)
 WITH CHECK (true);
+
+-- Ensure extra columns exist on site_settings (SEO & Commercial details)
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS commercial_register TEXT DEFAULT '108420';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS tax_card TEXT DEFAULT '629-418-735';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS exporter_reg_number TEXT DEFAULT '28410';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS seo_title TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS seo_description TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS seo_keywords JSONB;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS google_verification_id TEXT;
 
 INSERT INTO public.site_settings (id, company_name, tagline, email, phone, location, export_banner_text, show_export_banner)
 VALUES (

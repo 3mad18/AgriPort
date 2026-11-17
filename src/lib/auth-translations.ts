@@ -5,7 +5,9 @@ export type AuthTranslations = {
   pageSubtitle: string;
   badge: string;
   tabSignIn: string;
+  tabSignInShort: string;
   tabRegister: string;
+  tabRegisterShort: string;
   socialGoogle: string;
   socialApple: string;
   orContinueWithEmail: string;
@@ -66,6 +68,7 @@ export type AuthTranslations = {
 
   // Guest registration keys
   guestTabLabel: string;
+  guestTabLabelShort: string;
   permanentTabLabel: string;
   guestBadge: string;
   guestDescription: string;
@@ -86,7 +89,9 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     pageSubtitle: "بوابتك المباشرة لاستعراض كتالوج المحاصيل، متابعة الطلبات، وتنسيق الشحنات الدولية.",
     badge: "بوابة الزوار والعملاء المعتمدة",
     tabSignIn: "تسجيل الدخول",
+    tabSignInShort: "دخول",
     tabRegister: "إنشاء حساب جديد",
+    tabRegisterShort: "حساب جديد",
     socialGoogle: "المتابعة باستخدام Google",
     socialApple: "المتابعة باستخدام Apple",
     orContinueWithEmail: "أو بالبريد الإلكتروني",
@@ -145,7 +150,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     simulationCodeNotice: "رمز التحقق الفوري للتجربة السريعة:",
 
     // Guest registration keys
-    guestTabLabel: "تسجيل سريع كضيف",
+    guestTabLabel: "تسجيل كضيف",
+    guestTabLabelShort: "ضيف",
     permanentTabLabel: "حساب دائم (بكلمة مرور)",
     guestBadge: "تسجيل فوري كضيف بدون كلمة مرور",
     guestDescription: "سجل بيانات تواصلك الأساسية فقط للبدء المباشر وطلب عروض الأسعار والتصدير دون الحاجة لإنشاء كلمة مرور.",
@@ -164,7 +170,9 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     pageSubtitle: "Your global portal to browse fresh produce, track inquiries, and coordinate international shipments.",
     badge: "Authorized Visitor & Client Portal",
     tabSignIn: "Sign In",
+    tabSignInShort: "Sign In",
     tabRegister: "Create Account",
+    tabRegisterShort: "Register",
     socialGoogle: "Continue with Google",
     socialApple: "Continue with Apple",
     orContinueWithEmail: "or continue with email",
@@ -223,7 +231,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     simulationCodeNotice: "Quick test verification code:",
 
     // Guest registration keys
-    guestTabLabel: "Quick Guest Sign-up",
+    guestTabLabel: "Quick Guest",
+    guestTabLabelShort: "Guest",
     permanentTabLabel: "Permanent Account",
     guestBadge: "Instant Guest Access (No Password)",
     guestDescription: "Enter basic contact details to start browsing and requesting export quotes immediately without a password.",
@@ -242,7 +251,9 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     pageSubtitle: "Votre portail pour explorer les produits frais et organiser vos expéditions internationales.",
     badge: "Portail Visiteurs et Clients",
     tabSignIn: "Connexion",
+    tabSignInShort: "Connexion",
     tabRegister: "Créer un compte",
+    tabRegisterShort: "S'inscrire",
     socialGoogle: "Continuer avec Google",
     socialApple: "Continuer avec Apple",
     orContinueWithEmail: "ou continuer avec email",
@@ -301,7 +312,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     simulationCodeNotice: "Code de test rapide :",
 
     // Guest registration keys
-    guestTabLabel: "Inscription Invité Rapide",
+    guestTabLabel: "Inscription Invité",
+    guestTabLabelShort: "Invité",
     permanentTabLabel: "Compte Permanent",
     guestBadge: "Accès Invité Rapide (Sans mot de passe)",
     guestDescription: "Renseignez vos coordonnées de base pour explorer et demander des devis immédiatement sans mot de passe.",
@@ -320,7 +332,9 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     pageSubtitle: "Il tuo portale per esplorare i prodotti ortofrutticoli e gestire le spedizioni internazionali.",
     badge: "Portale Visitatori e Clienti Autorizzati",
     tabSignIn: "Accedi",
+    tabSignInShort: "Accedi",
     tabRegister: "Crea Account",
+    tabRegisterShort: "Registrati",
     socialGoogle: "Continua con Google",
     socialApple: "Continua con Apple",
     orContinueWithEmail: "o continua via email",
@@ -379,7 +393,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     simulationCodeNotice: "Codice di test rapido:",
 
     // Guest registration keys
-    guestTabLabel: "Registrazione Ospite Rapida",
+    guestTabLabel: "Accesso Ospite",
+    guestTabLabelShort: "Ospite",
     permanentTabLabel: "Account Permanente",
     guestBadge: "Accesso Ospite Rapido (Senza password)",
     guestDescription: "Inserisci i tuoi dati di contatto di base per esplorare e richiedere preventivi senza password.",
@@ -398,7 +413,9 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     pageSubtitle: "Tu portal global para explorar productos agrícolas frescos y coordinar envíos internacionales.",
     badge: "Portal de Visitantes y Clientes Autorizados",
     tabSignIn: "Iniciar Sesión",
+    tabSignInShort: "Acceder",
     tabRegister: "Crear Cuenta",
+    tabRegisterShort: "Registro",
     socialGoogle: "Continuar con Google",
     socialApple: "Continuar con Apple",
     orContinueWithEmail: "o continuar con correo",
@@ -457,7 +474,8 @@ export const authTranslations: Record<Language, AuthTranslations> = {
     simulationCodeNotice: "Código de prueba rápida:",
 
     // Guest registration keys
-    guestTabLabel: "Registro Rápido como Invitado",
+    guestTabLabel: "Registro Invitado",
+    guestTabLabelShort: "Invitado",
     permanentTabLabel: "Cuenta Permanente",
     guestBadge: "Acceso Invitado Rápido (Sin contraseña)",
     guestDescription: "Ingresa tus datos básicos de contacto para explorar y solicitar cotizaciones sin contraseña.",
