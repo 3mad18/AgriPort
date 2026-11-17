@@ -893,13 +893,29 @@ export function OpsStoreProvider({
   const addProduct = useCallback(
     async (item: Omit<Product, "id">) => {
       const current = getProductsSnapshot();
+      const imagesArr = Array.isArray(item.images)
+        ? item.images
+        : item.imageUrl
+        ? [item.imageUrl]
+        : [];
       const newProduct: Product = {
         ...item,
         id: "prod-" + Date.now(),
+        imageUrl:
+          item.imageUrl ||
+          (imagesArr.length > 0 ? imagesArr[0] : "") ||
+          "/images/products/artichoke.jpg",
+        images: imagesArr,
       };
       const updated = [newProduct, ...current];
-      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
-      localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+      try {
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
+        localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+      } catch (err) {
+        console.warn("⚠️ LocalStorage quota warning in addProduct:", err);
+      }
+      cachedProducts = updated;
+      cachedProductsRaw = JSON.stringify(updated);
       window.dispatchEvent(new Event(PRODUCTS_EVENT));
       notifyChange();
 
@@ -922,13 +938,36 @@ export function OpsStoreProvider({
         body: JSON.stringify(newProduct),
       }).catch(() => {});
 
-      // Direct Supabase upsert using packed specs
+      // Direct Supabase upsert using packed specs and extended columns
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
         try {
           const packedSpecs = packProductSpecs(newProduct);
-          await fetch(`${supabaseUrl}/rest/v1/products`, {
+          const fullPayload = {
+            id: newProduct.id,
+            name: newProduct.name,
+            category: newProduct.category,
+            variety: newProduct.variety,
+            season: newProduct.season,
+            pack: newProduct.pack,
+            specs: packedSpecs,
+            image_url: newProduct.imageUrl,
+            icon: newProduct.icon || "🌿",
+            status: newProduct.status,
+            featured: newProduct.featured ?? false,
+            sort_order: 0,
+            images: newProduct.images,
+            description: newProduct.description || "",
+            pdf_url: newProduct.pdfUrl || "",
+            pdf_name: newProduct.pdfName || "",
+            origin: newProduct.origin || "جمهورية مصر العربية (Egypt)",
+            hs_code: newProduct.hsCode || "",
+            storage_temp: newProduct.storageTemp || "",
+            shelf_life: newProduct.shelfLife || "",
+          };
+
+          const insertRes = await fetch(`${supabaseUrl}/rest/v1/products`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -936,7 +975,11 @@ export function OpsStoreProvider({
               Authorization: `Bearer ${supabaseKey}`,
               Prefer: "resolution=merge-duplicates,return=representation",
             },
-            body: JSON.stringify({
+            body: JSON.stringify(fullPayload),
+          });
+
+          if (!insertRes.ok && insertRes.status === 400) {
+            const corePayload = {
               id: newProduct.id,
               name: newProduct.name,
               category: newProduct.category,
@@ -944,13 +987,23 @@ export function OpsStoreProvider({
               season: newProduct.season,
               pack: newProduct.pack,
               specs: packedSpecs,
-              image_url: newProduct.imageUrl || (Array.isArray(newProduct.images) ? newProduct.images[0] : "") || "/images/products/artichoke.jpg",
+              image_url: newProduct.imageUrl,
               icon: newProduct.icon || "🌿",
               status: newProduct.status,
               featured: newProduct.featured ?? false,
               sort_order: 0,
-            }),
-          });
+            };
+            await fetch(`${supabaseUrl}/rest/v1/products`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
+                Prefer: "resolution=merge-duplicates,return=representation",
+              },
+              body: JSON.stringify(corePayload),
+            });
+          }
         } catch (e) {
           console.warn("⚠️ Failed to push product to Supabase:", e);
         }
@@ -965,8 +1018,14 @@ export function OpsStoreProvider({
       const updated = current.map((p) =>
         p.id === id ? { ...p, ...partial } : p,
       );
-      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
-      localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+      try {
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
+        localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+      } catch (err) {
+        console.warn("⚠️ LocalStorage quota warning in updateProduct:", err);
+      }
+      cachedProducts = updated;
+      cachedProductsRaw = JSON.stringify(updated);
       window.dispatchEvent(new Event(PRODUCTS_EVENT));
       notifyChange();
 
@@ -989,7 +1048,7 @@ export function OpsStoreProvider({
         body: JSON.stringify({ id, ...partial }),
       }).catch(() => {});
 
-      // Direct Supabase upsert using packed specs
+      // Direct Supabase update using standard PATCH
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
@@ -997,28 +1056,74 @@ export function OpsStoreProvider({
           const productToSave = updated.find((p) => p.id === id);
           if (productToSave) {
             const packedSpecs = packProductSpecs(productToSave);
-            await fetch(`${supabaseUrl}/rest/v1/products`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                apikey: supabaseKey,
-                Authorization: `Bearer ${supabaseKey}`,
-                Prefer: "resolution=merge-duplicates,return=representation",
-              },
-              body: JSON.stringify({
-                id: productToSave.id,
+            const directPayload: Record<string, any> = {
+              name: productToSave.name,
+              category: productToSave.category,
+              variety: productToSave.variety,
+              season: productToSave.season,
+              pack: productToSave.pack,
+              specs: packedSpecs,
+              image_url:
+                productToSave.imageUrl ||
+                (Array.isArray(productToSave.images) && productToSave.images.length > 0
+                  ? productToSave.images[0]
+                  : "") ||
+                "/images/products/artichoke.jpg",
+              icon: productToSave.icon || "🌿",
+              status: productToSave.status || "متاح للتصدير",
+              featured: productToSave.featured ?? false,
+              images: Array.isArray(productToSave.images) ? productToSave.images : [],
+              description: productToSave.description || "",
+              pdf_url: productToSave.pdfUrl || "",
+              pdf_name: productToSave.pdfName || "",
+              origin: productToSave.origin || "جمهورية مصر العربية (Egypt)",
+              hs_code: productToSave.hsCode || "",
+              storage_temp: productToSave.storageTemp || "",
+              shelf_life: productToSave.shelfLife || "",
+            };
+
+            const patchRes = await fetch(
+              `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey: supabaseKey,
+                  Authorization: `Bearer ${supabaseKey}`,
+                  Prefer: "return=representation",
+                },
+                body: JSON.stringify(directPayload),
+              }
+            );
+
+            // Fallback to core columns with packed specs if extended columns don't exist
+            if (!patchRes.ok && patchRes.status === 400) {
+              const corePayload = {
                 name: productToSave.name,
                 category: productToSave.category,
                 variety: productToSave.variety,
                 season: productToSave.season,
                 pack: productToSave.pack,
                 specs: packedSpecs,
-                image_url: productToSave.imageUrl || (Array.isArray(productToSave.images) ? productToSave.images[0] : "") || "/images/products/artichoke.jpg",
+                image_url: directPayload.image_url,
                 icon: productToSave.icon || "🌿",
                 status: productToSave.status || "متاح للتصدير",
                 featured: productToSave.featured ?? false,
-              }),
-            });
+              };
+              await fetch(
+                `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`,
+                {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                    apikey: supabaseKey,
+                    Authorization: `Bearer ${supabaseKey}`,
+                    Prefer: "return=minimal",
+                  },
+                  body: JSON.stringify(corePayload),
+                }
+              );
+            }
           }
         } catch (e) {
           console.warn("⚠️ Failed to update product in Supabase:", e);

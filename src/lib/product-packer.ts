@@ -75,14 +75,14 @@ export function unpackProductRow(row: any) {
       const parsed = JSON.parse(row.specs);
       if (parsed && typeof parsed === "object") {
         if (parsed.specsText !== undefined) specsText = parsed.specsText;
-        if (images === undefined && Array.isArray(parsed.images)) images = parsed.images;
-        if (description === undefined && parsed.description) description = parsed.description;
-        if (pdfUrl === undefined && parsed.pdfUrl) pdfUrl = parsed.pdfUrl;
-        if (pdfName === undefined && parsed.pdfName) pdfName = parsed.pdfName;
-        if (origin === undefined && parsed.origin) origin = parsed.origin;
-        if (hsCode === undefined && parsed.hsCode) hsCode = parsed.hsCode;
-        if (storageTemp === undefined && parsed.storageTemp) storageTemp = parsed.storageTemp;
-        if (shelfLife === undefined && parsed.shelfLife) shelfLife = parsed.shelfLife;
+        if (Array.isArray(parsed.images)) images = parsed.images;
+        if (parsed.description !== undefined) description = parsed.description;
+        if (parsed.pdfUrl !== undefined) pdfUrl = parsed.pdfUrl;
+        if (parsed.pdfName !== undefined) pdfName = parsed.pdfName;
+        if (parsed.origin !== undefined) origin = parsed.origin;
+        if (parsed.hsCode !== undefined) hsCode = parsed.hsCode;
+        if (parsed.storageTemp !== undefined) storageTemp = parsed.storageTemp;
+        if (parsed.shelfLife !== undefined) shelfLife = parsed.shelfLife;
       }
     } catch {
       // not JSON, keep specsText as is

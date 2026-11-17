@@ -108,19 +108,13 @@ export function OpsProducts({
 
   // Calculate clean list of all attached images
   const allAttachedImages = useMemo(() => {
-    const list: string[] = [];
+    if (Array.isArray(form.images) && form.images.length > 0) {
+      return form.images.map((img) => (img || "").trim()).filter(Boolean);
+    }
     if (form.imageUrl && form.imageUrl.trim()) {
-      list.push(form.imageUrl.trim());
+      return [form.imageUrl.trim()];
     }
-    if (Array.isArray(form.images)) {
-      form.images.forEach((img) => {
-        const trimmed = (img || "").trim();
-        if (trimmed && !list.includes(trimmed)) {
-          list.push(trimmed);
-        }
-      });
-    }
-    return list;
+    return [];
   }, [form.imageUrl, form.images]);
 
   const handleOpenAdd = useCallback(() => {
@@ -216,7 +210,7 @@ export function OpsProducts({
         img.onload = () => {
           const canvas = document.createElement("canvas");
           let { width, height } = img;
-          const MAX_DIM = 1200;
+          const MAX_DIM = 960;
           if (width > MAX_DIM || height > MAX_DIM) {
             if (width > height) {
               height = Math.round((height * MAX_DIM) / width);
@@ -231,7 +225,7 @@ export function OpsProducts({
           const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
             resolve(dataUrl);
           } else {
             resolve(e.target?.result as string);
@@ -262,10 +256,9 @@ export function OpsProducts({
       }
 
       setForm((prev) => {
-        const currentList = Array.isArray(prev.images) ? [...prev.images] : [];
-        if (prev.imageUrl && !currentList.includes(prev.imageUrl)) {
-          currentList.unshift(prev.imageUrl);
-        }
+        const currentList = Array.isArray(prev.images) && prev.images.length > 0
+          ? [...prev.images]
+          : (prev.imageUrl ? [prev.imageUrl] : []);
         const updatedList = [...currentList, ...dataUrls];
         const primaryCover = prev.imageUrl || updatedList[0] || "";
         return {
@@ -292,10 +285,9 @@ export function OpsProducts({
     try {
       const dataUrl = await compressImage(file);
       setForm((prev) => {
-        const list = Array.isArray(prev.images) ? [...prev.images] : [];
-        if (prev.imageUrl && !list.includes(prev.imageUrl)) {
-          list.unshift(prev.imageUrl);
-        }
+        const list = Array.isArray(prev.images) && prev.images.length > 0
+          ? [...prev.images]
+          : (prev.imageUrl ? [prev.imageUrl] : []);
         const oldImage = list[index];
         list[index] = dataUrl;
         const newCover = prev.imageUrl === oldImage ? dataUrl : prev.imageUrl;
@@ -319,7 +311,9 @@ export function OpsProducts({
   // Set any image as primary cover
   const handleSetCover = (imgUrl: string) => {
     setForm((prev) => {
-      const list = Array.isArray(prev.images) ? [...prev.images] : [];
+      const list = Array.isArray(prev.images) && prev.images.length > 0
+        ? [...prev.images]
+        : (prev.imageUrl ? [prev.imageUrl] : []);
       if (!list.includes(imgUrl)) {
         list.push(imgUrl);
       }
@@ -336,9 +330,13 @@ export function OpsProducts({
   // Delete an image
   const handleDeleteImage = (index: number) => {
     setForm((prev) => {
-      const list = allAttachedImages.filter((_, idx) => idx !== index);
+      const currentList = Array.isArray(prev.images) && prev.images.length > 0
+        ? [...prev.images]
+        : (prev.imageUrl ? [prev.imageUrl] : []);
+      const deletedImg = currentList[index];
+      const list = currentList.filter((_, idx) => idx !== index);
       let nextCover = prev.imageUrl;
-      if (allAttachedImages[index] === prev.imageUrl) {
+      if (deletedImg === prev.imageUrl) {
         nextCover = list[0] || "";
       }
       return {
@@ -351,16 +349,19 @@ export function OpsProducts({
 
   // Move image forward / backward
   const handleMoveImage = (fromIdx: number, toIdx: number) => {
-    if (toIdx < 0 || toIdx >= allAttachedImages.length) return;
     setForm((prev) => {
-      const list = [...allAttachedImages];
+      const currentList = Array.isArray(prev.images) && prev.images.length > 0
+        ? [...prev.images]
+        : (prev.imageUrl ? [prev.imageUrl] : []);
+      if (toIdx < 0 || toIdx >= currentList.length) return prev;
+      const list = [...currentList];
       const item = list[fromIdx];
       list.splice(fromIdx, 1);
       list.splice(toIdx, 0, item);
       return {
         ...prev,
         images: list,
-        imageUrl: prev.imageUrl || list[0] || "",
+        imageUrl: list[0] || prev.imageUrl || "",
       };
     });
   };
@@ -370,10 +371,9 @@ export function OpsProducts({
     if (!urlInput.trim()) return;
     const cleanUrl = urlInput.trim();
     setForm((prev) => {
-      const list = Array.isArray(prev.images) ? [...prev.images] : [];
-      if (prev.imageUrl && !list.includes(prev.imageUrl)) {
-        list.unshift(prev.imageUrl);
-      }
+      const list = Array.isArray(prev.images) && prev.images.length > 0
+        ? [...prev.images]
+        : (prev.imageUrl ? [prev.imageUrl] : []);
       if (!list.includes(cleanUrl)) {
         list.push(cleanUrl);
       }
@@ -390,10 +390,9 @@ export function OpsProducts({
   // Add from standard crops library
   const handleAddFromSampleLibrary = (sampleUrl: string) => {
     setForm((prev) => {
-      const list = Array.isArray(prev.images) ? [...prev.images] : [];
-      if (prev.imageUrl && !list.includes(prev.imageUrl)) {
-        list.unshift(prev.imageUrl);
-      }
+      const list = Array.isArray(prev.images) && prev.images.length > 0
+        ? [...prev.images]
+        : (prev.imageUrl ? [prev.imageUrl] : []);
       if (!list.includes(sampleUrl)) {
         list.push(sampleUrl);
       }
@@ -441,11 +440,15 @@ export function OpsProducts({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalCover = form.imageUrl || allAttachedImages[0] || "";
+    const cleanImages = (Array.isArray(form.images) && form.images.length > 0
+      ? form.images
+      : allAttachedImages
+    ).filter(Boolean);
+    const finalCover = form.imageUrl || cleanImages[0] || "";
     const submission: Omit<Product, "id"> = {
       ...form,
       imageUrl: finalCover,
-      images: allAttachedImages,
+      images: cleanImages,
     };
 
     if (editingProduct) {
