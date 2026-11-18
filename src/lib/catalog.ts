@@ -246,6 +246,12 @@ export async function submitQuoteInquiry(inquiryData: {
     }
   } catch {}
 
+  const portValue =
+    inquiryData.destinationPort?.trim() ||
+    (inquiryData.incoterms === "FOB"
+      ? "ميناء الإسكندرية / دمياط (FOB)"
+      : "ميناء الوصول (حسب الاتفاق)");
+
   const payload = {
     id: "inq-" + Date.now(),
     date: new Date().toISOString().split("T")[0],
@@ -257,7 +263,8 @@ export async function submitQuoteInquiry(inquiryData: {
     product: inquiryData.product || "General Quotation",
     quantity: inquiryData.quantity || "As agreed",
     incoterms: inquiryData.incoterms || "FOB",
-    destination_port: inquiryData.destinationPort || "",
+    destination_port: portValue,
+    destinationPort: portValue,
     message: inquiryData.message || "",
     status: "جديد",
     read: false,

@@ -124,7 +124,13 @@ export async function POST(request: Request) {
       product: String(product || "General Quotation"),
       quantity: String(quantity || "As agreed"),
       incoterms: String(incoterms || "FOB"),
-      destination_port: String(destinationPort || ""),
+      destination_port: String(
+        destinationPort ||
+          body.destination_port ||
+          body.shippingPort ||
+          body.shipping_port ||
+          (incoterms === "FOB" ? "ميناء الإسكندرية / دمياط (FOB)" : "ميناء الوصول (حسب الاتفاق)")
+      ),
       message: String(message || ""),
       status: "جديد",
       read: false,

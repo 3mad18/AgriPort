@@ -100,7 +100,7 @@ export const accountTranslations: Record<
     orderDate: "تاريخ الطلب:",
     quantityLabel: "الكمية:",
     incotermsLabel: "شرط الشحن:",
-    portLabel: "ميناء الوصول:",
+    portLabel: "ميناء الشحن / الوصول:",
     trackingTitle: "متابعة مسار الطلب:",
     currentStatusLabel: "الحالة الحالية:",
     orderNotesLabel: "ملاحظات الطلب:",
@@ -163,7 +163,7 @@ export const accountTranslations: Record<
     orderDate: "Date:",
     quantityLabel: "Quantity:",
     incotermsLabel: "Incoterms:",
-    portLabel: "Destination Port:",
+    portLabel: "Port (Loading / Destination):",
     trackingTitle: "Order Progress Tracking:",
     currentStatusLabel: "Current Status:",
     orderNotesLabel: "Order Notes:",
@@ -226,7 +226,7 @@ export const accountTranslations: Record<
     orderDate: "Date :",
     quantityLabel: "Quantité :",
     incotermsLabel: "Incoterms :",
-    portLabel: "Port de destination :",
+    portLabel: "Port (Départ / Destination) :",
     trackingTitle: "Suivi de la commande :",
     currentStatusLabel: "Statut actuel :",
     orderNotesLabel: "Remarques :",
@@ -289,7 +289,7 @@ export const accountTranslations: Record<
     orderDate: "Data:",
     quantityLabel: "Quantità:",
     incotermsLabel: "Incoterms:",
-    portLabel: "Porto di destinazione:",
+    portLabel: "Porto (Partenza / Destinazione):",
     trackingTitle: "Tracciamento avanzamento ordine:",
     currentStatusLabel: "Stato attuale:",
     orderNotesLabel: "Note ordine:",
@@ -352,7 +352,7 @@ export const accountTranslations: Record<
     orderDate: "Fecha:",
     quantityLabel: "Cantidad:",
     incotermsLabel: "Incoterms:",
-    portLabel: "Puerto de destino:",
+    portLabel: "Puerto (Embarque / Destino):",
     trackingTitle: "Seguimiento del pedido:",
     currentStatusLabel: "Estado actual:",
     orderNotesLabel: "Notas del pedido:",
@@ -451,7 +451,12 @@ export function AccountDashboard() {
                 product: item.product,
                 quantity: item.quantity || "",
                 incoterms: item.incoterms || "FOB",
-                destinationPort: item.destination_port || item.destinationPort || "",
+                destinationPort:
+                  item.destination_port ||
+                  item.destinationPort ||
+                  item.shipping_port ||
+                  item.shippingPort ||
+                  "",
                 message: item.message || "",
                 status: item.status || "جديد",
                 read: item.read ?? false,
@@ -471,9 +476,19 @@ export function AccountDashboard() {
             if (Array.isArray(parsed)) {
               const map = new Map<string, Inquiry>();
               // Local items first as fallback for un-synced inquiries
-              parsed.forEach((i) => map.set(i.id, i));
+              parsed.forEach((i) => {
+                if (!i.destinationPort && (i as any).destination_port) {
+                  i.destinationPort = (i as any).destination_port;
+                }
+                map.set(i.id, i);
+              });
               // Cloud server items take absolute priority
-              list.forEach((i) => map.set(i.id, i));
+              list.forEach((i) => {
+                if (!i.destinationPort && (i as any).destination_port) {
+                  i.destinationPort = (i as any).destination_port;
+                }
+                map.set(i.id, i);
+              });
               list = Array.from(map.values());
             }
           } catch {}
@@ -808,7 +823,15 @@ export function AccountDashboard() {
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <span className="text-slate-400 block text-[10px] font-semibold">{tr.portLabel}</span>
-                      <span className="font-bold text-slate-800">{inquiry.destinationPort || "—"}</span>
+                      <span className="font-bold text-slate-800">
+                        {inquiry.destinationPort ||
+                          (inquiry as any).destination_port ||
+                          (inquiry as any).shippingPort ||
+                          (inquiry as any).shipping_port ||
+                          (inquiry.incoterms === "FOB"
+                            ? (language === "ar" ? "ميناء الإسكندرية / دمياط (FOB)" : "Alexandria / Damietta (FOB)")
+                            : (language === "ar" ? "ميناء الوصول (حسب الاتفاق)" : "Discharge Port (As agreed)"))}
+                      </span>
                     </div>
                   </div>
 
