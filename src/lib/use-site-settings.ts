@@ -100,6 +100,18 @@ function parseSettings(raw: string | null): PublicSiteSettings | null {
   return null;
 }
 
+function safeSetItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    try {
+      localStorage.removeItem("agriport_live_settings_cache");
+      localStorage.setItem(key, value);
+    } catch {}
+  }
+}
+
 function getSnapshot(): PublicSiteSettings {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
   const raw =
@@ -162,8 +174,7 @@ export function useSiteSettings() {
 
             const raw = JSON.stringify(mapped);
             if (raw !== localStorage.getItem(SETTINGS_KEY)) {
-              localStorage.setItem(SETTINGS_KEY, raw);
-              localStorage.setItem(SETTINGS_CACHE_KEY, raw);
+              safeSetItem(SETTINGS_KEY, raw);
               cachedSettings = mapped;
               cachedRaw = raw;
               window.dispatchEvent(new Event(SETTINGS_EVENT));

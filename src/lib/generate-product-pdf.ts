@@ -593,7 +593,7 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
 
     <!-- Product Summary Card -->
     <div class="product-hero">
-      <img src="${product.imageUrl || "/images/products/artichoke.jpg"}" alt="${escapeHtml(localized.name)}" class="product-img" />
+      ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHtml(localized.name)}" class="product-img" />` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:42px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">${product.icon || "🌿"}</div>`}
       <div class="product-info">
         <div class="badges">
           <span class="badge badge-status">● ${escapeHtml(status)}</span>

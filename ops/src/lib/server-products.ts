@@ -1,18 +1,12 @@
-import { cacheTag, cacheLife } from "next/cache";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config";
 import { unpackProductRow } from "./product-packer";
 import { EXPORT_CATALOG, type ExportProduct } from "./catalog";
 
 /**
  * Server-side loader that fetches live products directly from Supabase Cloud
- * using Next.js 16 Cache Components ('use cache') to eliminate un-cached prerender warnings
- * and prevent any stale data flash during SSR and page refresh.
+ * with no-store cache to guarantee fresh real-time data across SSR and client navigations.
  */
 export async function getLiveProductsServer(): Promise<ExportProduct[]> {
-  "use cache";
-  cacheTag("products");
-  cacheLife("seconds");
-
   const url = SUPABASE_URL;
   const key = SUPABASE_ANON_KEY;
 
@@ -25,6 +19,7 @@ export async function getLiveProductsServer(): Promise<ExportProduct[]> {
             apikey: key,
             Authorization: `Bearer ${key}`,
           },
+          cache: "no-store",
         }
       );
 

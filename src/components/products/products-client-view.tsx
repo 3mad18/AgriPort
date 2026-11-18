@@ -99,15 +99,22 @@ export function ProductsClientView({
                   className="relative h-52 sm:h-56 w-full overflow-hidden bg-slate-100 cursor-pointer"
                   title={cardTrans.imageTitle}
                 >
-                  <img
-                    src={
-                      item.imageUrl ||
-                      "/images/products/artichoke.jpg"
-                    }
-                    alt={item.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  {item.imageUrl ? (
+                    <>
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                    </>
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-emerald-50/70 via-slate-50 to-slate-100 text-slate-400 p-6 text-center select-none">
+                      <span className="text-5xl mb-2 transition-transform duration-300 group-hover:scale-110">{item.icon || "🌿"}</span>
+                      <span className="text-sm font-bold text-slate-700 line-clamp-1">{item.name}</span>
+                      <span className="text-[11px] font-medium text-emerald-600/90 mt-1">AgriPort Premium Export</span>
+                    </div>
+                  )}
 
                   {/* Quick View Pill on Hover */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/25 backdrop-blur-[2px]">

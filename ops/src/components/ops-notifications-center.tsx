@@ -552,6 +552,12 @@ export function OpsNotificationsCenter({
             color: "text-blue-600 bg-blue-50",
           },
           {
+            key: "اكتمال الشحن",
+            label: "اكتمال الشحن",
+            count: quoteInquiries.filter((i) => i.status === "اكتمال الشحن").length,
+            color: "text-purple-600 bg-purple-50",
+          },
+          {
             key: "مؤرشف",
             label: "مؤرشف",
             count: inquiries.filter((i) => i.status === "مؤرشف").length,
@@ -700,12 +706,15 @@ export function OpsNotificationsCenter({
                               ? "bg-amber-50 text-amber-800 border-amber-200"
                               : item.status === "تم الاتفاق"
                                 ? "bg-blue-50 text-blue-800 border-blue-200"
-                                : "bg-slate-100 text-slate-700 border-slate-200"
+                                : item.status === "اكتمال الشحن"
+                                  ? "bg-purple-50 text-purple-800 border-purple-200"
+                                  : "bg-slate-100 text-slate-700 border-slate-200"
                         }`}
                       >
                         <option value="جديد">جديد (New)</option>
                         <option value="قيد المتابعة">قيد المتابعة (In Progress)</option>
                         <option value="تم الاتفاق">تم الاتفاق (Deal Closed)</option>
+                        <option value="اكتمال الشحن">اكتمال الشحن (Shipped)</option>
                         <option value="مؤرشف">مؤرشف (Archived)</option>
                       </select>
                     </div>
@@ -922,6 +931,7 @@ export function OpsNotificationsCenter({
                     <option value="جديد">جديد</option>
                     <option value="قيد المتابعة">قيد المتابعة</option>
                     <option value="تم الاتفاق">تم الاتفاق</option>
+                    <option value="اكتمال الشحن">اكتمال الشحن</option>
                     <option value="مؤرشف">مؤرشف</option>
                   </select>
                 </div>

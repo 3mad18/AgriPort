@@ -25,6 +25,19 @@ export function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (isMobileMenuOpen) {
+      const origBodyOverflow = document.body.style.overflow;
+      const origHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = origBodyOverflow;
+        document.documentElement.style.overflow = origHtmlOverflow;
+      };
+    }
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     const checkScroll = () => {
       if (typeof window !== "undefined") {
         setIsScrolled(window.scrollY > 15);
@@ -273,12 +286,12 @@ export function Header() {
 
                     <div className="space-y-1">
                       <Link
-                        href="/login"
+                        href="/account"
                         onClick={() => setUserMenuOpen(false)}
                         className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 rounded-xl font-medium transition-colors"
                       >
                         <User className="w-4 h-4 text-slate-500" />
-                        <span>{language === "ar" ? "بيانات حسابي" : "Account Details"}</span>
+                        <span>{language === "ar" ? "بيانات حسابي وطلباتي" : "Account & Orders"}</span>
                       </Link>
                       <button
                         type="button"
@@ -462,39 +475,49 @@ export function Header() {
 
             {/* User Status Bar or Sign In in Mobile Menu (Placed after Contact) */}
             {isAuthenticated && user ? (
-              <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex items-center justify-between text-start mt-2">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
-                    {user.avatar ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      user.name.charAt(0).toUpperCase()
-                    )}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-bold text-slate-900">{user.name}</p>
-                      {user.isGuest && (
-                        <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded-full">
-                          {language === "ar" ? "ضيف" : "Guest"}
-                        </span>
+              <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex flex-col gap-3 text-start mt-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+                      {user.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={user.avatar}
+                          alt={user.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        user.name.charAt(0).toUpperCase()
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 font-mono dir-ltr">{user.email}</p>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                        {user.isGuest && (
+                          <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded-full">
+                            {language === "ar" ? "ضيف" : "Guest"}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 font-mono dir-ltr">{user.email}</p>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-colors"
+                  >
+                    {language === "ar" ? "خروج" : "Logout"}
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-colors"
+                <Link
+                  href="/account"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs"
                 >
-                  {language === "ar" ? "خروج" : "Logout"}
-                </button>
+                  <User className="w-3.5 h-3.5" />
+                  <span>{language === "ar" ? "لوحة حسابي ومتابعة الشحنات" : "My Account & Orders"}</span>
+                </Link>
               </div>
             ) : (
               <Link

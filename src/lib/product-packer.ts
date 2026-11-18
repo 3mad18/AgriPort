@@ -89,11 +89,17 @@ export function unpackProductRow(row: any) {
     }
   }
 
-  const cleanImageUrl =
-    row.image_url ||
-    row.imageUrl ||
-    (Array.isArray(images) && images.length > 0 ? images[0] : "") ||
-    "/images/products/artichoke.jpg";
+  let cleanImageUrl = "";
+  if (Array.isArray(images)) {
+    if (images.length > 0) {
+      cleanImageUrl = (row.image_url && images.includes(row.image_url)) ? row.image_url : images[0];
+    } else {
+      // Images explicitly cleared
+      cleanImageUrl = "";
+    }
+  } else {
+    cleanImageUrl = row.image_url || row.imageUrl || "";
+  }
 
   return {
     id: row.id,

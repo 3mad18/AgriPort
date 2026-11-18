@@ -58,7 +58,7 @@ export type Inquiry = {
   incoterms: string;
   destinationPort: string;
   message: string;
-  status: "جديد" | "قيد المتابعة" | "تم الاتفاق" | "مؤرشف";
+  status: "جديد" | "قيد المتابعة" | "تم الاتفاق" | "اكتمال الشحن" | "مؤرشف" | string;
   read?: boolean;
   createdAt?: number;
 };
@@ -455,6 +455,29 @@ function subscribeStore(callback: () => void) {
   };
 }
 
+function safeSetItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch (err) {
+    console.warn(`⚠️ [Storage] Quota exceeded for "${key}". Cleaning duplicate caches...`);
+    try {
+      localStorage.removeItem("agriport_live_products_cache_v2");
+      localStorage.removeItem("agriport_live_settings_cache_v2");
+      localStorage.setItem(key, value);
+    } catch {
+      // Retain in memory without crashing React
+    }
+  }
+}
+
+if (typeof window !== "undefined") {
+  try {
+    localStorage.removeItem("agriport_live_products_cache_v2");
+    localStorage.removeItem("agriport_live_settings_cache_v2");
+  } catch {}
+}
+
 let cachedProducts: Product[] | null = null;
 let cachedProductsRaw: string | null = null;
 
@@ -469,12 +492,7 @@ function getProductsSnapshot(): Product[] {
     if (cachedProducts && cachedProducts.length > 0) return cachedProducts;
     cachedProducts = DEFAULT_PRODUCTS;
     cachedProductsRaw = JSON.stringify(DEFAULT_PRODUCTS);
-    try {
-      localStorage.setItem(PRODUCTS_KEY, cachedProductsRaw);
-      localStorage.setItem(PRODUCTS_CACHE_KEY, cachedProductsRaw);
-    } catch {
-      // ignore
-    }
+    safeSetItem(PRODUCTS_KEY, cachedProductsRaw);
     return DEFAULT_PRODUCTS;
   }
 
@@ -563,10 +581,7 @@ export function OpsStoreProvider({
       cachedProducts = initialProducts;
       cachedProductsRaw = serialized;
       if (typeof window !== "undefined") {
-        try {
-          localStorage.setItem(PRODUCTS_KEY, serialized);
-          localStorage.setItem(PRODUCTS_CACHE_KEY, serialized);
-        } catch {}
+        safeSetItem(PRODUCTS_KEY, serialized);
       }
     }
   }
@@ -746,9 +761,21 @@ export function OpsStoreProvider({
         const defaultMap = new Map(DEFAULT_PRODUCTS.map((d) => [d.id, d]));
         const mapped: Product[] = cloudProducts.map((item: any) => {
           const base = defaultMap.get(item.id);
-          const imagesList = Array.isArray(item.images)
+          const hasExplicitImages = Array.isArray(item.images);
+          const imagesList = hasExplicitImages
             ? item.images
             : (item.imageUrl ? [item.imageUrl] : (base?.images || []));
+
+          let primaryImage = "";
+          if (hasExplicitImages) {
+            primaryImage = item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "");
+          } else if (item.imageUrl !== undefined && item.imageUrl !== null && item.imageUrl !== "") {
+            primaryImage = item.imageUrl;
+          } else if (item.imageUrl === "") {
+            primaryImage = "";
+          } else {
+            primaryImage = base?.imageUrl || "";
+          }
 
           return {
             id: item.id,
@@ -758,7 +785,7 @@ export function OpsStoreProvider({
             season: item.season || base?.season || "",
             pack: item.pack || base?.pack || "",
             specs: item.specs || base?.specs || "",
-            imageUrl: item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "") || base?.imageUrl || "/images/products/artichoke.jpg",
+            imageUrl: primaryImage,
             icon: item.icon || base?.icon || "🌿",
             status: item.status || base?.status || "متاح للتصدير",
             featured: item.featured ?? base?.featured ?? false,
@@ -775,8 +802,7 @@ export function OpsStoreProvider({
 
         const raw = JSON.stringify(mapped);
         if (raw !== localStorage.getItem(PRODUCTS_KEY)) {
-          localStorage.setItem(PRODUCTS_KEY, raw);
-          localStorage.setItem(PRODUCTS_CACHE_KEY, raw);
+          safeSetItem(PRODUCTS_KEY, raw);
           window.dispatchEvent(new Event(PRODUCTS_EVENT));
           cachedProducts = mapped;
           cachedProductsRaw = raw;
@@ -820,8 +846,7 @@ export function OpsStoreProvider({
                 : (local.seoKeywords && local.seoKeywords.length > 0 ? local.seoKeywords : DEFAULT_SETTINGS.seoKeywords),
               googleVerificationId: row.google_verification_id || local.googleVerificationId || "",
             };
-            localStorage.setItem(SETTINGS_KEY, JSON.stringify(mapped));
-            localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(mapped));
+            safeSetItem(SETTINGS_KEY, JSON.stringify(mapped));
             window.dispatchEvent(new Event(SETTINGS_EVENT));
             cachedSettings = mapped;
             cachedSettingsRaw = JSON.stringify(mapped);
@@ -904,16 +929,11 @@ export function OpsStoreProvider({
         imageUrl:
           item.imageUrl ||
           (imagesArr.length > 0 ? imagesArr[0] : "") ||
-          "/images/products/artichoke.jpg",
+          "",
         images: imagesArr,
       };
       const updated = [newProduct, ...current];
-      try {
-        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
-        localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
-      } catch (err) {
-        console.warn("⚠️ LocalStorage quota warning in addProduct:", err);
-      }
+      safeSetItem(PRODUCTS_KEY, JSON.stringify(updated));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       window.dispatchEvent(new Event(PRODUCTS_EVENT));
@@ -1018,12 +1038,7 @@ export function OpsStoreProvider({
       const updated = current.map((p) =>
         p.id === id ? { ...p, ...partial } : p,
       );
-      try {
-        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
-        localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
-      } catch (err) {
-        console.warn("⚠️ LocalStorage quota warning in updateProduct:", err);
-      }
+      safeSetItem(PRODUCTS_KEY, JSON.stringify(updated));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       window.dispatchEvent(new Event(PRODUCTS_EVENT));
@@ -1048,6 +1063,14 @@ export function OpsStoreProvider({
         body: JSON.stringify({ id, ...partial }),
       }).catch(() => {});
 
+      if (typeof window !== "undefined" && window.location.port === "3001") {
+        fetch("http://localhost:3000/api/products", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, ...partial }),
+        }).catch(() => {});
+      }
+
       // Direct Supabase update using standard PATCH
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
@@ -1068,21 +1091,13 @@ export function OpsStoreProvider({
                 (Array.isArray(productToSave.images) && productToSave.images.length > 0
                   ? productToSave.images[0]
                   : "") ||
-                "/images/products/artichoke.jpg",
+                "",
               icon: productToSave.icon || "🌿",
               status: productToSave.status || "متاح للتصدير",
               featured: productToSave.featured ?? false,
-              images: Array.isArray(productToSave.images) ? productToSave.images : [],
-              description: productToSave.description || "",
-              pdf_url: productToSave.pdfUrl || "",
-              pdf_name: productToSave.pdfName || "",
-              origin: productToSave.origin || "جمهورية مصر العربية (Egypt)",
-              hs_code: productToSave.hsCode || "",
-              storage_temp: productToSave.storageTemp || "",
-              shelf_life: productToSave.shelfLife || "",
             };
 
-            const patchRes = await fetch(
+            await fetch(
               `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`,
               {
                 method: "PATCH",
@@ -1090,40 +1105,11 @@ export function OpsStoreProvider({
                   "Content-Type": "application/json",
                   apikey: supabaseKey,
                   Authorization: `Bearer ${supabaseKey}`,
-                  Prefer: "return=representation",
+                  Prefer: "return=minimal",
                 },
                 body: JSON.stringify(directPayload),
               }
             );
-
-            // Fallback to core columns with packed specs if extended columns don't exist
-            if (!patchRes.ok && patchRes.status === 400) {
-              const corePayload = {
-                name: productToSave.name,
-                category: productToSave.category,
-                variety: productToSave.variety,
-                season: productToSave.season,
-                pack: productToSave.pack,
-                specs: packedSpecs,
-                image_url: directPayload.image_url,
-                icon: productToSave.icon || "🌿",
-                status: productToSave.status || "متاح للتصدير",
-                featured: productToSave.featured ?? false,
-              };
-              await fetch(
-                `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`,
-                {
-                  method: "PATCH",
-                  headers: {
-                    "Content-Type": "application/json",
-                    apikey: supabaseKey,
-                    Authorization: `Bearer ${supabaseKey}`,
-                    Prefer: "return=minimal",
-                  },
-                  body: JSON.stringify(corePayload),
-                }
-              );
-            }
           }
         } catch (e) {
           console.warn("⚠️ Failed to update product in Supabase:", e);
@@ -1137,8 +1123,7 @@ export function OpsStoreProvider({
     async (id: string) => {
       const current = getProductsSnapshot();
       const updated = current.filter((p) => p.id !== id);
-      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(updated));
-      localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+      safeSetItem(PRODUCTS_KEY, JSON.stringify(updated));
       cachedProducts = updated;
       cachedProductsRaw = JSON.stringify(updated);
       window.dispatchEvent(new Event(PRODUCTS_EVENT));
@@ -1267,8 +1252,40 @@ export function OpsStoreProvider({
       cachedInquiries = updated;
       cachedInquiriesRaw = JSON.stringify(updated);
       notifyChange();
+      window.dispatchEvent(new Event("agriport_inquiries_updated"));
+      try {
+        const bc = new BroadcastChannel("agriport_inquiries_channel");
+        bc.postMessage({ type: "UPDATE_STATUS", id, status });
+        bc.close();
+      } catch {}
       triggerOpsToast(`تم تحديث حالة الطلب إلى "${status}" 📋`);
 
+      // 1. Direct Supabase update
+      const supabaseUrl = SUPABASE_URL;
+      const supabaseKey = SUPABASE_ANON_KEY;
+      if (supabaseUrl && supabaseKey) {
+        fetch(`${supabaseUrl}/rest/v1/inquiries?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify({ status, read: true }),
+        }).catch((err) => console.warn("Supabase updateInquiryStatus error:", err));
+      }
+
+      // 2. Cross-port notification to visitor site on port 3000
+      if (typeof window !== "undefined" && window.location.port === "3001") {
+        fetch("http://localhost:3000/api/inquiries", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, status, read: true }),
+        }).catch(() => {});
+      }
+
+      // 3. Local Next.js API route sync
       fetch("/api/inquiries", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -1299,8 +1316,7 @@ export function OpsStoreProvider({
     async (partial: Partial<SiteSettings>): Promise<{ success: boolean; error?: string }> => {
       const current = getSettingsSnapshot();
       const updated = { ...current, ...partial };
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
-      localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(updated));
+      safeSetItem(SETTINGS_KEY, JSON.stringify(updated));
       window.dispatchEvent(new Event(SETTINGS_EVENT));
       cachedSettings = updated;
       cachedSettingsRaw = JSON.stringify(updated);

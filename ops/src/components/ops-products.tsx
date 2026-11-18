@@ -198,6 +198,19 @@ export function OpsProducts({
     setIsModalOpen(true);
   };
 
+  useEffect(() => {
+    if (isModalOpen || previewLightboxImage) {
+      const origBodyOverflow = document.body.style.overflow;
+      const origHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = origBodyOverflow;
+        document.documentElement.style.overflow = origHtmlOverflow;
+      };
+    }
+  }, [isModalOpen, previewLightboxImage]);
+
   // Compress single image to high-efficiency web JPEG
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -210,7 +223,7 @@ export function OpsProducts({
         img.onload = () => {
           const canvas = document.createElement("canvas");
           let { width, height } = img;
-          const MAX_DIM = 960;
+          const MAX_DIM = 800;
           if (width > MAX_DIM || height > MAX_DIM) {
             if (width > height) {
               height = Math.round((height * MAX_DIM) / width);
@@ -225,7 +238,7 @@ export function OpsProducts({
           const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.70);
             resolve(dataUrl);
           } else {
             resolve(e.target?.result as string);
@@ -440,11 +453,13 @@ export function OpsProducts({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanImages = (Array.isArray(form.images) && form.images.length > 0
+    const cleanImages = (Array.isArray(form.images)
       ? form.images
       : allAttachedImages
     ).filter(Boolean);
-    const finalCover = form.imageUrl || cleanImages[0] || "";
+    const finalCover = cleanImages.length > 0
+      ? (form.imageUrl && cleanImages.includes(form.imageUrl) ? form.imageUrl : cleanImages[0])
+      : "";
     const submission: Omit<Product, "id"> = {
       ...form,
       imageUrl: finalCover,
@@ -553,15 +568,22 @@ export function OpsProducts({
                 <div>
                   {/* Image Container with Badges */}
                   <div className="relative h-48 w-full overflow-hidden bg-slate-100">
-                    <img
-                      src={
-                        item.imageUrl ||
-                        (item.images && item.images[0]) ||
-                        "/images/products/artichoke.jpg"
-                      }
-                      alt={item.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
+                    {item.imageUrl || (item.images && item.images[0]) ? (
+                      <img
+                        src={
+                          item.imageUrl ||
+                          (item.images && item.images[0])
+                        }
+                        alt={item.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-emerald-50/70 via-slate-50 to-slate-100 text-slate-400 p-4 select-none">
+                        <span className="text-4xl mb-2">{item.icon || "🌿"}</span>
+                        <span className="text-xs font-bold text-slate-600 line-clamp-1">{item.name}</span>
+                        <span className="text-[10px] text-slate-400 mt-1">بدون صور مرفقة</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
 
                     {/* Status Badge */}
@@ -979,9 +1001,27 @@ export function OpsProducts({
                       <span>
                         ترتيب ظهور الصور في المعرض (الصورة المحددة بنجمة خضراء هي صورة الغلاف الرئيسية):
                       </span>
-                      <span className="font-bold text-emerald-700">
-                        {allAttachedImages.length} صور مرفقة
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-emerald-700">
+                          {allAttachedImages.length} صور مرفقة
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm("هل أنت متأكد من حذف جميع صور هذا المنتج؟")) {
+                              setForm((prev) => ({
+                                ...prev,
+                                images: [],
+                                imageUrl: "",
+                              }));
+                            }
+                          }}
+                          className="rounded-lg bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-600 hover:bg-rose-100 transition-colors"
+                          title="حذف كل الصور المرفقة لهذا المنتج دفعة واحدة"
+                        >
+                          حذف جميع الصور ✕
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1">
@@ -1329,6 +1369,39 @@ export function OpsProducts({
           className="fixed inset-0 z-60 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-fade-in"
           onClick={() => setPreviewLightboxImage(null)}
         >
+          {/* Previous / Next Arrows in Lightbox */}
+          {allAttachedImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const curIdx = allAttachedImages.indexOf(previewLightboxImage);
+                  const prevIdx = curIdx <= 0 ? allAttachedImages.length - 1 : curIdx - 1;
+                  setPreviewLightboxImage(allAttachedImages[prevIdx]);
+                }}
+                className="absolute top-1/2 -translate-y-1/2 start-4 z-70 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 hover:bg-white/30 text-white backdrop-blur-md transition-all shadow-lg active:scale-90"
+                title="الصورة السابقة"
+              >
+                <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const curIdx = allAttachedImages.indexOf(previewLightboxImage);
+                  const nextIdx = curIdx >= allAttachedImages.length - 1 ? 0 : curIdx + 1;
+                  setPreviewLightboxImage(allAttachedImages[nextIdx]);
+                }}
+                className="absolute top-1/2 -translate-y-1/2 end-4 z-70 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 hover:bg-white/30 text-white backdrop-blur-md transition-all shadow-lg active:scale-90"
+                title="الصورة التالية"
+              >
+                <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+              </button>
+            </>
+          )}
+
           <div
             className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-slate-900 border border-white/20 shadow-2xl p-3 flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
@@ -1339,17 +1412,24 @@ export function OpsProducts({
               className="max-h-[75vh] w-auto max-w-full object-contain rounded-xl"
             />
             <div className="mt-3 flex items-center justify-between gap-3 w-full px-2 text-white text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  handleSetCover(previewLightboxImage);
-                  setPreviewLightboxImage(null);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 font-bold transition-all"
-              >
-                <span>★</span>
-                <span>تعيين كصورة الغلاف الرئيسية</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSetCover(previewLightboxImage);
+                    setPreviewLightboxImage(null);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 font-bold transition-all"
+                >
+                  <span>★</span>
+                  <span>تعيين كصورة الغلاف الرئيسية</span>
+                </button>
+                {allAttachedImages.length > 1 && (
+                  <span className="rounded-full bg-white/15 px-3 py-1.5 text-[11px] font-bold">
+                    {allAttachedImages.indexOf(previewLightboxImage) + 1} / {allAttachedImages.length}
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => setPreviewLightboxImage(null)}

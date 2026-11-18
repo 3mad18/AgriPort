@@ -41,6 +41,21 @@ function subscribe(callback: () => void) {
   };
 }
 
+function safeSetItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    try {
+      localStorage.removeItem("agriport_live_products_cache_v2");
+      localStorage.removeItem("agriport_live_settings_cache_v2");
+      localStorage.setItem(key, value);
+    } catch {
+      // Retain in memory without crashing React
+    }
+  }
+}
+
 function getSnapshot(): ExportProduct[] {
   if (typeof window === "undefined") {
     return cachedProducts || EXPORT_CATALOG;
@@ -55,12 +70,7 @@ function getSnapshot(): ExportProduct[] {
     if (cachedProducts && cachedProducts.length > 0) return cachedProducts;
     cachedProducts = EXPORT_CATALOG;
     cachedRaw = JSON.stringify(EXPORT_CATALOG);
-    try {
-      localStorage.setItem(PRODUCTS_KEY, cachedRaw);
-      localStorage.setItem(PRODUCTS_CACHE_KEY, cachedRaw);
-    } catch {
-      // ignore
-    }
+    safeSetItem(PRODUCTS_KEY, cachedRaw);
     return EXPORT_CATALOG;
   }
 
@@ -79,17 +89,15 @@ function getSnapshot(): ExportProduct[] {
 }
 
 export function useLiveProducts(initialProducts?: ExportProduct[]) {
-  // If initialProducts was supplied by the server from Supabase, prime the in-memory cache and localStorage synchronously
+  // Only use initialProducts to prime the store if localStorage and cachedProducts have nothing yet
   if (initialProducts && Array.isArray(initialProducts) && initialProducts.length > 0) {
-    const serialized = JSON.stringify(initialProducts);
-    if (cachedRaw !== serialized) {
-      cachedProducts = initialProducts;
-      cachedRaw = serialized;
-      if (typeof window !== "undefined") {
-        try {
-          localStorage.setItem(PRODUCTS_KEY, serialized);
-          localStorage.setItem(PRODUCTS_CACHE_KEY, serialized);
-        } catch {}
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(PRODUCTS_KEY);
+      if (!stored && !cachedProducts) {
+        const serialized = JSON.stringify(initialProducts);
+        cachedProducts = initialProducts;
+        cachedRaw = serialized;
+        safeSetItem(PRODUCTS_KEY, serialized);
       }
     }
   }
@@ -106,9 +114,9 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
     async function fetchProducts() {
       let remoteList: ExportProduct[] | null = null;
 
-      // 1. Try internal Next.js API route first
+      // 1. Try internal Next.js API route first with cache-busting timestamp
       try {
-        const apiRes = await fetch("/api/products", { cache: "no-store" });
+        const apiRes = await fetch("/api/products?t=" + Date.now(), { cache: "no-store" });
         if (apiRes.ok) {
           const apiData = await apiRes.json();
           if (apiData.success && Array.isArray(apiData.products) && apiData.products.length > 0) {
@@ -149,9 +157,21 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
 
         const mapped: ExportProduct[] = remoteList.map((item: any) => {
           const base = catalogMap.get(item.id);
-          const imagesList = Array.isArray(item.images)
+          const hasExplicitImages = Array.isArray(item.images);
+          const imagesList = hasExplicitImages
             ? item.images
             : (item.imageUrl ? [item.imageUrl] : (base?.images || []));
+
+          let primaryImage = "";
+          if (hasExplicitImages) {
+            primaryImage = item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "");
+          } else if (item.imageUrl !== undefined && item.imageUrl !== null && item.imageUrl !== "") {
+            primaryImage = item.imageUrl;
+          } else if (item.imageUrl === "") {
+            primaryImage = "";
+          } else {
+            primaryImage = base?.imageUrl || "";
+          }
 
           return {
             id: item.id,
@@ -161,7 +181,7 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
             season: item.season || base?.season || "",
             pack: item.pack || base?.pack || "",
             specs: item.specs || base?.specs || "",
-            imageUrl: item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "") || base?.imageUrl || "/images/products/artichoke.jpg",
+            imageUrl: primaryImage,
             icon: item.icon || base?.icon || "🌿",
             status: item.status || base?.status || "متاح للتصدير",
             featured: item.featured ?? base?.featured ?? false,
@@ -177,9 +197,8 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
         });
 
         const raw = JSON.stringify(mapped);
-        if (raw !== localStorage.getItem(PRODUCTS_KEY)) {
-          localStorage.setItem(PRODUCTS_KEY, raw);
-          localStorage.setItem(PRODUCTS_CACHE_KEY, raw);
+        if (raw !== localStorage.getItem(PRODUCTS_KEY) || raw !== cachedRaw) {
+          safeSetItem(PRODUCTS_KEY, raw);
           cachedProducts = mapped;
           cachedRaw = raw;
           window.dispatchEvent(new Event(PRODUCTS_EVENT));
@@ -189,7 +208,7 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
     }
 
     fetchProducts();
-    const interval = setInterval(fetchProducts, 2500);
+    const interval = setInterval(fetchProducts, 1200);
 
     const handleFocus = () => fetchProducts();
     window.addEventListener("focus", handleFocus);

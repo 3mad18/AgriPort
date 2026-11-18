@@ -626,6 +626,15 @@ export function VisitorAuthCard({ initialUser = null }: VisitorAuthCardProps) {
 
         <div className="mt-8 flex flex-col gap-3">
           <Link
+            href="/account"
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-md text-sm flex items-center justify-center gap-2"
+          >
+            <User className="w-4 h-4 text-emerald-400" />
+            <span>{language === "ar" ? "لوحة تفاصيل الحساب ومتابعة الشحنات" : "Account Dashboard & Order Tracker"}</span>
+            <span className={isRTL ? "rotate-180" : ""}>→</span>
+          </Link>
+
+          <Link
             href={targetDestination}
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-5 rounded-2xl transition-all shadow-md shadow-emerald-500/20 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
           >

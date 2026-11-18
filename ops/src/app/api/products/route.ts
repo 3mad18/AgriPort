@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       season: body.season,
       pack: body.pack,
       specs: packedSpecs,
-      image_url: body.imageUrl || (imagesList.length > 0 ? imagesList[0] : "") || "/images/products/artichoke.jpg",
+      image_url: body.imageUrl || (imagesList.length > 0 ? imagesList[0] : "") || "",
       icon: body.icon || "🌿",
       status: body.status || "متاح للتصدير",
       featured: body.featured ?? false,
@@ -264,7 +264,7 @@ export async function PATCH(request: Request) {
         memoryProductsCache[idx] = {
           ...memoryProductsCache[idx],
           ...partial,
-          imageUrl: partial.imageUrl || memoryProductsCache[idx].imageUrl,
+          imageUrl: partial.imageUrl !== undefined ? partial.imageUrl : (Array.isArray(partial.images) && partial.images.length === 0 ? "" : memoryProductsCache[idx].imageUrl),
           images: Array.isArray(partial.images) ? partial.images : memoryProductsCache[idx].images,
         };
       }
