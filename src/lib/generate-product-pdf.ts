@@ -255,21 +255,51 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
       color: #ffffff;
       border-radius: 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 12px;
+      z-index: 999;
+    }
+
+    .no-print-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .no-print-title-text {
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .no-print-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .no-print-bar button {
       background: #10b981;
       color: #ffffff;
       border: none;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border-radius: 10px;
       font-weight: 700;
       font-size: 13px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .no-print-bar button:active {
+      transform: scale(0.97);
     }
     .no-print-bar button:hover {
       background: #059669;
@@ -395,11 +425,17 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
       border: 1px solid #cbd5e1;
     }
 
+    .product-info {
+      min-width: 0;
+      word-break: break-word;
+    }
+
     .product-info h1 {
       font-size: 22px;
       font-weight: 900;
       color: #0f172a;
       margin-bottom: 6px;
+      line-height: 1.25;
     }
     .product-info .variety {
       font-size: 13px;
@@ -527,6 +563,149 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
       margin-bottom: 3px;
     }
 
+    /* Mobile Screens (< 768px) */
+    @media screen and (max-width: 768px) {
+      body {
+        padding: 10px 8px;
+      }
+
+      .no-print-bar {
+        position: sticky;
+        top: 8px;
+        margin-bottom: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .no-print-title {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .no-print-title-text {
+        white-space: normal;
+        font-size: 12.5px;
+        line-height: 1.35;
+      }
+
+      .no-print-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+
+      .no-print-actions button {
+        flex: 1;
+        padding: 10px 10px;
+        font-size: 12px;
+      }
+
+      .sheet {
+        padding: 18px 14px;
+        border-radius: 16px;
+        overflow-x: hidden;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding-bottom: 14px;
+        margin-bottom: 16px;
+      }
+
+      .brand {
+        gap: 10px;
+      }
+
+      .brand-title {
+        font-size: 24px;
+      }
+
+      .brand-subtitle {
+        font-size: 8.5px;
+        letter-spacing: 0.8px;
+      }
+
+      .doc-meta {
+        text-align: ${isRtl ? "right" : "left"};
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .doc-ref {
+        display: inline-block;
+        margin-bottom: 4px;
+      }
+
+      .product-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 14px;
+        margin-bottom: 18px;
+      }
+
+      .product-img {
+        width: 100%;
+        height: 200px;
+        max-height: 240px;
+      }
+
+      .product-info h1 {
+        font-size: 19px;
+        line-height: 1.3;
+      }
+
+      .specs-table {
+        margin-bottom: 16px;
+        font-size: 11.5px;
+        table-layout: fixed;
+      }
+
+      .specs-table th {
+        width: 38%;
+        padding: 8px 10px;
+        word-break: break-word;
+      }
+
+      .specs-table td {
+        width: 62%;
+        padding: 8px 10px;
+        word-break: break-word;
+      }
+
+      .desc-box {
+        padding: 12px 14px;
+        font-size: 11.5px;
+        line-height: 1.6;
+        margin-bottom: 18px;
+      }
+
+      .cert-strip {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .footer-col {
+        width: 100%;
+        text-align: ${isRtl ? "right" : "left"} !important;
+      }
+    }
+
     @media print {
       body {
         background: #ffffff !important;
@@ -541,6 +720,54 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
         padding: 0 !important;
         max-width: 100% !important;
       }
+      .header {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-bottom: 2px solid #10b981 !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 24px !important;
+      }
+      .doc-meta {
+        text-align: ${isRtl ? "left" : "right"} !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+      }
+      .product-hero {
+        display: grid !important;
+        grid-template-columns: 200px 1fr !important;
+        gap: 24px !important;
+        padding: 20px !important;
+      }
+      .product-img {
+        width: 100% !important;
+        height: 180px !important;
+      }
+      .specs-table {
+        table-layout: auto !important;
+      }
+      .specs-table th {
+        width: 32% !important;
+      }
+      .specs-table td {
+        width: auto !important;
+      }
+      .cert-strip {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 10px !important;
+      }
+      .footer {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+      }
+      .footer-col {
+        width: auto !important;
+        text-align: inherit !important;
+      }
       @page {
         size: A4 portrait;
         margin: 12mm 15mm;
@@ -552,11 +779,11 @@ export function downloadProductPdf(product: ExportProduct, language: string = "a
 
   <!-- No-Print Action Bar -->
   <div class="no-print-bar">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <span style="font-size:18px;">📄</span>
-      <span style="font-weight:700; font-size:13px;">AgriPort Technical Datasheet — ${escapeHtml(localized.name)}</span>
+    <div class="no-print-title">
+      <span style="font-size:18px; line-height:1;">📄</span>
+      <span class="no-print-title-text">AgriPort Technical Datasheet — ${escapeHtml(localized.name)}</span>
     </div>
-    <div style="display:flex; gap:8px;">
+    <div class="no-print-actions">
       <button onclick="window.print()">
         <span>🖨️</span>
         <span>${dict.printBtn}</span>
