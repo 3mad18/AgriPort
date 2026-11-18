@@ -194,15 +194,7 @@ function ContactFormInner() {
 
     console.log("📝 [Contact Form] Submit clicked, data:", formData);
     setIsSubmitting(true);
-    const finalData = {
-      ...formData,
-      destinationPort:
-        formData.destinationPort.trim() ||
-        (formData.incoterms === "FOB"
-          ? (language === "ar" ? "ميناء الإسكندرية (FOB Alexandria)" : "Alexandria Port (FOB)")
-          : (language === "ar" ? "ميناء روتردام (CIF Rotterdam)" : "Port of Rotterdam (CIF)")),
-    };
-    const res = await submitQuoteInquiry(finalData);
+    const res = await submitQuoteInquiry(formData);
     console.log("📨 [Contact Form] Submit completed, response:", res);
     setIsSubmitting(false);
     setSubmitted(true);
@@ -563,68 +555,18 @@ function ContactFormInner() {
                   </div>
 
                   <div className="w-full min-w-0">
-                    <label className="block text-xs font-bold text-zinc-700 mb-1.5 flex items-center justify-between">
-                      <span>
-                        {language === "ar"
-                          ? "ميناء الشحن / ميناء الوصول المطلوب *"
-                          : language === "fr"
-                          ? "Port de chargement / destination *"
-                          : language === "it"
-                          ? "Porto di imbarco / destinazione *"
-                          : language === "es"
-                          ? "Puerto de embarque / destino *"
-                          : "Port of Loading / Destination *"}
-                      </span>
+                    <label className="block text-xs font-bold text-zinc-700 mb-1.5">
+                      {f.destinationPort} *
                     </label>
                     <input
                       required
                       type="text"
-                      list="ports-suggestions"
                       name="destinationPort"
                       value={formData.destinationPort}
                       onChange={handleChange}
-                      placeholder={
-                        language === "ar"
-                          ? "اختر أو اكتب ميناء الشحن/الوصول..."
-                          : "Select or type loading/discharge port..."
-                      }
+                      placeholder={f.destinationPortPlaceholder}
                       className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
                     />
-                    <datalist id="ports-suggestions">
-                      <option value={language === "ar" ? "ميناء الإسكندرية (FOB Alexandria)" : "Alexandria Port (FOB)"} />
-                      <option value={language === "ar" ? "ميناء دمياط (FOB Damietta)" : "Damietta Port (FOB)"} />
-                      <option value={language === "ar" ? "ميناء الدخيلة (FOB El-Dekheila)" : "El-Dekheila Port (FOB)"} />
-                      <option value={language === "ar" ? "ميناء شرق بورسعيد (FOB East Port Said)" : "East Port Said (FOB)"} />
-                      <option value={language === "ar" ? "ميناء العين السخنة (FOB Sokhna)" : "Sokhna Port (FOB)"} />
-                      <option value={language === "ar" ? "قرية البضائع بمطار القاهرة (شحن جوي)" : "Cairo Cargo Airport (Air Freight)"} />
-                      <option value="Port of Rotterdam (Netherlands)" />
-                      <option value="Jebel Ali Port (UAE)" />
-                      <option value="Jeddah Islamic Port (KSA)" />
-                      <option value="Port of Valencia (Spain)" />
-                      <option value="Port of Genoa (Italy)" />
-                      <option value="Port of Marseille-Fos (France)" />
-                      <option value="Port of Hamburg (Germany)" />
-                      <option value="Port of Koper (Slovenia)" />
-                    </datalist>
-
-                    {/* Quick Port Suggestions */}
-                    <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                      {[
-                        { label: language === "ar" ? "الإسكندرية" : "Alexandria", val: language === "ar" ? "ميناء الإسكندرية (FOB Alexandria)" : "Alexandria Port (FOB)" },
-                        { label: language === "ar" ? "دمياط" : "Damietta", val: language === "ar" ? "ميناء دمياط (FOB Damietta)" : "Damietta Port (FOB)" },
-                        { label: language === "ar" ? "روتردام" : "Rotterdam", val: "Port of Rotterdam (Netherlands)" },
-                        { label: language === "ar" ? "جبل علي" : "Jebel Ali", val: "Jebel Ali Port (UAE)" },
-                      ].map((chip, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setFormData((prev) => ({ ...prev, destinationPort: chip.val }))}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100 hover:bg-emerald-50 hover:text-emerald-700 text-zinc-600 transition-colors border border-zinc-200/60 cursor-pointer"
-                        >
-                          + {chip.label}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
 

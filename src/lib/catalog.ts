@@ -246,11 +246,7 @@ export async function submitQuoteInquiry(inquiryData: {
     }
   } catch {}
 
-  const portValue =
-    inquiryData.destinationPort?.trim() ||
-    (inquiryData.incoterms === "FOB"
-      ? "ميناء الإسكندرية / دمياط (FOB)"
-      : "ميناء الوصول (حسب الاتفاق)");
+  const portValue = inquiryData.destinationPort?.trim() || "";
 
   const payload = {
     id: "inq-" + Date.now(),

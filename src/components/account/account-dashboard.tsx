@@ -100,7 +100,7 @@ export const accountTranslations: Record<
     orderDate: "تاريخ الطلب:",
     quantityLabel: "الكمية:",
     incotermsLabel: "شرط الشحن:",
-    portLabel: "ميناء الشحن / الوصول:",
+    portLabel: "ميناء الوصول:",
     trackingTitle: "متابعة مسار الطلب:",
     currentStatusLabel: "الحالة الحالية:",
     orderNotesLabel: "ملاحظات الطلب:",
@@ -163,7 +163,7 @@ export const accountTranslations: Record<
     orderDate: "Date:",
     quantityLabel: "Quantity:",
     incotermsLabel: "Incoterms:",
-    portLabel: "Port (Loading / Destination):",
+    portLabel: "Destination Port:",
     trackingTitle: "Order Progress Tracking:",
     currentStatusLabel: "Current Status:",
     orderNotesLabel: "Order Notes:",
@@ -226,7 +226,7 @@ export const accountTranslations: Record<
     orderDate: "Date :",
     quantityLabel: "Quantité :",
     incotermsLabel: "Incoterms :",
-    portLabel: "Port (Départ / Destination) :",
+    portLabel: "Port de destination :",
     trackingTitle: "Suivi de la commande :",
     currentStatusLabel: "Statut actuel :",
     orderNotesLabel: "Remarques :",
@@ -289,7 +289,7 @@ export const accountTranslations: Record<
     orderDate: "Data:",
     quantityLabel: "Quantità:",
     incotermsLabel: "Incoterms:",
-    portLabel: "Porto (Partenza / Destinazione):",
+    portLabel: "Porto di destinazione:",
     trackingTitle: "Tracciamento avanzamento ordine:",
     currentStatusLabel: "Stato attuale:",
     orderNotesLabel: "Note ordine:",
@@ -352,7 +352,7 @@ export const accountTranslations: Record<
     orderDate: "Fecha:",
     quantityLabel: "Cantidad:",
     incotermsLabel: "Incoterms:",
-    portLabel: "Puerto (Embarque / Destino):",
+    portLabel: "Puerto de destino:",
     trackingTitle: "Seguimiento del pedido:",
     currentStatusLabel: "Estado actual:",
     orderNotesLabel: "Notas del pedido:",
@@ -824,13 +824,7 @@ export function AccountDashboard() {
                     <div className="col-span-2 sm:col-span-1">
                       <span className="text-slate-400 block text-[10px] font-semibold">{tr.portLabel}</span>
                       <span className="font-bold text-slate-800">
-                        {inquiry.destinationPort ||
-                          (inquiry as any).destination_port ||
-                          (inquiry as any).shippingPort ||
-                          (inquiry as any).shipping_port ||
-                          (inquiry.incoterms === "FOB"
-                            ? (language === "ar" ? "ميناء الإسكندرية / دمياط (FOB)" : "Alexandria / Damietta (FOB)")
-                            : (language === "ar" ? "ميناء الوصول (حسب الاتفاق)" : "Discharge Port (As agreed)"))}
+                        {inquiry.destinationPort || (inquiry as any).destination_port || "—"}
                       </span>
                     </div>
                   </div>
