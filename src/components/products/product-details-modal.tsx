@@ -182,23 +182,11 @@ export function ProductDetailsModal({
     const scrollAmount = 140;
 
     if (direction === "left") {
-      thumbnailsRef.current.scrollBy({ left: isRtl ? scrollAmount : -scrollAmount, behavior: "smooth" });
-      setActiveImageIndex((prev) => {
-        if (isRtl) {
-          return prev >= galleryImages.length - 1 ? 0 : prev + 1;
-        } else {
-          return prev <= 0 ? galleryImages.length - 1 : prev - 1;
-        }
-      });
+      thumbnailsRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      setActiveImageIndex((prev) => (prev <= 0 ? galleryImages.length - 1 : prev - 1));
     } else {
-      thumbnailsRef.current.scrollBy({ left: isRtl ? -scrollAmount : scrollAmount, behavior: "smooth" });
-      setActiveImageIndex((prev) => {
-        if (isRtl) {
-          return prev <= 0 ? galleryImages.length - 1 : prev - 1;
-        } else {
-          return prev >= galleryImages.length - 1 ? 0 : prev + 1;
-        }
-      });
+      thumbnailsRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      setActiveImageIndex((prev) => (prev >= galleryImages.length - 1 ? 0 : prev + 1));
     }
   };
 
@@ -228,17 +216,9 @@ export function ProductDetailsModal({
           onClose();
         }
       } else if (e.key === "ArrowLeft") {
-        if (isRtl) {
-          handleNextImage();
-        } else {
-          handlePrevImage();
-        }
+        handlePrevImage();
       } else if (e.key === "ArrowRight") {
-        if (isRtl) {
-          handlePrevImage();
-        } else {
-          handleNextImage();
-        }
+        handleNextImage();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -408,13 +388,13 @@ export function ProductDetailsModal({
 
               {/* Gallery Thumbnails Row with Equal Inline Left and Right Arrows */}
               {galleryImages.length > 1 && (
-                <div className="flex items-center gap-2 pt-1 w-full">
+                <div className="flex items-center gap-2 pt-1 w-full" dir="ltr">
                   {/* Left Navigation Arrow */}
                   <button
                     type="button"
                     onClick={() => handleNavigateThumbnails("left")}
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 transition-all active:scale-90 cursor-pointer"
-                    title="الصورة السابقة"
+                    title={isRtl ? "الصورة السابقة" : "Previous image"}
                     aria-label="Previous image"
                   >
                     <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
@@ -426,7 +406,7 @@ export function ProductDetailsModal({
                     onWheel={(e) => {
                       if (e.deltaY !== 0 && thumbnailsRef.current) {
                         e.preventDefault();
-                        thumbnailsRef.current.scrollLeft += (isRtl ? -e.deltaY : e.deltaY);
+                        thumbnailsRef.current.scrollLeft += e.deltaY;
                       }
                     }}
                     className="flex-1 flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar scroll-smooth"
@@ -456,7 +436,7 @@ export function ProductDetailsModal({
                     type="button"
                     onClick={() => handleNavigateThumbnails("right")}
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 transition-all active:scale-90 cursor-pointer"
-                    title="الصورة التالية"
+                    title={isRtl ? "الصورة التالية" : "Next image"}
                     aria-label="Next image"
                   >
                     <ChevronRight className="w-4 h-4 stroke-[2.5]" />
