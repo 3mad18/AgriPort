@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
@@ -110,6 +110,34 @@ function ContactFormInner() {
     destinationPort: "",
     message: "",
   });
+
+  const catalogCategories = useMemo(() => {
+    const set = new Set<string>();
+    liveCatalog.forEach((p) => {
+      if (p.category) set.add(p.category);
+    });
+    return Array.from(set);
+  }, [liveCatalog]);
+
+  const activeProduct = useMemo(() => {
+    if (isCleared || !formData.product) return null;
+    return (
+      liveCatalog.find((item) => {
+        const loc = getLocalizedProduct(item, validLang);
+        return (
+          loc.name === formData.product ||
+          item.name === formData.product ||
+          item.id === formData.product ||
+          (idParam && item.id.toLowerCase() === idParam.toLowerCase()) ||
+          (cropParam && item.id.toLowerCase() === cropParam.toLowerCase())
+        );
+      }) || matchedProduct || null
+    );
+  }, [isCleared, formData.product, liveCatalog, validLang, idParam, cropParam, matchedProduct]);
+
+  const activeLocalizedProduct = activeProduct
+    ? getLocalizedProduct(activeProduct, validLang)
+    : null;
 
   // Sync state if search params arrive
   useEffect(() => {
@@ -301,14 +329,14 @@ function ContactFormInner() {
             </p>
 
             {/* Active Selected Product Badge */}
-            {!isCleared && resolvedProductName && formData.product && (
+            {!isCleared && formData.product && activeProduct && (
               <div className="mt-4 sm:mt-5 flex items-center justify-between gap-2.5 sm:gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-50/70 p-3 sm:p-4 shadow-2xs w-full min-w-0">
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-                  {matchedProduct?.imageUrl ? (
+                  {activeProduct?.imageUrl ? (
                     <div className="relative h-11 w-11 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-emerald-500/20 shadow-2xs">
                       <img
-                        src={matchedProduct.imageUrl}
-                        alt={resolvedProductName}
+                        src={activeProduct.imageUrl}
+                        alt={activeLocalizedProduct?.name || formData.product}
                         className="h-full w-full object-cover"
                       />
                     </div>
@@ -322,22 +350,22 @@ function ContactFormInner() {
                       <span className="text-[10px] sm:text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
                         {c.selectedCropBadge}
                       </span>
-                      {(localizedProduct?.category || matchedProduct?.category) && (
+                      {(activeLocalizedProduct?.category || activeProduct?.category) && (
                         <span className="rounded-full bg-emerald-200/60 px-1.5 py-0.2 text-[9px] sm:text-[10px] font-bold text-emerald-900">
-                          {localizedProduct?.category ||
+                          {activeLocalizedProduct?.category ||
                             getProductCategoryTranslation(
-                              matchedProduct?.category || "",
+                              activeProduct?.category || "",
                               validLang
                             )}
                         </span>
                       )}
                     </div>
                     <h4 className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 truncate">
-                      {resolvedProductName}
+                      {activeLocalizedProduct?.name || formData.product}
                     </h4>
-                    {resolvedVariety && (
+                    {(activeLocalizedProduct?.variety || activeProduct?.variety) && (
                       <p className="text-[11px] sm:text-xs text-slate-600 truncate mt-0.5 font-medium">
-                        {resolvedVariety}
+                        {activeLocalizedProduct?.variety || activeProduct?.variety}
                       </p>
                     )}
                   </div>
@@ -508,15 +536,51 @@ function ContactFormInner() {
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.product} *
                     </label>
-                    <input
+                    <select
                       required
-                      type="text"
                       name="product"
                       value={formData.product}
-                      onChange={handleChange}
-                      placeholder={f.productPlaceholder}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setIsCleared(!val);
+                        setFormData((prev) => ({ ...prev, product: val }));
+                      }}
                       className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
-                    />
+                    >
+                      <option value="">
+                        {language === "ar" ? "-- اختر المحصول المطلوب من الكتالوج --" : "-- Select Target Crop from Catalog --"}
+                      </option>
+
+                      {catalogCategories.map((cat) => {
+                        const catProducts = liveCatalog.filter((item) => item.category === cat);
+                        if (catProducts.length === 0) return null;
+                        const catLabel = getProductCategoryTranslation(cat, validLang) || cat;
+                        return (
+                          <optgroup key={cat} label={catLabel}>
+                            {catProducts.map((item) => {
+                              const loc = getLocalizedProduct(item, validLang);
+                              const varietyPart = loc.variety ? ` — ${loc.variety}` : "";
+                              return (
+                                <option key={item.id} value={loc.name}>
+                                  {loc.name}{varietyPart}
+                                </option>
+                              );
+                            })}
+                          </optgroup>
+                        );
+                      })}
+
+                      {/* If a crop was passed from URL or custom and is not yet in categories, display it */}
+                      {formData.product &&
+                        !liveCatalog.some((item) => {
+                          const loc = getLocalizedProduct(item, validLang);
+                          return loc.name === formData.product || item.name === formData.product;
+                        }) && (
+                          <option value={formData.product}>
+                            {formData.product}
+                          </option>
+                        )}
+                    </select>
                   </div>
                 </div>
 
