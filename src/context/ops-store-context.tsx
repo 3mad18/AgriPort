@@ -518,9 +518,17 @@ function getInquiriesSnapshot(): Inquiry[] {
   if (raw === cachedInquiriesRaw && cachedInquiries) return cachedInquiries;
   if (!raw) return DEFAULT_INQUIRIES;
   try {
-    cachedInquiries = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    const normalized = Array.isArray(parsed)
+      ? parsed.map((item: any) => ({
+          ...item,
+          destinationPort: item.destinationPort || item.destination_port || "",
+          destination_port: item.destination_port || item.destinationPort || "",
+        }))
+      : DEFAULT_INQUIRIES;
+    cachedInquiries = normalized;
     cachedInquiriesRaw = raw;
-    return cachedInquiries!;
+    return cachedInquiries;
   } catch {
     return DEFAULT_INQUIRIES;
   }

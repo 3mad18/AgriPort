@@ -558,15 +558,133 @@ function ContactFormInner() {
                     <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                       {f.destinationPort} *
                     </label>
-                    <input
+                    <select
                       required
-                      type="text"
                       name="destinationPort"
                       value={formData.destinationPort}
                       onChange={handleChange}
-                      placeholder={f.destinationPortPlaceholder}
                       className="w-full min-w-0 max-w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 focus:border-emerald-600 focus:bg-white focus:outline-none transition-colors"
-                    />
+                    >
+                      <option value="">
+                        {language === "ar" ? "-- اختر ميناء الوصول المستهدف --" : "-- Select Destination Port --"}
+                      </option>
+
+                      <optgroup label={language === "ar" ? "🇪🇺 موانئ أوروبا (Europe)" : "🇪🇺 Europe"}>
+                        <option value="Port of Rotterdam (Netherlands)">Port of Rotterdam (Netherlands) - ميناء روتردام</option>
+                        <option value="Port of Antwerp-Bruges (Belgium)">Port of Antwerp-Bruges (Belgium) - ميناء أنتويرب</option>
+                        <option value="Port of Hamburg (Germany)">Port of Hamburg (Germany) - ميناء هامبورغ</option>
+                        <option value="Port of Bremen / Bremerhaven (Germany)">Port of Bremerhaven (Germany) - ميناء بريمن</option>
+                        <option value="Port of Valencia (Spain)">Port of Valencia (Spain) - ميناء فالنسيا</option>
+                        <option value="Port of Barcelona (Spain)">Port of Barcelona (Spain) - ميناء برشلونة</option>
+                        <option value="Port of Algeciras (Spain)">Port of Algeciras (Spain) - ميناء الجزيرة الخضراء</option>
+                        <option value="Port of Genoa (Italy)">Port of Genoa (Italy) - ميناء جنوة</option>
+                        <option value="Port of Trieste (Italy)">Port of Trieste (Italy) - ميناء ترييستي</option>
+                        <option value="Port of Salerno / Naples (Italy)">Port of Salerno / Naples (Italy) - ميناء ساليرنو / نابولي</option>
+                        <option value="Port of Marseille-Fos (France)">Port of Marseille-Fos (France) - ميناء مرسيليا</option>
+                        <option value="Port of Le Havre (France)">Port of Le Havre (France) - ميناء لو هافر</option>
+                        <option value="Port of Koper (Slovenia)">Port of Koper (Slovenia) - ميناء كوبر</option>
+                        <option value="Port of Piraeus (Greece)">Port of Piraeus (Greece) - ميناء بيرايوس</option>
+                        <option value="Port of Thessaloniki (Greece)">Port of Thessaloniki (Greece) - ميناء سالونيك</option>
+                        <option value="Port of Felixstowe (United Kingdom)">Port of Felixstowe (UK) - ميناء فيلكستو</option>
+                        <option value="London Gateway (United Kingdom)">London Gateway (UK) - ميناء بوابة لندن</option>
+                        <option value="Port of Southampton (United Kingdom)">Port of Southampton (UK) - ميناء ساوثهامبتون</option>
+                        <option value="Port of St. Petersburg (Russia)">Port of St. Petersburg (Russia) - ميناء سانت بطرسبرغ</option>
+                        <option value="Port of Novorossiysk (Russia)">Port of Novorossiysk (Russia) - ميناء نوفوروسيسك</option>
+                        <option value="Port of Constanta (Romania)">Port of Constanta (Romania) - ميناء كونستانتسا</option>
+                        <option value="Port of Varna (Bulgaria)">Port of Varna (Bulgaria) - ميناء فارنا</option>
+                        <option value="Port of Gdansk (Poland)">Port of Gdansk (Poland) - ميناء غدانسك</option>
+                      </optgroup>
+
+                      <optgroup label={language === "ar" ? "🇸🇦🇦🇪 موانئ الخليج والشرق الأوسط (Middle East & GCC)" : "🇸🇦🇦🇪 Middle East & GCC"}>
+                        <option value="Jebel Ali Port, Dubai (UAE)">Jebel Ali Port, Dubai (UAE) - ميناء جبل علي، دبي</option>
+                        <option value="Khalifa Port, Abu Dhabi (UAE)">Khalifa Port, Abu Dhabi (UAE) - ميناء خليفة، أبوظبي</option>
+                        <option value="Sharjah Port Khalid (UAE)">Port Khalid, Sharjah (UAE) - ميناء خالد، الشارقة</option>
+                        <option value="Jeddah Islamic Port (Saudi Arabia)">Jeddah Islamic Port (Saudi Arabia) - ميناء جدة الإسلامي</option>
+                        <option value="King Abdulaziz Port, Dammam (Saudi Arabia)">King Abdulaziz Port, Dammam (KSA) - ميناء الملك عبد العزيز، الدمام</option>
+                        <option value="King Abdullah Port, Rabigh (Saudi Arabia)">King Abdullah Port, Rabigh (KSA) - ميناء الملك عبد الله، رابغ</option>
+                        <option value="Hamad Port, Doha (Qatar)">Hamad Port, Doha (Qatar) - ميناء حمد، الدوحة</option>
+                        <option value="Shuwaikh Port (Kuwait)">Shuwaikh Port (Kuwait) - ميناء الشويخ، الكويت</option>
+                        <option value="Shuaiba Port (Kuwait)">Shuaiba Port (Kuwait) - ميناء الشعيبة، الكويت</option>
+                        <option value="Khalifa Bin Salman Port (Bahrain)">Khalifa Bin Salman Port (Bahrain) - ميناء خليفة بن سلمان، البحرين</option>
+                        <option value="Port of Sohar (Oman)">Port of Sohar (Oman) - ميناء صحار، عمان</option>
+                        <option value="Port of Salalah (Oman)">Port of Salalah (Oman) - ميناء صلالة، عمان</option>
+                        <option value="Port Sultan Qaboos, Muscat (Oman)">Port Sultan Qaboos (Oman) - ميناء السلطان قابوس، مسقط</option>
+                        <option value="Port of Aqaba (Jordan)">Port of Aqaba (Jordan) - ميناء العقبة، الأردن</option>
+                        <option value="Port of Beirut (Lebanon)">Port of Beirut (Lebanon) - ميناء بيروت، لبنان</option>
+                        <option value="Port of Tripoli (Lebanon)">Port of Tripoli (Lebanon) - ميناء طرابلس، لبنان</option>
+                        <option value="Umm Qasr Port, Basra (Iraq)">Umm Qasr Port, Basra (Iraq) - ميناء أم قصر، البصرة</option>
+                      </optgroup>
+
+                      <optgroup label={language === "ar" ? "🇪🇬 موانئ الشحن والتصدير المصرية (Egypt Loading Ports)" : "🇪🇬 Egypt Loading Ports"}>
+                        <option value="Port of Alexandria (Egypt)">Port of Alexandria (Egypt) - ميناء الإسكندرية البحري</option>
+                        <option value="Port of Damietta (Egypt)">Port of Damietta (Egypt) - ميناء دمياط البحري</option>
+                        <option value="Port of El-Dekheila (Egypt)">Port of El-Dekheila (Egypt) - ميناء الدخيلة</option>
+                        <option value="Port Said Port (Egypt)">Port Said Port (Egypt) - ميناء بورسعيد (شرق / غرب)</option>
+                        <option value="Sokhna Port, Red Sea (Egypt)">Sokhna Port, Red Sea (Egypt) - ميناء العين السخنة</option>
+                        <option value="Cairo Cargo Airport (Egypt)">Cairo Cargo Airport (Egypt) - قرية البضائع بمطار القاهرة الدولي</option>
+                      </optgroup>
+
+                      <optgroup label={language === "ar" ? "🌍 موانئ أفريقيا (Africa)" : "🌍 Africa"}>
+                        <option value="Tanger Med Port (Morocco)">Tanger Med Port (Morocco) - ميناء طنجة المتوسط</option>
+                        <option value="Casablanca Port (Morocco)">Casablanca Port (Morocco) - ميناء الدار البيضاء</option>
+                        <option value="Port of Algiers (Algeria)">Port of Algiers (Algeria) - ميناء الجزائر العاصمة</option>
+                        <option value="Port of Oran (Algeria)">Port of Oran (Algeria) - ميناء وهران</option>
+                        <option value="Port of Rades / Tunis (Tunisia)">Port of Rades (Tunisia) - ميناء رادس، تونس</option>
+                        <option value="Port of Tripoli (Libya)">Port of Tripoli (Libya) - ميناء طرابلس، ليبيا</option>
+                        <option value="Port of Misrata (Libya)">Port of Misrata (Libya) - ميناء مصراتة، ليبيا</option>
+                        <option value="Port of Benghazi (Libya)">Port of Benghazi (Libya) - ميناء بنغازي، ليبيا</option>
+                        <option value="Port Sudan (Sudan)">Port Sudan (Sudan) - ميناء بورتسودان</option>
+                        <option value="Port of Djibouti (Djibouti)">Port of Djibouti (Djibouti) - ميناء جيبوتي</option>
+                        <option value="Port of Mombasa (Kenya)">Port of Mombasa (Kenya) - ميناء مومباسا، كينيا</option>
+                        <option value="Port of Dar es Salaam (Tanzania)">Port of Dar es Salaam (Tanzania) - ميناء دار السلام، تنزانيا</option>
+                        <option value="Port of Durban (South Africa)">Port of Durban (South Africa) - ميناء ديربان، جنوب أفريقيا</option>
+                        <option value="Port of Cape Town (South Africa)">Port of Cape Town (South Africa) - ميناء كيب تاون</option>
+                      </optgroup>
+
+                      <optgroup label={language === "ar" ? "🌏 موانئ آسيا والشرق الأقصى (Asia & Far East)" : "🌏 Asia & Far East"}>
+                        <option value="Port of Singapore">Port of Singapore - ميناء سنغافورة</option>
+                        <option value="Port Klang (Malaysia)">Port Klang (Malaysia) - ميناء بورت كلانج، ماليزيا</option>
+                        <option value="Port of Shanghai (China)">Port of Shanghai (China) - ميناء شنغهاي، الصين</option>
+                        <option value="Port of Ningbo-Zhoushan (China)">Port of Ningbo-Zhoushan (China) - ميناء نينغبو، الصين</option>
+                        <option value="Port of Shenzhen (China)">Port of Shenzhen (China) - ميناء شنتشن، الصين</option>
+                        <option value="Port of Guangzhou (China)">Port of Guangzhou (China) - ميناء قوانغتشو، الصين</option>
+                        <option value="Port of Qingdao (China)">Port of Qingdao (China) - ميناء تشينغداو، الصين</option>
+                        <option value="Port of Tianjin (China)">Port of Tianjin (China) - ميناء تيانجين، الصين</option>
+                        <option value="Port of Hong Kong">Port of Hong Kong - ميناء هونغ كونغ</option>
+                        <option value="Port of Busan (South Korea)">Port of Busan (South Korea) - ميناء بوسان، كوريا الجنوبية</option>
+                        <option value="Port of Tokyo / Yokohama (Japan)">Port of Tokyo / Yokohama (Japan) - ميناء طوكيو / يوكوهاما</option>
+                        <option value="Nhava Sheva Port, Mumbai (India)">Nhava Sheva Port, Mumbai (India) - ميناء نهافا شيفا، مومباي</option>
+                        <option value="Mundra Port, Gujarat (India)">Mundra Port, Gujarat (India) - ميناء موندرا، الهند</option>
+                        <option value="Port of Karachi (Pakistan)">Port of Karachi (Pakistan) - ميناء كراتشي، باكستان</option>
+                        <option value="Port of Colombo (Sri Lanka)">Port of Colombo (Sri Lanka) - ميناء كولومبو، سريلانكا</option>
+                        <option value="Port of Chittagong (Bangladesh)">Port of Chittagong (Bangladesh) - ميناء تشيتاغونغ، بنغلاديش</option>
+                        <option value="Laem Chabang Port (Thailand)">Laem Chabang Port (Thailand) - ميناء لايم شابانج، تايلاند</option>
+                        <option value="Tanjung Priok Port, Jakarta (Indonesia)">Tanjung Priok Port, Jakarta (Indonesia) - ميناء جاكرتا</option>
+                        <option value="Port of Manila (Philippines)">Port of Manila (Philippines) - ميناء مانيلا، الفلبين</option>
+                        <option value="Port of Haiphong / Cat Lai (Vietnam)">Port of Haiphong / Cat Lai (Vietnam) - ميناء هايفونغ، فيتنام</option>
+                      </optgroup>
+
+                      <optgroup label={language === "ar" ? "🌎 موانئ الأمريكتين وأستراليا (Americas & Australia)" : "🌎 Americas & Australia"}>
+                        <option value="Port of New York and New Jersey (USA)">Port of New York & New Jersey (USA) - ميناء نيويورك</option>
+                        <option value="Port of Savannah, Georgia (USA)">Port of Savannah, Georgia (USA) - ميناء سافانا</option>
+                        <option value="Port of Houston, Texas (USA)">Port of Houston, Texas (USA) - ميناء هيوستن</option>
+                        <option value="Port of Los Angeles / Long Beach (USA)">Port of Los Angeles (USA) - ميناء لوس أنجلوس</option>
+                        <option value="Port of Miami, Florida (USA)">Port of Miami, Florida (USA) - ميناء ميامي</option>
+                        <option value="Port of Norfolk, Virginia (USA)">Port of Norfolk, Virginia (USA) - ميناء نورفولك</option>
+                        <option value="Port of Montreal (Canada)">Port of Montreal (Canada) - ميناء مونتريال، كندا</option>
+                        <option value="Port of Vancouver (Canada)">Port of Vancouver (Canada) - ميناء فانكوفر، كندا</option>
+                        <option value="Port of Santos, Sao Paulo (Brazil)">Port of Santos (Brazil) - ميناء سانتوس، البرازيل</option>
+                        <option value="Port of Buenos Aires (Argentina)">Port of Buenos Aires (Argentina) - ميناء بوينس آيرس</option>
+                        <option value="Port of Valparaiso (Chile)">Port of Valparaiso (Chile) - ميناء فالبارايسو، تشيلي</option>
+                        <option value="Port of Sydney / Melbourne (Australia)">Port of Sydney / Melbourne (Australia) - ميناء سيدني / ملبورن</option>
+                      </optgroup>
+
+                      <optgroup label={language === "ar" ? "🌐 وجهة أخرى (Other Destination)" : "🌐 Other Destination"}>
+                        <option value="Other Port (Specified in notes)">
+                          {language === "ar" ? "ميناء آخر (يُحدد في تفاصيل الملاحظات بالأسفل)" : "Other Port (Specified in notes below)"}
+                        </option>
+                      </optgroup>
+                    </select>
                   </div>
                 </div>
 

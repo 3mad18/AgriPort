@@ -670,7 +670,7 @@ export function OpsNotificationsCenter({
                           ميناء الشحن:
                         </span>
                         <span className="text-slate-600">
-                          {item.incoterms} — {item.destinationPort}
+                          {item.incoterms} — {item.destinationPort || (item as any).destination_port || "—"}
                         </span>
                       </div>
                     </div>
@@ -892,7 +892,7 @@ export function OpsNotificationsCenter({
                   <div>
                     <span className="text-xs text-slate-500">ميناء الوصول المستهدف:</span>
                     <p className="font-bold text-slate-900">
-                      {selectedInquiry.destinationPort}
+                      {selectedInquiry.destinationPort || (selectedInquiry as any).destination_port || "—"}
                     </p>
                   </div>
                 </div>

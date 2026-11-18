@@ -421,7 +421,11 @@ export function AccountDashboard() {
       if (res && res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.inquiries)) {
-          list = data.inquiries;
+          list = data.inquiries.map((item: any) => ({
+            ...item,
+            destinationPort: item.destinationPort || item.destination_port || "",
+            destination_port: item.destination_port || item.destinationPort || "",
+          }));
         }
       }
 

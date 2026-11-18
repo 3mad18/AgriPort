@@ -270,6 +270,22 @@ export async function submitQuoteInquiry(inquiryData: {
   if (supabaseUrl && supabaseKey) {
     try {
       console.log("⚡ [AgriPort] Writing directly to Supabase REST API...");
+      const sbPayload = {
+        id: payload.id,
+        date: payload.date,
+        name: payload.name,
+        company: payload.company,
+        country: payload.country,
+        email: payload.email,
+        phone: payload.phone,
+        product: payload.product,
+        quantity: payload.quantity,
+        incoterms: payload.incoterms,
+        destination_port: payload.destination_port,
+        message: payload.message,
+        status: payload.status,
+        read: payload.read,
+      };
       const sbRes = await fetch(`${supabaseUrl}/rest/v1/inquiries`, {
         method: "POST",
         headers: {
@@ -278,7 +294,7 @@ export async function submitQuoteInquiry(inquiryData: {
           Authorization: `Bearer ${supabaseKey}`,
           Prefer: "return=minimal",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(sbPayload),
       });
 
       if (sbRes.ok) {
