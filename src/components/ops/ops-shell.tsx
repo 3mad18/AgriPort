@@ -11,6 +11,7 @@ import { OpsOverview } from "@/components/ops/ops-overview";
 import { OpsNotificationsCenter } from "@/components/ops/ops-notifications-center";
 import { OpsVisitsCenter, isFacilityVisit } from "@/components/ops/ops-visits-center";
 import { OpsProducts } from "@/components/ops/ops-products";
+import { OpsFacilities } from "@/components/ops/ops-facilities";
 import { OpsUsers } from "@/components/ops/ops-users";
 import { OpsTraffic } from "@/components/ops/ops-traffic";
 import { OpsSettings } from "@/components/ops/ops-settings";
@@ -19,6 +20,7 @@ import {
   LayoutDashboard,
   Bell,
   Landmark,
+  Building2,
   Package,
   Boxes,
   Users,
@@ -32,7 +34,7 @@ import {
   Globe,
 } from "lucide-react";
 
-export type OpsTab = "overview" | "notifications" | "visits" | "products" | "users" | "traffic" | "settings";
+export type OpsTab = "overview" | "notifications" | "visits" | "products" | "facilities" | "users" | "traffic" | "settings";
 
 const OPS_TAB_STORAGE_KEY = "agriport_ops_persisted_tab";
 
@@ -49,22 +51,22 @@ function subscribeOpsTab(callback: () => void) {
 function getInitialOpsTab(): OpsTab {
   if (typeof window === "undefined") return "overview";
   try {
-    // 1. Check URL hash (e.g. #settings, #products, #notifications, #visits, #users, #traffic, #overview)
+    // 1. Check URL hash (e.g. #settings, #products, #facilities, #notifications, #visits, #users, #traffic, #overview)
     const hash = window.location.hash.replace(/^#/, "").toLowerCase() as OpsTab;
-    if (["overview", "notifications", "visits", "products", "users", "traffic", "settings"].includes(hash)) {
+    if (["overview", "notifications", "visits", "products", "facilities", "users", "traffic", "settings"].includes(hash)) {
       return hash;
     }
 
     // 2. Check query param (e.g. ?tab=settings)
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get("tab")?.toLowerCase() as OpsTab;
-    if (["overview", "notifications", "visits", "products", "users", "traffic", "settings"].includes(tabParam)) {
+    if (["overview", "notifications", "visits", "products", "facilities", "users", "traffic", "settings"].includes(tabParam)) {
       return tabParam;
     }
 
     // 3. Check localStorage
     const saved = localStorage.getItem(OPS_TAB_STORAGE_KEY) as OpsTab;
-    if (["overview", "notifications", "visits", "products", "users", "traffic", "settings"].includes(saved)) {
+    if (["overview", "notifications", "visits", "products", "facilities", "users", "traffic", "settings"].includes(saved)) {
       return saved;
     }
   } catch (e) {}
@@ -192,6 +194,11 @@ export function OpsShell() {
       id: "products" as OpsTab,
       label: "إدارة كتالوج المحاصيل",
       icon: Boxes,
+    },
+    {
+      id: "facilities" as OpsTab,
+      label: "المرافق ومحطات التعبئة",
+      icon: Building2,
     },
     {
       id: "users" as OpsTab,
@@ -545,6 +552,8 @@ export function OpsShell() {
               onResetOpenAddModal={() => setOpenAddProductModal(false)}
             />
           )}
+
+          {activeTab === "facilities" && <OpsFacilities />}
 
           {activeTab === "users" && <OpsUsers />}
 

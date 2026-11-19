@@ -21,6 +21,7 @@ import {
   PRODUCTS_EVENT,
 } from "@/lib/supabase-config";
 import { packProductSpecs, unpackProductRow } from "@/lib/product-packer";
+import { DEFAULT_FACILITIES, FacilityItem } from "@/lib/facilities";
 
 
 export type Product = {
@@ -94,6 +95,7 @@ export type RegisteredUserRecord = {
 
 type OpsStoreContextType = {
   products: Product[];
+  facilities: FacilityItem[];
   inquiries: Inquiry[];
   settings: SiteSettings;
   registeredUsers: RegisteredUserRecord[];
@@ -101,6 +103,9 @@ type OpsStoreContextType = {
   addProduct: (product: Omit<Product, "id">) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
+  addFacility: (facility: Omit<FacilityItem, "id">) => void;
+  updateFacility: (id: string, facility: Partial<FacilityItem>) => void;
+  deleteFacility: (id: string) => void;
   addInquiry: (inquiry: Omit<Inquiry, "id" | "date" | "status" | "read" | "createdAt">) => void;
   updateInquiryStatus: (id: string, status: Inquiry["status"]) => void;
   markInquiryRead: (id: string) => void;
@@ -421,16 +426,25 @@ const USERS_STORAGE_KEY = "agriport_visitor_registered_accounts";
 // SETTINGS_KEY imported
 // STORE_EVENT imported
 
+const FACILITIES_KEY = "agriport_ops_facilities";
+const FACILITIES_EVENT = "agriport_facilities_change";
+
 function subscribeStore(callback: () => void) {
   window.addEventListener("storage", callback);
   window.addEventListener(STORE_EVENT, callback);
   window.addEventListener(PRODUCTS_EVENT, callback);
+  window.addEventListener(FACILITIES_EVENT, callback);
   window.addEventListener("agriport_visitor_auth_change", callback);
 
   let bc: BroadcastChannel | null = null;
+  let fbc: BroadcastChannel | null = null;
   try {
     bc = new BroadcastChannel("agriport_products_channel");
     bc.onmessage = () => {
+      callback();
+    };
+    fbc = new BroadcastChannel("agriport_facilities_channel");
+    fbc.onmessage = () => {
       callback();
     };
   } catch {}
@@ -439,8 +453,10 @@ function subscribeStore(callback: () => void) {
     window.removeEventListener("storage", callback);
     window.removeEventListener(STORE_EVENT, callback);
     window.removeEventListener(PRODUCTS_EVENT, callback);
+    window.removeEventListener(FACILITIES_EVENT, callback);
     window.removeEventListener("agriport_visitor_auth_change", callback);
     if (bc) bc.close();
+    if (fbc) fbc.close();
   };
 }
 
@@ -498,6 +514,35 @@ function getProductsSnapshot(): Product[] {
     return cachedProducts || DEFAULT_PRODUCTS;
   } catch {
     return cachedProducts || DEFAULT_PRODUCTS;
+  }
+}
+
+let cachedFacilities: FacilityItem[] | null = null;
+let cachedFacilitiesRaw: string | null = null;
+
+function getFacilitiesSnapshot(): FacilityItem[] {
+  if (typeof window === "undefined") {
+    return cachedFacilities || DEFAULT_FACILITIES;
+  }
+  const raw = localStorage.getItem(FACILITIES_KEY);
+  if (raw === cachedFacilitiesRaw && cachedFacilities) return cachedFacilities;
+  if (!raw) {
+    if (cachedFacilities && cachedFacilities.length > 0) return cachedFacilities;
+    cachedFacilities = DEFAULT_FACILITIES;
+    cachedFacilitiesRaw = JSON.stringify(DEFAULT_FACILITIES);
+    safeSetItem(FACILITIES_KEY, cachedFacilitiesRaw);
+    return DEFAULT_FACILITIES;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      cachedFacilities = parsed;
+      cachedFacilitiesRaw = raw;
+      return parsed;
+    }
+    return DEFAULT_FACILITIES;
+  } catch {
+    return DEFAULT_FACILITIES;
   }
 }
 
@@ -590,6 +635,12 @@ export function OpsStoreProvider({
     subscribeStore,
     getProductsSnapshot,
     () => (initialProducts && initialProducts.length > 0 ? initialProducts : (cachedProducts || DEFAULT_PRODUCTS)),
+  );
+
+  const facilities = useSyncExternalStore(
+    subscribeStore,
+    getFacilitiesSnapshot,
+    () => cachedFacilities || DEFAULT_FACILITIES,
   );
 
   const inquiries = useSyncExternalStore(
@@ -885,11 +936,31 @@ export function OpsStoreProvider({
       }
     }
 
+    async function syncFacilitiesFromApi() {
+      try {
+        const res = await fetch("/api/facilities", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.facilities) && isMounted) {
+            const raw = JSON.stringify(data.facilities);
+            if (raw !== localStorage.getItem(FACILITIES_KEY)) {
+              safeSetItem(FACILITIES_KEY, raw);
+              cachedFacilities = data.facilities;
+              cachedFacilitiesRaw = raw;
+              window.dispatchEvent(new Event(FACILITIES_EVENT));
+              notifyChange();
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
     // Initial fetch
     syncInquiriesFromCloud();
     syncProductsFromCloud();
     syncSettingsFromCloud();
     syncRegisteredUsersFromCloud();
+    syncFacilitiesFromApi();
 
     // Poll every 15s
     const timer = setInterval(() => {
@@ -897,6 +968,7 @@ export function OpsStoreProvider({
       syncProductsFromCloud();
       syncSettingsFromCloud();
       syncRegisteredUsersFromCloud();
+      syncFacilitiesFromApi();
     }, 15000);
 
     // Sync on tab focus / visibility
@@ -905,6 +977,7 @@ export function OpsStoreProvider({
       syncProductsFromCloud();
       syncSettingsFromCloud();
       syncRegisteredUsersFromCloud();
+      syncFacilitiesFromApi();
     };
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleFocus);
@@ -1176,6 +1249,94 @@ export function OpsStoreProvider({
     },
     [],
   );
+
+  const addFacility = useCallback(async (item: Omit<FacilityItem, "id">) => {
+    const current = getFacilitiesSnapshot();
+    const imagesArr = Array.isArray(item.images) && item.images.length > 0
+      ? item.images
+      : item.image ? [item.image] : [];
+    const newFacility: FacilityItem = {
+      ...item,
+      id: "facility-" + Date.now(),
+      image: item.image || imagesArr[0] || "/images/cold-chain-facility.jpg",
+      images: imagesArr,
+    };
+    const updated = [newFacility, ...current];
+    safeSetItem(FACILITIES_KEY, JSON.stringify(updated));
+    cachedFacilities = updated;
+    cachedFacilitiesRaw = JSON.stringify(updated);
+    window.dispatchEvent(new Event(FACILITIES_EVENT));
+    notifyChange();
+
+    try {
+      const bc = new BroadcastChannel("agriport_facilities_channel");
+      bc.postMessage({ type: "ADD_FACILITY", facility: newFacility });
+      bc.close();
+    } catch {}
+
+    triggerOpsToast(
+      `تمت إضافة "${newFacility.title}" بنجاح إلى المرافق والمحطات.`,
+      "success",
+      "تم الحفظ بنجاح"
+    );
+
+    fetch("/api/facilities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newFacility),
+    }).catch(() => {});
+  }, []);
+
+  const updateFacility = useCallback(async (id: string, partial: Partial<FacilityItem>) => {
+    const current = getFacilitiesSnapshot();
+    const updated = current.map((f) => (f.id === id ? { ...f, ...partial } : f));
+    safeSetItem(FACILITIES_KEY, JSON.stringify(updated));
+    cachedFacilities = updated;
+    cachedFacilitiesRaw = JSON.stringify(updated);
+    window.dispatchEvent(new Event(FACILITIES_EVENT));
+    notifyChange();
+
+    try {
+      const bc = new BroadcastChannel("agriport_facilities_channel");
+      bc.postMessage({ type: "UPDATE_FACILITY", id, partial });
+      bc.close();
+    } catch {}
+
+    triggerOpsToast("تم تحديث بيانات وصور المرفق بنجاح.", "success", "تم الحفظ بنجاح");
+
+    fetch("/api/facilities", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...partial }),
+    }).catch(() => {});
+  }, []);
+
+  const deleteFacility = useCallback(async (id: string) => {
+    const current = getFacilitiesSnapshot();
+    const target = current.find((f) => f.id === id);
+    const updated = current.filter((f) => f.id !== id);
+    safeSetItem(FACILITIES_KEY, JSON.stringify(updated));
+    cachedFacilities = updated;
+    cachedFacilitiesRaw = JSON.stringify(updated);
+    window.dispatchEvent(new Event(FACILITIES_EVENT));
+    notifyChange();
+
+    try {
+      const bc = new BroadcastChannel("agriport_facilities_channel");
+      bc.postMessage({ type: "DELETE_FACILITY", id });
+      bc.close();
+    } catch {}
+
+    triggerOpsToast(
+      `تم حذف المرفق "${target?.title || id}" بنجاح.`,
+      "info",
+      "تم الحذف"
+    );
+
+    fetch(`/api/facilities?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }).catch(() => {});
+  }, []);
 
   const addInquiry = useCallback(
     (data: Omit<Inquiry, "id" | "date" | "status" | "read" | "createdAt">) => {
@@ -1529,6 +1690,7 @@ export function OpsStoreProvider({
     <OpsStoreContext.Provider
       value={{
         products,
+        facilities,
         inquiries,
         settings,
         registeredUsers,
@@ -1536,6 +1698,9 @@ export function OpsStoreProvider({
         addProduct,
         updateProduct,
         deleteProduct,
+        addFacility,
+        updateFacility,
+        deleteFacility,
         addInquiry,
         updateInquiryStatus,
         markInquiryRead,

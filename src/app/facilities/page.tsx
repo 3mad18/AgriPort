@@ -5,6 +5,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { useLanguage } from "@/context/language-context";
+import { useLiveFacilities } from "@/lib/use-live-facilities";
+import { DEFAULT_FACILITIES, FacilityItem } from "@/lib/facilities";
 import {
   Building2,
   Sprout,
@@ -12,23 +14,15 @@ import {
   Zap,
   Maximize2,
   Settings2,
+  ImageIcon,
 } from "lucide-react";
-
-type FacilityItem = {
-  id: string;
-  category: "stations" | "farms" | "coldchain" | "lab";
-  badge: string;
-  title: string;
-  desc: string;
-  specs: string;
-  image: string;
-  tag: string;
-};
 
 export default function FacilitiesPage() {
   const { t, dir } = useLanguage();
   const f = t.facilitiesPage;
   const isRTL = dir === "rtl";
+
+  const { facilities: liveFacilities } = useLiveFacilities(DEFAULT_FACILITIES);
 
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedMedia, setSelectedMedia] = useState<FacilityItem | null>(null);
@@ -42,7 +36,21 @@ export default function FacilitiesPage() {
     { id: "lab", label: f.filterLab },
   ];
 
-  const items = (f.items || []) as unknown as FacilityItem[];
+  // Map live facilities from dashboard, using localized fallback titles if untranslated
+  const items: FacilityItem[] = liveFacilities.map((liveItem) => {
+    const localizedDefault = (f.items as unknown as FacilityItem[])?.find(
+      (i) => i.id === liveItem.id
+    );
+    if (!localizedDefault) return liveItem;
+    return {
+      ...localizedDefault,
+      ...liveItem,
+      image: liveItem.image || localizedDefault.image,
+      images: Array.isArray(liveItem.images) && liveItem.images.length > 0
+        ? liveItem.images
+        : [liveItem.image || localizedDefault.image],
+    };
+  });
 
   const filteredItems = items.filter((item) => {
     if (activeFilter === "all") return true;
@@ -230,6 +238,16 @@ export default function FacilitiesPage() {
                       <Maximize2 className="w-3.5 h-3.5 text-white" />
                     </span>
                   </div>
+
+                  {/* Multiple Images Indicator (Bottom Start) */}
+                  {item.images && item.images.length > 1 && (
+                    <div className="absolute bottom-4 start-4">
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-black/60 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-white shadow-xs">
+                        <ImageIcon className="w-3 h-3 text-emerald-400" />
+                        <span>{item.images.length} صور</span>
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}
@@ -335,6 +353,26 @@ export default function FacilitiesPage() {
                 ✕
               </button>
             </div>
+
+            {/* Gallery Thumbnail Strip if facility has multiple images */}
+            {selectedMedia.images && selectedMedia.images.length > 1 && (
+              <div className="flex items-center gap-2.5 px-6 sm:px-8 pt-4 pb-1 overflow-x-auto bg-slate-50 border-b border-slate-100">
+                {selectedMedia.images.map((thumb, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedMedia({ ...selectedMedia, image: thumb })}
+                    className={`relative h-14 w-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
+                      selectedMedia.image === thumb
+                        ? "border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs"
+                        : "border-slate-200 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img src={thumb} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="p-6 sm:p-8">
               <div className="flex items-center gap-2 mb-2">
