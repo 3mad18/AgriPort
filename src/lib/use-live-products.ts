@@ -49,9 +49,12 @@ function safeSetItem(key: string, value: string) {
     try {
       localStorage.removeItem("agriport_live_products_cache_v2");
       localStorage.removeItem("agriport_live_settings_cache_v2");
+      localStorage.removeItem(key);
       localStorage.setItem(key, value);
     } catch {
-      // Retain in memory without crashing React
+      try {
+        localStorage.removeItem(key);
+      } catch {}
     }
   }
 }
@@ -164,7 +167,9 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
 
           let primaryImage = "";
           if (hasExplicitImages) {
-            primaryImage = item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "");
+            primaryImage = (item.imageUrl && imagesList.includes(item.imageUrl))
+              ? item.imageUrl
+              : (imagesList.length > 0 ? imagesList[0] : "");
           } else if (item.imageUrl !== undefined && item.imageUrl !== null && item.imageUrl !== "") {
             primaryImage = item.imageUrl;
           } else if (item.imageUrl === "") {
@@ -208,7 +213,7 @@ export function useLiveProducts(initialProducts?: ExportProduct[]) {
     }
 
     fetchProducts();
-    const interval = setInterval(fetchProducts, 1200);
+    const interval = setInterval(fetchProducts, 15000);
 
     const handleFocus = () => fetchProducts();
     window.addEventListener("focus", handleFocus);

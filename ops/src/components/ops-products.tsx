@@ -164,16 +164,22 @@ export function OpsProducts({
     setReplacingImageIndex(null);
     setPreviewLightboxImage(null);
 
-    // Collect existing images
+    // Collect existing images prioritizing explicit images array
     const initialImages: string[] = [];
-    if (item.imageUrl) initialImages.push(item.imageUrl);
-    if (Array.isArray(item.images)) {
+    if (Array.isArray(item.images) && item.images.length > 0) {
       item.images.forEach((img) => {
-        if (img && !initialImages.includes(img)) {
-          initialImages.push(img);
+        const trimmed = (img || "").trim();
+        if (trimmed && !initialImages.includes(trimmed)) {
+          initialImages.push(trimmed);
         }
       });
+    } else if (item.imageUrl && item.imageUrl.trim()) {
+      initialImages.push(item.imageUrl.trim());
     }
+
+    const initialCover = (item.imageUrl && initialImages.includes(item.imageUrl))
+      ? item.imageUrl
+      : (initialImages[0] || "");
 
     setForm({
       name: item.name,
@@ -182,7 +188,7 @@ export function OpsProducts({
       season: item.season,
       pack: item.pack,
       specs: item.specs,
-      imageUrl: item.imageUrl || initialImages[0] || "",
+      imageUrl: initialCover,
       icon: item.icon,
       status: item.status,
       featured: item.featured || false,
@@ -223,7 +229,7 @@ export function OpsProducts({
         img.onload = () => {
           const canvas = document.createElement("canvas");
           let { width, height } = img;
-          const MAX_DIM = 800;
+          const MAX_DIM = 750;
           if (width > MAX_DIM || height > MAX_DIM) {
             if (width > height) {
               height = Math.round((height * MAX_DIM) / width);
@@ -238,7 +244,7 @@ export function OpsProducts({
           const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.70);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.65);
             resolve(dataUrl);
           } else {
             resolve(e.target?.result as string);
@@ -349,7 +355,7 @@ export function OpsProducts({
       const deletedImg = currentList[index];
       const list = currentList.filter((_, idx) => idx !== index);
       let nextCover = prev.imageUrl;
-      if (deletedImg === prev.imageUrl) {
+      if (deletedImg === prev.imageUrl || !list.includes(prev.imageUrl)) {
         nextCover = list[0] || "";
       }
       return {

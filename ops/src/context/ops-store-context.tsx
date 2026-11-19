@@ -464,9 +464,12 @@ function safeSetItem(key: string, value: string) {
     try {
       localStorage.removeItem("agriport_live_products_cache_v2");
       localStorage.removeItem("agriport_live_settings_cache_v2");
+      localStorage.removeItem(key);
       localStorage.setItem(key, value);
     } catch {
-      // Retain in memory without crashing React
+      try {
+        localStorage.removeItem(key);
+      } catch {}
     }
   }
 }
@@ -776,7 +779,9 @@ export function OpsStoreProvider({
 
           let primaryImage = "";
           if (hasExplicitImages) {
-            primaryImage = item.imageUrl || (imagesList.length > 0 ? imagesList[0] : "");
+            primaryImage = (item.imageUrl && imagesList.includes(item.imageUrl))
+              ? item.imageUrl
+              : (imagesList.length > 0 ? imagesList[0] : "");
           } else if (item.imageUrl !== undefined && item.imageUrl !== null && item.imageUrl !== "") {
             primaryImage = item.imageUrl;
           } else if (item.imageUrl === "") {
@@ -1079,7 +1084,7 @@ export function OpsStoreProvider({
         }).catch(() => {});
       }
 
-      // Direct Supabase update using standard PATCH
+      // Direct Supabase update using standard PATCH with fallback UPSERT
       const supabaseUrl = SUPABASE_URL;
       const supabaseKey = SUPABASE_ANON_KEY;
       if (supabaseUrl && supabaseKey) {
@@ -1087,7 +1092,8 @@ export function OpsStoreProvider({
           const productToSave = updated.find((p) => p.id === id);
           if (productToSave) {
             const packedSpecs = packProductSpecs(productToSave);
-            const directPayload: Record<string, any> = {
+            const corePayload: Record<string, any> = {
+              id: productToSave.id,
               name: productToSave.name,
               category: productToSave.category,
               variety: productToSave.variety,
@@ -1103,9 +1109,10 @@ export function OpsStoreProvider({
               icon: productToSave.icon || "🌿",
               status: productToSave.status || "متاح للتصدير",
               featured: productToSave.featured ?? false,
+              sort_order: (productToSave as any).sortOrder || (productToSave as any).sort_order || 99,
             };
 
-            await fetch(
+            const patchRes = await fetch(
               `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(id)}`,
               {
                 method: "PATCH",
@@ -1113,11 +1120,25 @@ export function OpsStoreProvider({
                   "Content-Type": "application/json",
                   apikey: supabaseKey,
                   Authorization: `Bearer ${supabaseKey}`,
-                  Prefer: "return=minimal",
+                  Prefer: "return=representation",
                 },
-                body: JSON.stringify(directPayload),
+                body: JSON.stringify(corePayload),
               }
             );
+
+            const patchData = patchRes.ok ? await patchRes.json() : null;
+            if (!patchData || (Array.isArray(patchData) && patchData.length === 0)) {
+              await fetch(`${supabaseUrl}/rest/v1/products`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey: supabaseKey,
+                  Authorization: `Bearer ${supabaseKey}`,
+                  Prefer: "resolution=merge-duplicates,return=representation",
+                },
+                body: JSON.stringify(corePayload),
+              });
+            }
           }
         } catch (e) {
           console.warn("⚠️ Failed to update product in Supabase:", e);

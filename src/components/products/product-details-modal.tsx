@@ -147,16 +147,14 @@ export function ProductDetailsModal({
   // Collect all gallery images
   const galleryImages = useMemo(() => {
     if (!product) return [];
-    const list: string[] = [];
-    if (product.imageUrl) list.push(product.imageUrl);
     if (Array.isArray(product.images)) {
-      product.images.forEach((img) => {
-        if (img && !list.includes(img)) {
-          list.push(img);
-        }
-      });
+      const clean = product.images.map((img) => (img || "").trim()).filter(Boolean);
+      if (clean.length > 0) return clean;
     }
-    return list;
+    if (product.imageUrl && product.imageUrl.trim()) {
+      return [product.imageUrl.trim()];
+    }
+    return [];
   }, [product]);
 
   // Reset active image on product change

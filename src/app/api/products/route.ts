@@ -180,38 +180,21 @@ export async function PATCH(request: Request) {
     // Prepare packed specs with updated metadata
     const packedSpecs = packProductSpecs(partial);
 
-    const supabasePayload: Record<string, any> = {
+    const corePayload: Record<string, any> = {
+      id,
       specs: packedSpecs,
     };
-    if (partial.name !== undefined) supabasePayload.name = partial.name;
-    if (partial.category !== undefined) supabasePayload.category = partial.category;
-    if (partial.variety !== undefined) supabasePayload.variety = partial.variety;
-    if (partial.season !== undefined) supabasePayload.season = partial.season;
-    if (partial.pack !== undefined) supabasePayload.pack = partial.pack;
-    if (partial.imageUrl !== undefined) supabasePayload.image_url = partial.imageUrl;
-    if (partial.icon !== undefined) supabasePayload.icon = partial.icon;
-    if (partial.status !== undefined) supabasePayload.status = partial.status;
-    if (partial.featured !== undefined) supabasePayload.featured = partial.featured;
+    if (partial.name !== undefined) corePayload.name = partial.name;
+    if (partial.category !== undefined) corePayload.category = partial.category;
+    if (partial.variety !== undefined) corePayload.variety = partial.variety;
+    if (partial.season !== undefined) corePayload.season = partial.season;
+    if (partial.pack !== undefined) corePayload.pack = partial.pack;
+    if (partial.imageUrl !== undefined) corePayload.image_url = partial.imageUrl;
+    if (partial.icon !== undefined) corePayload.icon = partial.icon;
+    if (partial.status !== undefined) corePayload.status = partial.status;
+    if (partial.featured !== undefined) corePayload.featured = partial.featured;
     if (partial.sortOrder !== undefined || partial.sort_order !== undefined) {
-      supabasePayload.sort_order = partial.sortOrder || partial.sort_order;
-    }
-    if (Array.isArray(partial.images)) supabasePayload.images = partial.images;
-    if (partial.description !== undefined) supabasePayload.description = partial.description;
-    if (partial.pdfUrl !== undefined || partial.pdf_url !== undefined) {
-      supabasePayload.pdf_url = partial.pdfUrl || partial.pdf_url;
-    }
-    if (partial.pdfName !== undefined || partial.pdf_name !== undefined) {
-      supabasePayload.pdf_name = partial.pdfName || partial.pdf_name;
-    }
-    if (partial.origin !== undefined) supabasePayload.origin = partial.origin;
-    if (partial.hsCode !== undefined || partial.hs_code !== undefined) {
-      supabasePayload.hs_code = partial.hsCode || partial.hs_code;
-    }
-    if (partial.storageTemp !== undefined || partial.storage_temp !== undefined) {
-      supabasePayload.storage_temp = partial.storageTemp || partial.storage_temp;
-    }
-    if (partial.shelfLife !== undefined || partial.shelf_life !== undefined) {
-      supabasePayload.shelf_life = partial.shelfLife || partial.shelf_life;
+      corePayload.sort_order = partial.sortOrder || partial.sort_order;
     }
 
     if (url && key) {
@@ -222,38 +205,26 @@ export async function PATCH(request: Request) {
             "Content-Type": "application/json",
             apikey: key,
             Authorization: `Bearer ${key}`,
-            Prefer: "return=minimal",
+            Prefer: "return=representation",
           },
-          body: JSON.stringify(supabasePayload),
+          body: JSON.stringify(corePayload),
         });
 
-        // Fallback to core columns if table does not yet have extended columns
-        if (!patchRes.ok && patchRes.status === 400) {
-          const corePayload: Record<string, any> = {
-            specs: packedSpecs,
-          };
-          if (partial.name !== undefined) corePayload.name = partial.name;
-          if (partial.category !== undefined) corePayload.category = partial.category;
-          if (partial.variety !== undefined) corePayload.variety = partial.variety;
-          if (partial.season !== undefined) corePayload.season = partial.season;
-          if (partial.pack !== undefined) corePayload.pack = partial.pack;
-          if (partial.imageUrl !== undefined) corePayload.image_url = partial.imageUrl;
-          if (partial.icon !== undefined) corePayload.icon = partial.icon;
-          if (partial.status !== undefined) corePayload.status = partial.status;
-          if (partial.featured !== undefined) corePayload.featured = partial.featured;
-          await fetch(`${url}/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
-            method: "PATCH",
+        const patchData = patchRes.ok ? await patchRes.json() : null;
+        if (!patchData || (Array.isArray(patchData) && patchData.length === 0)) {
+          await fetch(`${url}/rest/v1/products`, {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
               apikey: key,
               Authorization: `Bearer ${key}`,
-              Prefer: "return=minimal",
+              Prefer: "resolution=merge-duplicates,return=representation",
             },
             body: JSON.stringify(corePayload),
           });
         }
       } catch (err) {
-        console.warn("⚠️ [/api/products] Supabase patch failed:", err);
+        console.warn("⚠️ [/api/products] Supabase update failed:", err);
       }
     }
 

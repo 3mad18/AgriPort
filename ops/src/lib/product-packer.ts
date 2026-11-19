@@ -89,16 +89,17 @@ export function unpackProductRow(row: any) {
     }
   }
 
-  let cleanImageUrl = "";
+  let cleanImages: string[] = [];
   if (Array.isArray(images)) {
-    if (images.length > 0) {
-      cleanImageUrl = (row.image_url && images.includes(row.image_url)) ? row.image_url : images[0];
-    } else {
-      // Images explicitly cleared
-      cleanImageUrl = "";
-    }
-  } else {
-    cleanImageUrl = row.image_url || row.imageUrl || "";
+    cleanImages = images.map((img) => (img || "").trim()).filter(Boolean);
+  } else if (row.image_url || row.imageUrl) {
+    const single = (row.image_url || row.imageUrl || "").trim();
+    if (single) cleanImages = [single];
+  }
+
+  let cleanImageUrl = "";
+  if (cleanImages.length > 0) {
+    cleanImageUrl = (row.image_url && cleanImages.includes(row.image_url)) ? row.image_url : cleanImages[0];
   }
 
   return {
@@ -114,11 +115,7 @@ export function unpackProductRow(row: any) {
     status: row.status || "متاح للتصدير",
     featured: row.featured ?? false,
     description: description || "",
-    images: Array.isArray(images)
-      ? images
-      : cleanImageUrl
-      ? [cleanImageUrl]
-      : [],
+    images: cleanImages,
     pdfUrl: pdfUrl || "",
     pdfName: pdfName || "",
     origin: origin || "جمهورية مصر العربية (Egypt)",
