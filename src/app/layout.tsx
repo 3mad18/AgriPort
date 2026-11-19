@@ -211,6 +211,12 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                  }
+                  if (!window.location.hash || window.location.hash === '#products') {
+                    window.scrollTo(0, 0);
+                  }
                   var p = window.location.pathname;
                   if (p.startsWith("/ops") || p.startsWith("/secure-login")) {
                     document.documentElement.lang = "ar";

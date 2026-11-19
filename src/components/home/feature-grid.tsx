@@ -24,7 +24,7 @@ export function FeatureGrid() {
   const bento = t.bento;
 
   return (
-    <section id="products" className="py-16 sm:py-24 bg-[#F7F9FC]">
+    <section id="featured-crops" className="py-16 sm:py-24 bg-[#F7F9FC]">
       <div id="capabilities" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-10 sm:mb-16 max-w-2xl text-start">
