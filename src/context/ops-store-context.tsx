@@ -1258,7 +1258,7 @@ export function OpsStoreProvider({
     const newFacility: FacilityItem = {
       ...item,
       id: "facility-" + Date.now(),
-      image: item.image || imagesArr[0] || "/images/cold-chain-facility.jpg",
+      image: item.image || imagesArr[0] || "",
       images: imagesArr,
     };
     const updated = [newFacility, ...current];

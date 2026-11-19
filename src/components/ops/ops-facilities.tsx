@@ -351,7 +351,7 @@ export function OpsFacilities() {
     }
 
     const cleanImages = allAttachedImages;
-    const cleanCover = form.image || cleanImages[0] || "/images/cold-chain-facility.jpg";
+    const cleanCover = form.image || cleanImages[0] || "";
 
     if (editingFacility) {
       updateFacility(editingFacility.id, {
@@ -491,7 +491,7 @@ export function OpsFacilities() {
           const imagesList = Array.isArray(item.images) && item.images.length > 0
             ? item.images
             : item.image ? [item.image] : [];
-          const coverImg = item.image || imagesList[0] || "/images/cold-chain-facility.jpg";
+          const coverImg = item.image || imagesList[0] || "";
 
           return (
             <div
@@ -500,13 +500,20 @@ export function OpsFacilities() {
             >
               <div>
                 {/* Facility Cover Image */}
-                <div className="relative h-48 w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={coverImg}
-                    alt={item.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="relative h-48 w-full overflow-hidden bg-slate-900">
+                  {coverImg ? (
+                    <img
+                      src={coverImg}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-slate-400 p-4 text-center">
+                      <Building2 className="w-8 h-8 text-slate-500 mb-1" />
+                      <span className="text-[11px] text-slate-400">لا توجد صور مرفوعة</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
 
                   {/* Badges Overlay */}
                   <div className="absolute top-3 start-3 flex flex-wrap gap-1.5">

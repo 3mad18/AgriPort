@@ -41,16 +41,23 @@ export default function FacilitiesPage() {
     const localizedDefault = (f.items as unknown as FacilityItem[])?.find(
       (i) => i.id === liveItem.id
     );
-    if (!localizedDefault) return liveItem;
+    const itemImage = liveItem.image || "";
+    const itemImages =
+      Array.isArray(liveItem.images) && liveItem.images.length > 0
+        ? liveItem.images.filter(Boolean)
+        : itemImage
+        ? [itemImage]
+        : [];
+
     return {
-      ...localizedDefault,
+      ...(localizedDefault || {}),
       ...liveItem,
-      image: liveItem.image || localizedDefault.image,
-      images: Array.isArray(liveItem.images) && liveItem.images.length > 0
-        ? liveItem.images
-        : [liveItem.image || localizedDefault.image],
+      image: itemImage,
+      images: itemImages,
     };
   });
+
+  const featuredImage = items.find((it) => !!it.image)?.image || "";
 
   const filteredItems = items.filter((item) => {
     if (activeFilter === "all") return true;
@@ -122,12 +129,26 @@ export default function FacilitiesPage() {
         {/* 2. Featured Video Showcase Card */}
         <div className="relative overflow-hidden rounded-3xl sm:rounded-[2.5rem] bg-slate-900 text-white border border-slate-800 shadow-xl group">
           <div className="relative h-[340px] sm:h-[440px] lg:h-[500px] w-full overflow-hidden">
-            <img
-              src="/images/cold-chain-facility.jpg"
-              alt="Live Vegetable Packing Station & Cold Chain"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-[0.7]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+            {featuredImage ? (
+              <img
+                src={featuredImage}
+                alt="AgriPort Packhouse & Cold Chain"
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-[0.7]"
+              />
+            ) : (
+              <div className="h-full w-full bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
+                <div className="text-center p-6 relative z-10">
+                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-3 backdrop-blur-md">
+                    <Building2 className="w-8 h-8" />
+                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400/80">
+                    {isRTL ? "مرافق التجهيز والتعبئة المعتمدة" : "Certified Processing Facilities"}
+                  </p>
+                </div>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
 
             {/* Top Badges */}
             <div className="absolute top-6 start-6 sm:top-8 sm:start-8 flex flex-wrap items-center gap-2 z-10">
@@ -210,13 +231,24 @@ export default function FacilitiesPage() {
             >
               <div>
                 {/* Image Viewport */}
-                <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/20" />
+                <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-900">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-850 to-slate-800 text-slate-400 p-6 text-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 mb-2">
+                        <Building2 className="w-6 h-6 text-emerald-400/70" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-400">
+                        {isRTL ? "بانتظار إضافة صورة من لوحة التحكم" : "No image uploaded"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/20 pointer-events-none" />
 
                   {/* Category Pill (Top Start) */}
                   <div className="absolute top-4 start-4">
@@ -338,16 +370,25 @@ export default function FacilitiesPage() {
             onClick={(e) => e.stopPropagation()}
             className="relative max-w-4xl w-full overflow-hidden rounded-3xl bg-white shadow-2xl animate-zoom-in text-start max-h-[90vh] overflow-y-auto"
           >
-            <div className="relative h-[320px] sm:h-[450px] w-full overflow-hidden bg-slate-900">
-              <img
-                src={selectedMedia.image}
-                alt={selectedMedia.title}
-                className="h-full w-full object-cover"
-              />
+            <div className="relative h-[320px] sm:h-[450px] w-full overflow-hidden bg-slate-950">
+              {selectedMedia.image ? (
+                <img
+                  src={selectedMedia.image}
+                  alt={selectedMedia.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 p-6 text-center">
+                  <Building2 className="w-16 h-16 stroke-1 text-slate-600 mb-3" />
+                  <span className="text-sm font-medium text-slate-400">
+                    {isRTL ? "لا توجد صورة مرفوعة لهذا المرفق حالياً" : "No image uploaded for this facility"}
+                  </span>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => setSelectedMedia(null)}
-                className="absolute top-4 end-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black transition-colors"
+                className="absolute top-4 end-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black transition-colors z-20"
                 aria-label="Close"
               >
                 ✕
@@ -425,12 +466,16 @@ export default function FacilitiesPage() {
               </button>
             </div>
 
-            <div className="relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center">
-              <img
-                src="/images/facilities/artichoke-processing.jpg"
-                alt="Packing station showcase"
-                className="h-full w-full object-cover opacity-80"
-              />
+            <div className="relative aspect-video w-full bg-slate-950 overflow-hidden flex items-center justify-center">
+              {featuredImage ? (
+                <img
+                  src={featuredImage}
+                  alt="Packing station showcase"
+                  className="h-full w-full object-cover opacity-60"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 opacity-90" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-center p-6 text-center">
                 <div className="h-16 w-16 rounded-full bg-emerald-500 flex items-center justify-center text-white text-2xl shadow-xl mb-4 animate-bounce">
                   ▶

@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
+import { useLiveFacilities } from "@/lib/use-live-facilities";
 import {
   Snowflake,
   Globe,
@@ -22,6 +23,11 @@ export function FeatureGrid() {
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const bento = t.bento;
+  const { facilities: liveFacilities } = useLiveFacilities();
+  const coldChainImg =
+    liveFacilities.find((f) => f.category === "coldchain" && f.image)?.image ||
+    liveFacilities.find((f) => !!f.image)?.image ||
+    "";
 
   return (
     <section id="featured-crops" className="py-16 sm:py-24 bg-[#F7F9FC]">
@@ -68,11 +74,15 @@ export function FeatureGrid() {
             className="bg-slate-950 rounded-2xl sm:rounded-[2rem] p-5 sm:p-7 border border-slate-800/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group text-start min-h-[300px] md:min-h-0 relative overflow-hidden cursor-pointer"
           >
             {/* Expressive Cold Chain Facility Image */}
-            <img
-              src="/images/cold-chain-facility.jpg"
-              alt="Agricultural Cold Chain Integrity"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.85]"
-            />
+            {coldChainImg ? (
+              <img
+                src={coldChainImg}
+                alt="Agricultural Cold Chain Integrity"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.85]"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950" />
+            )}
 
             {/* Multi-layered Cinematic Gradient Scrim for crisp text contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-900/40 pointer-events-none" />

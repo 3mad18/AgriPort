@@ -406,7 +406,7 @@ export const translations = {
                       "title": "وحدة فرز وتقميع وتجهيز الخرشوف المصري للتصدير",
                       "desc": "خطوط معقمة لفرز رؤوس الخرشوف الطازج، تقميع وإعداد القلوب والأقماع، وتعبئتها في براميل غذائية بمحلول ملحي أو كراتين مبردة للتصدير لأوروبا.",
                       "specs": "طاقة إنتاجية 40 طن/يوم • أحجام كاليبر 50، 60، 65 مم • شهادات BRC و Global G.A.P",
-                      "image": "/images/facilities/artichoke-processing.jpg",
+                      "image": "",
                       "tag": "تجهيز وتعبئة"
                 },
                 {
@@ -416,7 +416,7 @@ export const translations = {
                       "title": "مزارع وبساتين الخضروات التصديرية (خرشوف، بروكلي، خس، كرنب)",
                       "desc": "إدارة زراعية متكاملة بنظام الري بالتنقيط الحديث ومكافحة حيوية للمحاصيل في محافظات البحيرة والدلتا لضمان خلوها التام من متبقيات المبيدات.",
                       "specs": "+600 فدان خضروات تصديرية • النوبارية والدلتا • شهادات Global G.A.P و SMETA",
-                      "image": "/images/facilities/vegetable-farms.jpg",
+                      "image": "",
                       "tag": "مزارع معتمدة"
                 },
                 {
@@ -426,7 +426,7 @@ export const translations = {
                       "title": "غرف التبريد الأولي (Pre-Cooling) وتفريغ الهواء (Vacuum Cooling)",
                       "desc": "تخفيض درجة حرارة الخضروات والبروكلي والخرشوف مباشرة بعد الحصاد خلال ساعتين للحفاظ على نضارتها التامة وصلابتها حتى ميناء الوصول.",
                       "specs": "تحكم حراري 0-4°C • رطوبة نسبية 90-95% • تتبع رقمي لحظي IoT",
-                      "image": "/images/cold-chain-facility.jpg",
+                      "image": "",
                       "tag": "تبريد سريع"
                 },
                 {
@@ -436,7 +436,7 @@ export const translations = {
                       "title": "خطوط غسيل وتدريج وتعبئة البطاطس المجهزة للتصدير",
                       "desc": "خطوط متطورة لغسيل وتجفيف وتدريج البطاطس واستبعاد العيوب وتعبئتها في شكاير شبكية 10 و 25 كجم أو أكياس جامبو 1250 كجم للشحن البحري.",
                       "specs": "طاقة تعبئة 120 طن/يوم • أحجام كاليبر 35/55 مم و 55+ مم • أحواض غسيل معقمة",
-                      "image": "/images/facilities/potatoes-packhouse.jpg",
+                      "image": "",
                       "tag": "فرز وتدريج"
                 },
                 {
@@ -446,7 +446,7 @@ export const translations = {
                       "title": "خطوط تدريج وتعبئة الفاصولياء الخضراء والبروكلي والقرنبيط",
                       "desc": "فرز دقيق لأطوال وجودة الفاصولياء الخضراء وتعبئتها في بانيتات، وتغليف رؤوس البروكلي والقرنبيط بالبوليسترين المثلج (Iced Styrofoam) والغشاء المسامي.",
                       "specs": "تغليف مثلج Iced Styrofoam • تغليف Shrink Wrap • فرز يدوي دقيق نخب أول",
-                      "image": "/images/facilities/broccoli-beans-packing.jpg",
+                      "image": "",
                       "tag": "تعبئة مبردة"
                 },
                 {
@@ -456,7 +456,7 @@ export const translations = {
                       "title": "مختبر فحص سلامة الغذاء ومتبقيات المبيدات (MRLs)",
                       "desc": "تحاليل معملية دقيقة لكل شحنة قبل الشحن للتأكد التام من خلوها من الآفات ومطابقة المعايير الأوروبية وإصدار الشهادات الصحية المعتمدة.",
                       "specs": "فحص مخبري معتمد • شهادات ISO 22000 و HACCP • نتائج فحص فورية",
-                      "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "فحص مخبري"
                 },
                 {
@@ -466,7 +466,7 @@ export const translations = {
                       "title": "أرصفة تحميل الحاويات المبردة لموانئ الإسكندرية ودمياط",
                       "desc": "أرصفة مغلقة ومحكمة العزل لتحميل الحاويات المبردة مباشرة من المخازن دون التعرض للحرارة الخارجية، مع تزويد الحاويات بأجهزة Data Loggers الرقمية.",
                       "specs": "تحميل 10+ حاويات مبردة يومياً • أجهزة تتبع رقمي حراري",
-                      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "أرصفة مبردة"
                 },
                 {
@@ -476,7 +476,7 @@ export const translations = {
                       "title": "وحدة فرز وتعبئة الكرنب (الأخضر والأحمر) وخس الكابوتشا",
                       "desc": "تنظيف وتشذيب أوراق الحماية الخارجية للكرنب والخس، وتعبئتها في كراتين مموجة وأكياس شبك تهوية مجهزة للشحن السريع للحفاظ على القوام المقرمش.",
                       "specs": "تغليف فردي Micro-perforated • أوزان متجانسة 1 - 2.5 كجم • شحن بحري مبرد",
-                      "image": "/images/facilities/cabbage-packing.jpg",
+                      "image": "",
                       "tag": "تعبئة وتغليف"
                 }
           ],
@@ -1021,7 +1021,7 @@ export const translations = {
                       "title": "Egyptian Artichoke Sorting, Trimming & Export Processing Unit",
                       "desc": "Sterile processing and sorting lines for fresh artichokes, trimming bottoms and hearts packed into food-grade brine barrels and chilled cartons for Europe.",
                       "specs": "40 Tons / Day Output • Calibers 50, 60, 65 mm • BRC & Global G.A.P Certified",
-                      "image": "/images/facilities/artichoke-processing.jpg",
+                      "image": "",
                       "tag": "Processing & Packing"
                 },
                 {
@@ -1031,7 +1031,7 @@ export const translations = {
                       "title": "Certified Vegetable Farmlands (Artichoke, Broccoli, Lettuce, Cabbage)",
                       "desc": "Integrated farm management with automated drip irrigation and biocontrol protocols across Beheira and Nile Delta, ensuring zero harmful pesticide residues.",
                       "specs": "+600 Feddans Export Vegetables • Nubariya & Nile Delta • Global G.A.P & SMETA",
-                      "image": "/images/facilities/vegetable-farms.jpg",
+                      "image": "",
                       "tag": "Certified Farms"
                 },
                 {
@@ -1041,7 +1041,7 @@ export const translations = {
                       "title": "Rapid Pre-Cooling Chambers & Vacuum Cooling Facilities",
                       "desc": "Vegetable pulp temperature is rapidly reduced within 2 hours of harvest to arrest respiration, locking in maximum crispness and long transit shelf-life.",
                       "specs": "0–4°C Climate Control • 90–95% Relative Humidity • IoT Real-time Telemetry",
-                      "image": "/images/cold-chain-facility.jpg",
+                      "image": "",
                       "tag": "Rapid Pre-Cooling"
                 },
                 {
@@ -1051,7 +1051,7 @@ export const translations = {
                       "title": "Potato Washing, Grading & Packing Facility",
                       "desc": "Advanced mechanical screening and curing lines preparing export potatoes in 10/25 kg mesh sacks and 1250 kg jumbo export bags for maritime freight.",
                       "specs": "120 Tons / Day Capacity • Calibers 35/55 mm & 55+ mm • Disinfected Wash Basins",
-                      "image": "/images/facilities/potatoes-packhouse.jpg",
+                      "image": "",
                       "tag": "Grading & Packing"
                 },
                 {
@@ -1061,7 +1061,7 @@ export const translations = {
                       "title": "Green Beans, Broccoli & Cauliflower Sizing & Packing Lines",
                       "desc": "Precise sizing for tender green beans into punnets, plus shrink-wrapped cauliflower and iced styrofoam packing for crisp broccoli florets.",
                       "specs": "Iced Styrofoam Packing • Shrink Wrap Packaging • Grade A Hand Selection",
-                      "image": "/images/facilities/broccoli-beans-packing.jpg",
+                      "image": "",
                       "tag": "Chilled Packing"
                 },
                 {
@@ -1071,7 +1071,7 @@ export const translations = {
                       "title": "In-House Agricultural Quality & MRL Testing Lab",
                       "desc": "Systematic multi-point batch sampling verifying brix levels, sizing accuracy, and EU chemical residue limits with certified analysis certificates.",
                       "specs": "Accredited Lab Testing • Brix & Residue Analysis • ISO 22000",
-                      "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Lab Tested"
                 },
                 {
@@ -1081,7 +1081,7 @@ export const translations = {
                       "title": "Enclosed Refrigerated Container Loading Bays",
                       "desc": "Sealed cold loading docks connected directly to Alexandria and Damietta ports, equipped with digital temperature data loggers tracking every nautical mile.",
                       "specs": "10+ Reefer Containers Daily • Digital Live Tracking Loggers",
-                      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Cold Docking"
                 },
                 {
@@ -1091,7 +1091,7 @@ export const translations = {
                       "title": "Green & Red Cabbage and Iceberg Lettuce Conditioning Unit",
                       "desc": "Exterior leaf trimming, micro-perforated individual wrapping, and packing into ventilated cartons ensuring superior crispness throughout export journeys.",
                       "specs": "Micro-perforated Film Wrapping • 1.0 - 2.5 kg Uniform Weights • Reefer Sea Freight",
-                      "image": "/images/facilities/cabbage-packing.jpg",
+                      "image": "",
                       "tag": "Trimming & Wrapping"
                 }
           ],
@@ -1636,7 +1636,7 @@ export const translations = {
                       "title": "Atelier de Tri, Parage et Conditionnement d'Artichauts Égyptiens",
                       "desc": "Lignes stériles de tri et de parage des artichauts frais, fonds et cœurs conditionnés en fûts alimentaires sous saumure et cartons réfrigérés pour l'exportation vers l'Europe.",
                       "specs": "Capacité 40 Tonnes / Jour • Calibres 50, 60, 65 mm • Certifications BRC & Global G.A.P",
-                      "image": "/images/facilities/artichoke-processing.jpg",
+                      "image": "",
                       "tag": "Parage & Conditionnement"
                 },
                 {
@@ -1646,7 +1646,7 @@ export const translations = {
                       "title": "Domaines Agricoles Certifiés (Artichauts, Brocolis, Laitues, Choux)",
                       "desc": "Gestion agricole intégrée avec fertigation goutte-à-goutte automatisée et biocontrôle à Beheira et dans le delta du Nil, assurant l'absence de résidus chimiques nocifs.",
                       "specs": "+600 Feddans Légumes Export • Noubariya & Delta • Global G.A.P & SMETA",
-                      "image": "/images/facilities/vegetable-farms.jpg",
+                      "image": "",
                       "tag": "Domaines Certifiés"
                 },
                 {
@@ -1656,7 +1656,7 @@ export const translations = {
                       "title": "Chambres de Pré-refroidissement Rapide (Pre-Cooling) & Vacuum Cooling",
                       "desc": "La température à cœur des légumes est abaissée dans les 2 heures suivant la récolte pour bloquer la respiration et garantir une fermeté et une fraîcheur durables.",
                       "specs": "Contrôle 0–4°C • Humidité Relative 90–95% • Télémétrie IoT en Direct",
-                      "image": "/images/cold-chain-facility.jpg",
+                      "image": "",
                       "tag": "Pré-refroidissement"
                 },
                 {
@@ -1666,7 +1666,7 @@ export const translations = {
                       "title": "Lignes de Lavage, Calibrage et Conditionnement de Pommes de Terre",
                       "desc": "Lignes modernes de lavage, séchage et tri éliminant les défauts, préparant les pommes de terre en sacs filets de 10/25 kg et sacs jumbo de 1250 kg pour l'export maritime.",
                       "specs": "Capacité 120 Tonnes / Jour • Calibres 35/55 mm & 55+ mm • Bacs de lavage désinfectés",
-                      "image": "/images/facilities/potatoes-packhouse.jpg",
+                      "image": "",
                       "tag": "Calibrage & Conditionnement"
                 },
                 {
@@ -1676,7 +1676,7 @@ export const translations = {
                       "title": "Lignes de Tri et d'Emballage pour Haricots Verts, Brocolis & Choux-fleurs",
                       "desc": "Calibrage précis des haricots verts extra-fins en barquettes, emballage sous film rétractable pour le chou-fleur et caisses polystyrène glacées pour le brocoli.",
                       "specs": "Emballage Iced Styrofoam • Film Rétractable • Sélection Manuelle Extra",
-                      "image": "/images/facilities/broccoli-beans-packing.jpg",
+                      "image": "",
                       "tag": "Conditionnement Réfrigéré"
                 },
                 {
@@ -1686,7 +1686,7 @@ export const translations = {
                       "title": "Laboratoire d'Analyses Agricoles et Contrôle des LMR",
                       "desc": "Échantillonnage méthodique vérifiant la conformité dimensionnelle, la fraîcheur et le respect strict des limites maximales de résidus de l'Union Européenne.",
                       "specs": "Laboratoire Accrédité • Analyses Résidus & Qualité • ISO 22000 & HACCP",
-                      "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Certifié Labo"
                 },
                 {
@@ -1696,7 +1696,7 @@ export const translations = {
                       "title": "Quais Réfrigérés d'Empotage de Conteneurs Maritimes",
                       "desc": "Quais étanches sous température dirigée reliant directement les ports d'Alexandrie et Damiette, munis d'enregistreurs de température numériques IoT.",
                       "specs": "Plus de 10 Conteneurs Reefer / Jour • Suivi Numérique en Direct",
-                      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Quais Réfrigérés"
                 },
                 {
@@ -1706,7 +1706,7 @@ export const translations = {
                       "title": "Unité de Parage et d'Emballage de Choux (Vert et Rouge) & Laitue Iceberg",
                       "desc": "Parage hygiénique des feuilles extérieures, ensachage individuel micro-perforé et mise en cartons ondulés ventilés assurant un croquant intact durant l'exportation.",
                       "specs": "Film Micro-perforé • Poids Homogènes 1,0 - 2,5 kg • Fret Maritime Réfrigéré",
-                      "image": "/images/facilities/cabbage-packing.jpg",
+                      "image": "",
                       "tag": "Parage & Filmage"
                 }
           ],
@@ -2251,7 +2251,7 @@ export const translations = {
                       "title": "Impianto di Calibrazione, Mondatura e Confezionamento Carciofi Egiziani",
                       "desc": "Linee sterili per la selezione di carciofi freschi, rifilatura di fondi e cuori confezionati in fusti alimentari in salamoia e cartoni refrigerati per l'Europa.",
                       "specs": "Capacità 40 Ton / Giorno • Calibri 50, 60, 65 mm • Certificato BRC e Global G.A.P",
-                      "image": "/images/facilities/artichoke-processing.jpg",
+                      "image": "",
                       "tag": "Lavorazione & Confezionamento"
                 },
                 {
@@ -2261,7 +2261,7 @@ export const translations = {
                       "title": "Tenute Agricole Certificate (Carciofi, Broccoli, Lattuga, Cavolo)",
                       "desc": "Gestione agronomica integrata con fertirrigazione a goccia e lotta biologica nel governatorato di Beheira e Delta del Nilo, garantendo zero residui chimici nocivi.",
                       "specs": "+600 Feddan Ortaggi Export • Nubariya e Delta • Global G.A.P & SMETA",
-                      "image": "/images/facilities/vegetable-farms.jpg",
+                      "image": "",
                       "tag": "Tenute Certificate"
                 },
                 {
@@ -2271,7 +2271,7 @@ export const translations = {
                       "title": "Celle di Pre-refrigerazione Rapida (Pre-Cooling) & Vacuum Cooling",
                       "desc": "La temperatura interna degli ortaggi viene abbattuta entro 2 ore dalla raccolta per bloccare la respirazione cellulare e preservare massima croccantezza e freschezza.",
                       "specs": "Controllo 0–4°C • Umidità Relativa 90–95% • Monitoraggio IoT in Tempo Reale",
-                      "image": "/images/cold-chain-facility.jpg",
+                      "image": "",
                       "tag": "Pre-refrigerazione"
                 },
                 {
@@ -2281,7 +2281,7 @@ export const translations = {
                       "title": "Linee di Lavaggio, Calibrazione e Confezionamento Patate",
                       "desc": "Linee meccaniche evolute di lavaggio, asciugatura e calibratura per patate da export in sacchi a rete da 10/25 kg e sacconi jumbo da 1250 kg per spedizioni marittime.",
                       "specs": "Capacità 120 Ton / Giorno • Calibri 35/55 mm e 55+ mm • Vasche di lavaggio sanificate",
-                      "image": "/images/facilities/potatoes-packhouse.jpg",
+                      "image": "",
                       "tag": "Calibrazione & Insacco"
                 },
                 {
@@ -2291,7 +2291,7 @@ export const translations = {
                       "title": "Linee di Selezione e Confezionamento per Fagiolini, Broccoli e Cavolfiori",
                       "desc": "Calibrazione accurata di fagiolini finissimi in cestini, pellicola termoretraibile per cavolfiori e polistirolo ghiacciato (Iced Styrofoam) per le cime di broccolo fresco.",
                       "specs": "Imballo Iced Styrofoam • Film Termoretraibile • Selezione Manuale Prima Scelta",
-                      "image": "/images/facilities/broccoli-beans-packing.jpg",
+                      "image": "",
                       "tag": "Confezionamento Refrigerato"
                 },
                 {
@@ -2301,7 +2301,7 @@ export const translations = {
                       "title": "Laboratorio Interno di Controllo Qualità e Residui Fitosanitari (MRL)",
                       "desc": "Campionamento accurato per ogni lotto per verificare pezzatura, croccantezza e rigorosa conformità ai limiti chimici dell'Unione Europea con certificati ufficiali.",
                       "specs": "Laboratorio Accreditato • Analisi Residui & Qualità • ISO 22000 & HACCP",
-                      "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Certificato Lab"
                 },
                 {
@@ -2311,7 +2311,7 @@ export const translations = {
                       "title": "Baie di Carico Refrigerate Sigillate per Container Marittimi",
                       "desc": "Baie isotermiche direttamente collegate ai porti di Alessandria e Damietta, con datalogger digitali IoT per monitorare la temperatura per ogni miglio nautico.",
                       "specs": "Più di 10 Container Reefer / Giorno • Tracciamento Digitale Continuo",
-                      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Baie Refrigerate"
                 },
                 {
@@ -2321,7 +2321,7 @@ export const translations = {
                       "title": "Unità di Mondatura e Confezionamento Cavolo (Verde e Rosso) e Lattuga Iceberg",
                       "desc": "Rifilatura accurata delle foglie esterne protettive, film protettivo microforato individuale e imballaggio in cartoni areati per conservare croccantezza perfetta.",
                       "specs": "Film Microforato • Pesi Uniformi 1,0 - 2,5 kg • Spedizioni Marittime Reefer",
-                      "image": "/images/facilities/cabbage-packing.jpg",
+                      "image": "",
                       "tag": "Mondatura & Imballo"
                 }
           ],
@@ -2866,7 +2866,7 @@ export const translations = {
                       "title": "Unidad de Calibrado, Torneado y Empaque de Alcachofa Egipcia",
                       "desc": "Líneas estériles de selección y torneado de alcachofa fresca, corazones y fondos envasados en bidones alimentarios con salmuera y cajas refrigeradas para Europa.",
                       "specs": "Capacidad 40 Ton / Día • Calibres 50, 60, 65 mm • Certificaciones BRC y Global G.A.P",
-                      "image": "/images/facilities/artichoke-processing.jpg",
+                      "image": "",
                       "tag": "Procesado y Empaque"
                 },
                 {
@@ -2876,7 +2876,7 @@ export const translations = {
                       "title": "Fincas Agrícolas Certificadas (Alcachofa, Brócoli, Lechuga, Col)",
                       "desc": "Gestión agrícola integral con fertirrigación por goteo automatizada y biocontrol en Beheira y el Delta del Nilo, garantizando cero residuos fitosanitarios nocivos.",
                       "specs": "+600 Feddans Hortalizas Export • Nubariya y Delta • Global G.A.P y SMETA",
-                      "image": "/images/facilities/vegetable-farms.jpg",
+                      "image": "",
                       "tag": "Fincas Certificadas"
                 },
                 {
@@ -2886,7 +2886,7 @@ export const translations = {
                       "title": "Túneles de Pre-enfriamiento Rápido (Pre-Cooling) y Vacuum Cooling",
                       "desc": "La temperatura interna de las hortalizas se reduce en menos de 2 horas tras la cosecha para frenar la respiración celular y asegurar máxima frescura y turgencia.",
                       "specs": "Control 0–4°C • Humedad Relativa 90–95% • Telemetría IoT en Tiempo Real",
-                      "image": "/images/cold-chain-facility.jpg",
+                      "image": "",
                       "tag": "Pre-enfriamiento"
                 },
                 {
@@ -2896,7 +2896,7 @@ export const translations = {
                       "title": "Líneas de Lavado, Calibrado y Ensacado de Patatas",
                       "desc": "Líneas mecánicas avanzadas de lavado, secado y calibrado preparando patatas en sacos de malla de 10/25 kg y sacas jumbo de 1250 kg para flete marítimo.",
                       "specs": "Capacidad 120 Ton / Día • Calibres 35/55 mm y 55+ mm • Balsas de lavado desinfectadas",
-                      "image": "/images/facilities/potatoes-packhouse.jpg",
+                      "image": "",
                       "tag": "Calibrado y Ensacado"
                 },
                 {
@@ -2906,7 +2906,7 @@ export const translations = {
                       "title": "Líneas de Selección y Empaque para Judías Verdes, Brócoli y Coliflor",
                       "desc": "Calibrado riguroso de judías verdes finas en tarrinas, film retráctil para coliflor y empaque en cajas de poliestireno con hielo (Iced Styrofoam) para brócoli fresco.",
                       "specs": "Empaque Iced Styrofoam • Film Retráctil • Selección Manual Primera Categoría",
-                      "image": "/images/facilities/broccoli-beans-packing.jpg",
+                      "image": "",
                       "tag": "Empaque Refrigerado"
                 },
                 {
@@ -2916,7 +2916,7 @@ export const translations = {
                       "title": "Laboratorio Propio de Calidad Agrícola y Control de LMRs",
                       "desc": "Muestreo sistemático de lotes verificando calibre, firmeza y estricto cumplimiento de los límites máximos de residuos de la UE con certificados oficiales.",
                       "specs": "Laboratorio Acreditado • Análisis de Residuos y Calidad • ISO 22000 y HACCP",
-                      "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Certificado Lab"
                 },
                 {
@@ -2926,7 +2926,7 @@ export const translations = {
                       "title": "Muelles Refrigerados Herméticos de Carga de Contenedores",
                       "desc": "Muelles isotérmicos sellados conectados con los puertos de Alejandría y Damietta, equipados con registradores digitales IoT durante toda la travesía marina.",
                       "specs": "Más de 10 Contenedores Reefer / Día • Registro Digital Continuo",
-                      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+                      "image": "",
                       "tag": "Muelles Refrigerados"
                 },
                 {
@@ -2936,7 +2936,7 @@ export const translations = {
                       "title": "Unidad de Deshojado y Empaque de Col (Verde y Roja) y Lechuga Iceberg",
                       "desc": "Deshojado higiénico exterior, envoltura individual con film microperforado y empaque en cajas ventiladas asegurando textura crujiente durante la exportación.",
                       "specs": "Film Microperforado • Pesos Uniformes 1,0 - 2,5 kg • Flete Marítimo Reefer",
-                      "image": "/images/facilities/cabbage-packing.jpg",
+                      "image": "",
                       "tag": "Deshojado y Filmado"
                 }
           ],
