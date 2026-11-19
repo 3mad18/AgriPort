@@ -83,7 +83,6 @@ export function Header() {
     }
   }, [pathname]);
 
-  const isHome = pathname === "/";
 
   const handleSelectLanguage = (code: Language) => {
     setLanguage(code);
@@ -118,7 +117,7 @@ export function Header() {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-7">
             <Link
-              href={isHome ? "#products" : "/products"}
+              href="/products"
               className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
             >
               {t.nav.products}
@@ -445,7 +444,7 @@ export function Header() {
         <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden animate-fade-in flex flex-col justify-start gap-6 pb-8 overflow-y-auto">
           <div className="flex flex-col gap-4 text-lg font-medium text-start">
             <Link
-              href={isHome ? "#products" : "/products"}
+              href="/products"
               className="text-slate-700 hover:text-emerald-600 transition-colors py-1"
               onClick={() => setIsMobileMenuOpen(false)}
             >
