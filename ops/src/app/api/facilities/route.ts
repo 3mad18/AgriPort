@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { DEFAULT_FACILITIES, FacilityItem } from "@/lib/facilities";
-import { cleanSupabaseUrl } from "@/lib/supabase-config";
 
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0",
   };
 }
 
@@ -18,7 +20,7 @@ function getSupabaseConfig() {
   const rawUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
     "https://gwdyyuezddpbgmmdwiey.supabase.co";
-  const url = cleanSupabaseUrl(rawUrl);
+  let url = rawUrl.trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "").replace(/\/rest$/i, "");
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
@@ -27,22 +29,26 @@ function getSupabaseConfig() {
   return { url, key };
 }
 
-// In-memory runtime cache
-let memoryFacilitiesCache: FacilityItem[] | null = null;
+// Fallback in-memory cache if Supabase network fails
+let fallbackMemoryCache: FacilityItem[] | null = null;
 
 async function loadFromSupabase(): Promise<FacilityItem[] | null> {
   const { url, key } = getSupabaseConfig();
   if (!url || !key) return null;
   try {
     const res = await fetch(`${url}/rest/v1/site_settings?id=eq.facilities_data&limit=1`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
       cache: "no-store",
     });
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0 && data[0].tagline) {
         const parsed = JSON.parse(data[0].tagline);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          fallbackMemoryCache = parsed;
           return parsed;
         }
       }
@@ -69,7 +75,7 @@ async function saveToSupabase(list: FacilityItem[]): Promise<boolean> {
       updated_at: new Date().toISOString(),
     };
 
-    const res = await fetch(`${url}/rest/v1/site_settings`, {
+    const res = await fetch(`${url}/rest/v1/site_settings?on_conflict=id`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,25 +85,26 @@ async function saveToSupabase(list: FacilityItem[]): Promise<boolean> {
       },
       body: JSON.stringify(payload),
     });
-    return res.ok;
+
+    if (res.ok) {
+      fallbackMemoryCache = list;
+      return true;
+    }
+    console.warn("Supabase upsert returned status:", res.status);
+    return false;
   } catch (e) {
     console.warn("Failed to save facilities to Supabase:", e);
     return false;
   }
 }
 
-export async function GET() {
-  if (!memoryFacilitiesCache) {
-    const cloud = await loadFromSupabase();
-    if (cloud) {
-      memoryFacilitiesCache = cloud;
-    } else {
-      memoryFacilitiesCache = [...DEFAULT_FACILITIES];
-    }
-  }
+export async function GET(req: Request) {
+  // Always query freshest data from Supabase
+  const cloud = await loadFromSupabase();
+  const list = cloud || fallbackMemoryCache || [...DEFAULT_FACILITIES];
 
   return NextResponse.json(
-    { success: true, facilities: memoryFacilitiesCache },
+    { success: true, facilities: list },
     { headers: corsHeaders() }
   );
 }
@@ -105,13 +112,14 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    let current = memoryFacilitiesCache;
-    if (!current) {
-      const cloud = await loadFromSupabase();
-      current = cloud || [...DEFAULT_FACILITIES];
-    }
+    
+    // Always start with latest data from Supabase
+    const cloud = await loadFromSupabase();
+    let current = cloud || fallbackMemoryCache || [...DEFAULT_FACILITIES];
 
-    const cleanImages = Array.isArray(body.images) ? body.images : (body.image ? [body.image] : []);
+    const cleanImages = Array.isArray(body.images) && body.images.length > 0
+      ? body.images.map((img: string) => (img || "").trim()).filter(Boolean)
+      : (body.image ? [body.image.trim()] : []);
     const cleanCover = body.image || cleanImages[0] || "";
 
     const newFacility: FacilityItem = {
@@ -126,8 +134,8 @@ export async function POST(req: Request) {
       tag: body.tag || "مرفق",
     };
 
-    current = [newFacility, ...current];
-    memoryFacilitiesCache = current;
+    current = [newFacility, ...current.filter((f) => f.id !== newFacility.id)];
+    fallbackMemoryCache = current;
     await saveToSupabase(current);
 
     return NextResponse.json(
@@ -153,19 +161,28 @@ export async function PATCH(req: Request) {
       );
     }
 
-    let current = memoryFacilitiesCache;
-    if (!current) {
-      const cloud = await loadFromSupabase();
-      current = cloud || [...DEFAULT_FACILITIES];
-    }
+    // Always load freshest data from Supabase first
+    const cloud = await loadFromSupabase();
+    let current = cloud || fallbackMemoryCache || [...DEFAULT_FACILITIES];
 
     const idx = current.findIndex((f) => f.id === id);
     if (idx !== -1) {
+      const existing = current[idx];
+      const mergedImages = updates.images !== undefined
+        ? (Array.isArray(updates.images) ? updates.images.filter(Boolean) : [])
+        : existing.images;
+      const mergedImage = updates.image !== undefined
+        ? (updates.image || "")
+        : existing.image;
+
       current[idx] = {
-        ...current[idx],
+        ...existing,
         ...updates,
+        image: mergedImage,
+        images: mergedImages,
       };
     } else {
+      const cleanImages = Array.isArray(updates.images) ? updates.images.filter(Boolean) : (updates.image ? [updates.image] : []);
       current.push({
         id,
         category: updates.category || "stations",
@@ -173,13 +190,13 @@ export async function PATCH(req: Request) {
         title: updates.title || "مرفق",
         desc: updates.desc || "",
         specs: updates.specs || "",
-        image: updates.image || "",
-        images: updates.images || [],
+        image: updates.image || cleanImages[0] || "",
+        images: cleanImages,
         tag: updates.tag || "مرفق",
       });
     }
 
-    memoryFacilitiesCache = current;
+    fallbackMemoryCache = current;
     await saveToSupabase(current);
 
     return NextResponse.json(
@@ -205,14 +222,12 @@ export async function DELETE(req: Request) {
       );
     }
 
-    let current = memoryFacilitiesCache;
-    if (!current) {
-      const cloud = await loadFromSupabase();
-      current = cloud || [...DEFAULT_FACILITIES];
-    }
+    // Always load freshest data from Supabase first
+    const cloud = await loadFromSupabase();
+    let current = cloud || fallbackMemoryCache || [...DEFAULT_FACILITIES];
 
     current = current.filter((f) => f.id !== id);
-    memoryFacilitiesCache = current;
+    fallbackMemoryCache = current;
     await saveToSupabase(current);
 
     return NextResponse.json(

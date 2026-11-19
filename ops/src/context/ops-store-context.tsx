@@ -519,6 +519,7 @@ function getProductsSnapshot(): Product[] {
 
 let cachedFacilities: FacilityItem[] | null = null;
 let cachedFacilitiesRaw: string | null = null;
+let lastFacilitiesMutationTime = 0;
 
 function getFacilitiesSnapshot(): FacilityItem[] {
   if (typeof window === "undefined") {
@@ -937,11 +938,13 @@ export function OpsStoreProvider({
     }
 
     async function syncFacilitiesFromApi() {
+      if (Date.now() - lastFacilitiesMutationTime < 6000) return;
       try {
-        const res = await fetch("/api/facilities", { cache: "no-store" });
+        const res = await fetch(`/api/facilities?_t=${Date.now()}`, { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           if (data.success && Array.isArray(data.facilities) && isMounted) {
+            if (Date.now() - lastFacilitiesMutationTime < 6000) return;
             const raw = JSON.stringify(data.facilities);
             if (raw !== localStorage.getItem(FACILITIES_KEY)) {
               safeSetItem(FACILITIES_KEY, raw);
@@ -1251,6 +1254,7 @@ export function OpsStoreProvider({
   );
 
   const addFacility = useCallback(async (item: Omit<FacilityItem, "id">) => {
+    lastFacilitiesMutationTime = Date.now();
     const current = getFacilitiesSnapshot();
     const imagesArr = Array.isArray(item.images) && item.images.length > 0
       ? item.images
@@ -1280,14 +1284,29 @@ export function OpsStoreProvider({
       "تم الحفظ بنجاح"
     );
 
-    fetch("/api/facilities", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newFacility),
-    }).catch(() => {});
+    try {
+      const res = await fetch("/api/facilities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newFacility),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.facilities)) {
+          safeSetItem(FACILITIES_KEY, JSON.stringify(data.facilities));
+          cachedFacilities = data.facilities;
+          cachedFacilitiesRaw = JSON.stringify(data.facilities);
+          window.dispatchEvent(new Event(FACILITIES_EVENT));
+          notifyChange();
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to persist facility to server:", e);
+    }
   }, []);
 
   const updateFacility = useCallback(async (id: string, partial: Partial<FacilityItem>) => {
+    lastFacilitiesMutationTime = Date.now();
     const current = getFacilitiesSnapshot();
     const updated = current.map((f) => (f.id === id ? { ...f, ...partial } : f));
     safeSetItem(FACILITIES_KEY, JSON.stringify(updated));
@@ -1304,14 +1323,29 @@ export function OpsStoreProvider({
 
     triggerOpsToast("تم تحديث بيانات وصور المرفق بنجاح.", "success", "تم الحفظ بنجاح");
 
-    fetch("/api/facilities", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, ...partial }),
-    }).catch(() => {});
+    try {
+      const res = await fetch("/api/facilities", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...partial }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.facilities)) {
+          safeSetItem(FACILITIES_KEY, JSON.stringify(data.facilities));
+          cachedFacilities = data.facilities;
+          cachedFacilitiesRaw = JSON.stringify(data.facilities);
+          window.dispatchEvent(new Event(FACILITIES_EVENT));
+          notifyChange();
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to persist facility update to server:", e);
+    }
   }, []);
 
   const deleteFacility = useCallback(async (id: string) => {
+    lastFacilitiesMutationTime = Date.now();
     const current = getFacilitiesSnapshot();
     const target = current.find((f) => f.id === id);
     const updated = current.filter((f) => f.id !== id);
@@ -1333,9 +1367,23 @@ export function OpsStoreProvider({
       "تم الحذف"
     );
 
-    fetch(`/api/facilities?id=${encodeURIComponent(id)}`, {
-      method: "DELETE",
-    }).catch(() => {});
+    try {
+      const res = await fetch(`/api/facilities?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.facilities)) {
+          safeSetItem(FACILITIES_KEY, JSON.stringify(data.facilities));
+          cachedFacilities = data.facilities;
+          cachedFacilitiesRaw = JSON.stringify(data.facilities);
+          window.dispatchEvent(new Event(FACILITIES_EVENT));
+          notifyChange();
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to persist facility deletion to server:", e);
+    }
   }, []);
 
   const addInquiry = useCallback(

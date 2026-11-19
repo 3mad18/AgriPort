@@ -86,7 +86,7 @@ export function useLiveFacilities(initialFacilities: FacilityItem[] = DEFAULT_FA
     let isMounted = true;
     async function fetchApi() {
       try {
-        const res = await fetch("/api/facilities", { cache: "no-store" });
+        const res = await fetch(`/api/facilities?_t=${Date.now()}`, { cache: "no-store" });
         if (res.ok) {
           const json = await res.json();
           if (json.success && Array.isArray(json.facilities) && isMounted) {
