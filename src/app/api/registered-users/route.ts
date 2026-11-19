@@ -13,9 +13,10 @@ export async function OPTIONS() {
 }
 
 function getSupabaseConfig() {
-  const url =
+  const rawUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
     "https://gwdyyuezddpbgmmdwiey.supabase.co";
+  let url = rawUrl.trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "").replace(/\/rest$/i, "");
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||

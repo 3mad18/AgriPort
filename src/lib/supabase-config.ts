@@ -4,9 +4,14 @@
  * always connect to Supabase Cloud even if dashboard environment variables are pending.
  */
 
-export const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  "https://gwdyyuezddpbgmmdwiey.supabase.co";
+export function cleanSupabaseUrl(rawUrl?: string): string {
+  let url = (rawUrl || "https://gwdyyuezddpbgmmdwiey.supabase.co").trim();
+  url = url.replace(/\/+$/, "");
+  url = url.replace(/\/rest\/v1$/i, "").replace(/\/rest$/i, "");
+  return url;
+}
+
+export const SUPABASE_URL = cleanSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
 export const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||

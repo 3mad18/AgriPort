@@ -39,8 +39,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "خرشوف مصري طازج ومجهز مطابق للمواصفات التصديرية للاتحاد الأوروبي والأسواق الدولية. يتميز بأقماع مدمجة صلبة وقلوب غنية خالية من الألياف، يقطف يدوياً بعناية في الصباح الباكر مع تطبيق التبريد الأولي الفوري Pre-cooling لضمان النضارة التامة.",
     images: [
       "/images/products/artichoke.jpg",
-      "/images/facilities/artichoke-processing.jpg",
-      "/images/facilities/vegetable-farms.jpg",
     ],
   },
   {
@@ -61,8 +59,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "فاصوليا خضراء نقية نخب أول، تمتاز بقرون نضرة مستقيمة موحدة اللون وبدون خيوط أو تجويفات بذرية. تفرز وتعبأ يدوياً في محطات التعبئة المعتمدة لدينا مع خيارات تغليف مرنة للبانيتات والكراتين المبردة للشحن الجوي والبحري.",
     images: [
       "/images/products/green-beans.jpg",
-      "/images/facilities/broccoli-beans-packing.jpg",
-      "/images/facilities/vegetable-farms.jpg",
     ],
   },
   {
@@ -83,8 +79,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "رؤوس بروكلي عالية الجودة بزهيرات متراصة مشدودة بلون أخضر داكن غني، خالية تماماً من الاصفرار أو التفتح الزهري. يعبأ في صناديق بوليسترين عازلة مع تغطية بالثلج المجهري للحفاظ على الرطوبة والنضارة الفائقة طوال مسار الشحن.",
     images: [
       "/images/products/broccoli.jpg",
-      "/images/facilities/broccoli-beans-packing.jpg",
-      "/images/facilities/vegetable-farms.jpg",
     ],
   },
   {
@@ -105,7 +99,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "أقراص قرنبيط بيضاء نقية عالية الكثافة والصلابة بدون فراغات، محصودة في درجات النضج المثالية ومحمية بأوراق خارجية مشذبة أو مغلفة فردياً بغشاء مسامي مانع للرطوبة لحمايتها أثناء الشحن البحري والجوي.",
     images: [
       "/images/products/cauliflower.jpg",
-      "/images/facilities/vegetable-farms.jpg",
     ],
   },
   {
@@ -126,7 +119,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "كرنب أخضر صلب مجهز بعناية للتصدير الخارجي، رؤوس كروية متجانسة الأوزان بأوراق لامعة مشدودة، خالية من أي إصابات حشرية أو ميكانيكية، ومفرزة آلياً ومحملة على باليتات تبريد وفق المعايير الدولية.",
     images: [
       "/images/products/cabbage.jpg",
-      "/images/facilities/cabbage-packing.jpg",
     ],
   },
   {
@@ -147,7 +139,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "بطاطس مائدة وتصنيع شيبس مستخرجة من أراضٍ صحراوية بكر خالية من العفن البني ومطابقة للبروتوكولات الصارمة للاتحاد الأوروبي والمملكة المتحدة وروسيا والدول العربية. فرز وغسيل وتجفيف ومعايرة إلكترونية دقيقة.",
     images: [
       "/images/products/potatoes.jpg",
-      "/images/facilities/potatoes-packhouse.jpg",
     ],
   },
   {
@@ -168,7 +159,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "خس آيسبيرج وروماني عالي القرمشة والامتلاء الداخلي، محصود في الصباح الباكر ويخضع مباشرة لتقنية التبريد بالشفط الفراغي Vacuum Cooling لخفض حرارة اللب في دقائق وحماية الأوراق من التلف وضمان أطول فترة رف في أسواق الاستيراد.",
     images: [
       "/images/products/lettuce.jpg",
-      "/images/facilities/vegetable-farms.jpg",
     ],
   },
   {
@@ -189,7 +179,6 @@ export const EXPORT_CATALOG: ExportProduct[] = [
     description: "كرنب أحمر كروي ممتاز ذو لون بنفسجي داكن جذاب وبنية شديدة الكثافة، يمتاز بقدرة فائقة على تحمل فترات الشحن البحري الطويلة والاحتفاظ بالنضارة والقوام الصلب ومحتواه العالي من مضادات الأكسدة الطبيعية.",
     images: [
       "/images/products/red-cabbage.jpg",
-      "/images/facilities/cabbage-packing.jpg",
     ],
   },
 ];
